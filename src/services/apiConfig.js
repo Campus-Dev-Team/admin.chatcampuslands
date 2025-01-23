@@ -1,5 +1,5 @@
-const API_BASE_URL = "https://chatcampuslands.com:8443/chatbot--TEST/";
-const API_WEBSOCKET_URL = "wss://chatcampuslands.com:8443/chatbot--TEST/chat";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://chatcampuslands.com:8443/chatbot--TEST/";
+const API_WEBSOCKET_URL = import.meta.env.VITE_API_WEBSOCKET_URL || "wss://chatcampuslands.com:8443/chatbot--TEST/chat";
 
 export const endpoints = {
   login: `${API_BASE_URL}auth/login`,
