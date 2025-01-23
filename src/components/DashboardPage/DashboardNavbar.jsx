@@ -32,18 +32,21 @@ export const DashboardNavbar = () => {
   return (
     <div
       className={`fixed lg:relative lg:translate-x-0 inset-y-0 left-0 z-40
-        bg-slate-800/50 backdrop-blur-xl border-cyan-400/10
-        flex flex-col transform transition-all duration-300
-        ${isMenuOpen ? "translate-x-0" : "-translate-x-[calc(100%-6px)]"}
-        ${isCollapsed ? "lg:w-[64px]" : "lg:w-80"}
-        ${isLoaded ? "opacity-100 transition-opacity duration-700" : "opacity-0"}`}
+      bg-slate-800/50 backdrop-blur-xl border-cyan-400/10
+      flex flex-col transform transition-all duration-300
+      ${isMenuOpen ? "translate-x-0" : "-translate-x-[calc(100%-6px)]"}
+      ${isLoaded ? "opacity-100 transition-opacity duration-700" : "opacity-0"}`}
+      style={{
+        width: isCollapsed ? "64px" : "320px", // Ancho dinámico para animar
+        transition: "width 300ms ease-in-out", // Transición para el cambio de ancho
+      }}
     >
       {/* Botón hamburguesa (móvil) */}
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         className="lg:hidden fixed top-1/2 -translate-y-1/2 left-0 z-50 
-          w-6 h-12 bg-slate-800 text-white rounded-r-lg border-cyan-400/10 
-          hover:bg-slate-700 transition-all duration-200"
+        w-6 h-12 bg-slate-800 text-white rounded-r-lg border-cyan-400/10 
+        hover:bg-slate-700 transition-all duration-200"
       >
         {isMenuOpen ? <ChevronLeft /> : <ChevronRight />}
       </button>
@@ -51,12 +54,13 @@ export const DashboardNavbar = () => {
       {/* Botón colapso (desktop) */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="hidden lg:flex items-center justify-center fixed top-1/2 -translate-y-1/2 z-50 w-8 h-8 
-          bg-slate-800 text-white rounded-full shadow-sm border-cyan-400/10 
-          hover:bg-slate-700/90 transition-all duration-200"
+        className={`hidden lg:flex items-center justify-center fixed top-1/2 -translate-y-1/2 z-50 w-8 h-8 
+        bg-slate-800 text-white rounded-full shadow-sm border-cyan-400/10 
+        hover:bg-slate-700/90 transition-all duration-200 ${isCollapsed ? "translate-x-0 " : "translate-x-4"
+          }`}
         style={{
           left: isCollapsed ? "44px" : "284px",
-          transition: "all 300ms ease-in-out",
+          transition: "left 300ms ease-in-out", // Transición para la posición del botón
         }}
       >
         {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
@@ -72,7 +76,7 @@ export const DashboardNavbar = () => {
               ${isLoaded ? "opacity-100 transition-opacity duration-700" : "opacity-0"}`}
           >
             <LazyImage
-              src="https://camper-stories.s3.us-east-2.amazonaws.com/assets/iza-campus.webp"
+              src="https://camper-stories.s3.us-east-2.amazonaws.com/assets/iza-campus.webp "
               alt="Iza Campus"
               className="w-full h-full object-cover"
             />
@@ -88,9 +92,9 @@ export const DashboardNavbar = () => {
       {/* Filtros, Estadísticas y Reporte */}
       {!isCollapsed && (
         <div
-          className={`px-6 flex-1 space-y-3 transition-opacity duration-700 ${
-            isLoaded ? "opacity-100" : "opacity-0"
-          }`}
+          className={`px-6 flex-1 space-y-3 transition-opacity duration-700 ${isLoaded ? "opacity-100" : "opacity-0"
+            }`}
+          
         >
           <div className="flex flex-col justify-items-start ml-3">
             {/* Selector de Fecha de Inicio */}
@@ -99,7 +103,7 @@ export const DashboardNavbar = () => {
               <input
                 type="date"
                 className="w-full px-3 py-2 bg-[#2A303C] text-white rounded-lg border border-[#00D8D6]
-                   focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
+             focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
               />
             </div>
 
@@ -109,7 +113,7 @@ export const DashboardNavbar = () => {
               <input
                 type="date"
                 className="w-full px-3 py-2 bg-[#2A303C] text-white rounded-lg border border-[#00D8D6]
-                   focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
+             focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
               />
             </div>
           </div>
@@ -117,7 +121,7 @@ export const DashboardNavbar = () => {
           {/* Botón Aplicar Filtro */}
           <button
             className="w-full mt-4 px-4 py-2 bg-cyan-400 text-white rounded-lg font-semibold hover:bg-cyan-500/90
-               transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+         transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
           >
             Aplicar Filtro
           </button>
@@ -125,7 +129,7 @@ export const DashboardNavbar = () => {
           {/* Botón Descargar Reporte */}
           <button
             className="w-full mt-4 px-4 py-2 bg-[#2A303C] text-white rounded-lg font-semibold hover:bg-[#1B2430]/90
-               border border-cyan-400 hover:bg-cyan-500/10 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+         border border-cyan-400 hover:bg-cyan-500/10 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
             onClick={() => {
               console.log("Descargando reporte...");
             }}
@@ -135,11 +139,11 @@ export const DashboardNavbar = () => {
         </div>
       )}
 
+
       {/* Botón Logout */}
       <div
-        className={`p-6 border-t border-cyan-400/10 flex flex-col transition-opacity duration-700 ${
-          isLoaded ? "opacity-100" : "opacity-0"
-        }`}
+        className={`p-6 border-t border-cyan-400/10 flex flex-col transition-opacity duration-700 ${isLoaded ? "opacity-100" : "opacity-0"
+          }`}
       >
         <button
           onClick={handleLogout}

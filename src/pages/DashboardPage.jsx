@@ -1,4 +1,4 @@
-import { ChatContainer } from '../components/DashboardPage/ChatContainer';
+import { DashboardContainer } from '../components/DashboardPage/DashboardContainer';
 import { DashboardHeader } from '../components/DashboardPage/DashboardHeader';
 import { DashboardNavbar } from '../components/DashboardPage/DashboardNavbar';
 import { ChatProvider } from '../context/ChatContext';
@@ -10,7 +10,7 @@ export const DashboardPage = () => {
         <DashboardNavbar />
         <div className="flex-1 flex flex-col min-h-0">
           <DashboardHeader />
-          <ChatContainer />
+          <DashboardContainer />
         </div>
       </div>
     </ChatProvider>
