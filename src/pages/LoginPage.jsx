@@ -1,94 +1,20 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Mail, Lock } from "lucide-react";
+import React, { useState } from "react";
+import { Lock } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import campushm from "../assets/Campushm.png";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/loginService";
-import { register } from "@/services/registerService";
 import { useAuth } from "@/context/AuthContext";
-
-const phoneInputStyles = {
-  container: `flex-1 min-w-0 block w-full`,
-  input: `w-full px-3 py-2 rounded-r-lg bg-[#2A303C] text-white
-          border border-[#00D8D6] focus:ring-2 focus:ring-[#00D8D6] focus:ring-offset-0
-          transition-all duration-200 hover:bg-[#2A303C]/80`,
-};
-
-const customPhoneStyles = `
-  .iti__selected-dial-code {
-    color: white !important;
-  }
-`;
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const phoneInputRef = useRef(null);
-  const itiRef = useRef(null);
-  const [formData, setFormData] = useState({
-    telefono: "",
-    username: "",
-    city: "",
-  });
-  const [updatedFormData, setUpdatedFormData] = useState({
-    telefono: "",
-    username: "",
-    city: "",
-  });
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const cities = ["Bucaramanga", "Bogotá"];
   const { loginStorage } = useAuth();
 
-  useEffect(() => {
-    const styleSheet = document.createElement("style");
-    styleSheet.textContent = customPhoneStyles;
-    document.head.appendChild(styleSheet);
-
-    if (phoneInputRef.current && window.intlTelInput) {
-      itiRef.current = window.intlTelInput(phoneInputRef.current, {
-        separateDialCode: true,
-        initialCountry: "co",
-        preferredCountries: ["co"],
-        onlyCountries: ["co"], // Solo permitir Colombia
-        allowDropdown: false, // Deshabilitar el dropdown de países
-      });
-    }
-
-    return () => {
-      if (itiRef.current) {
-        itiRef.current.destroy();
-      }
-      // Limpiar los estilos al desmontar
-      document.head.removeChild(styleSheet);
-    };
-  }, []);
-
-  const validarTelefono = (numero) => {
-    if (!numero) return null;
-
-    // Convertir a string y eliminar todo lo que no sea número
-    let numeroLimpio = numero.toString().replace(/\D/g, "");
-
-    // Si ya tiene el prefijo 57, dejarlo como está
-    if (numeroLimpio.startsWith("57")) {
-      return numeroLimpio;
-    }
-
-    // Si es un número válido de Colombia (10 dígitos comenzando con 3)
-    if (numeroLimpio.length === 10 && numeroLimpio.startsWith("3")) {
-      // Agregar el prefijo 57
-      return `57${numeroLimpio}`;
-    }
-
-    return null;
-  };
-
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setPassword(e.target.value);
     if (error) setError("");
   };
 
@@ -97,68 +23,18 @@ const LoginPage = () => {
     setError("");
     setIsLoading(true);
 
-    // Obtener el número completo con el código de país
-    const phoneNumber = itiRef.current
-      ? itiRef.current.getNumber()
-      : formData.phone;
-    const validatedPhone = validarTelefono(phoneNumber);
-
-    if (!validatedPhone) {
-      setError("Por favor, ingresa un número de teléfono colombiano válido");
-      setIsLoading(false);
-      return;
-    }
-
-    setUpdatedFormData({
-      ...formData,
-      telefono: validatedPhone,
-    });
-
     try {
-      console.log("ciudad de usuario", formData.city);
+      // Intentar iniciar sesión
+      await login({ "id": 0, "username":password, "telefono": 11192006, "role": "ADMIN"});
 
-      console.log(
-        "telefono a enviar",
-        validatedPhone,
-        "//",
-        updatedFormData.telefono
-      );
-
-      console.log("formdata updated", updatedFormData);
-
-      await login({
-        ...formData,
-        telefono: validatedPhone
-      });
-
-      console.log('telefono a enviar', validatedPhone, "//", updatedFormData.phone)
-      loginStorage(formData.username, formData.city);
-      localStorage.setItem('city', formData.city);
-      navigate("/chat");
+      // Guardar sesión y redirigir
+      loginStorage("ADMIN", "Campuslands");
+      navigate("/dashboard");
     } catch (error) {
-      try {
-        const response = await register({
-          ...formData,
-          telefono: validatedPhone
-        });
-        if (response) {
-          
-          loginStorage(formData.username, formData.city);
-          navigate("/chat");
-          return;
-        }
-      } catch (registerError) {
-        console.error("Error en registro:", registerError);
-        setError("Error en el registro. Verifica tus datos.");
-      }
-
       if (error.response) {
         switch (error.response.status) {
           case 401:
-            setError("Credenciales inválidas");
-            break;
-          case 404:
-            setError("Usuario no encontrado");
+            setError("Contraseña incorrecta");
             break;
           default:
             setError("Error al iniciar sesión. Intente nuevamente");
@@ -194,7 +70,7 @@ const LoginPage = () => {
             </div>
 
             <h1 className="text-xl sm:text-2xl font-bold text-white mb-8">
-              ¡Bienvenido a Campuslands!
+              ¡Bienvenido al Panel Administrativo!
             </h1>
 
             {error && <div className="mb-4 text-red-400 text-sm">{error}</div>}
@@ -202,47 +78,7 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label className="text-white text-left block text-sm">
-                  Teléfono
-                </Label>
-                <div className="flex">
-                  <input
-                    type="tel"
-                    name="telefono"
-                    ref={phoneInputRef}
-                    required
-                    className={phoneInputStyles.input}
-                    placeholder="321 1234567"
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-white text-left block text-sm">
-                  Nombre y Apellido
-                </Label>
-                <div className="relative group">
-                  <Mail
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#A1A1AA] 
-                    group-hover:text-[#00D8D6] transition-colors duration-200"
-                    size={18}
-                  />
-                  <input
-                    type="text"
-                    name="username"
-                    required
-                    className="w-full py-2.5 px-4 pl-9 bg-[#2A303C] rounded-lg text-white 
-                      text-sm focus:outline-none focus:ring-2 focus:ring-[#00D8D6] 
-                      focus:ring-offset-0 transition-all duration-200 hover:bg-[#2A303C]/80"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-white text-left block text-sm">
-                  Ciudad
+                  Contraseña
                 </Label>
                 <div className="relative group">
                   <Lock
@@ -250,22 +86,17 @@ const LoginPage = () => {
                       group-hover:text-[#00D8D6] transition-colors duration-200"
                     size={18}
                   />
-                  <select
-                    name="city"
+                  <input
+                    type="password"
+                    name="password"
                     required
                     className="w-full py-2.5 px-4 pl-9 bg-[#2A303C] rounded-lg text-white 
-                           text-sm focus:outline-none focus:ring-2 focus:ring-[#00d8d4] 
-                           focus:ring-offset-0 transition-all duration-200 hover:bg-[#2A303C]/80"
-                    value={formData.city}
+                      text-sm focus:outline-none focus:ring-2 focus:ring-[#00D8D6] 
+                      focus:ring-offset-0 transition-all duration-200 hover:bg-[#2A303C]/80"
+                    value={password}
                     onChange={handleInputChange}
-                  >
-                    <option value="">Seleccione su ciudad</option>
-                    {cities.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="Ingrese su contraseña"
+                  />
                 </div>
               </div>
 
@@ -276,11 +107,10 @@ const LoginPage = () => {
                      cursor-pointer transition-all duration-300 
                      text-white font-semibold transform hover:scale-[1.02]
                      active:scale-[0.98] hover:shadow-lg
-                       ${
-                         isLoading
-                           ? "bg-cyan-400 cursor-not-allowed"
-                           : "bg-cyan-400 hover:bg-cyan-500/90"
-                       }`}
+                       ${isLoading
+                    ? "bg-cyan-400 cursor-not-allowed"
+                    : "bg-cyan-400 hover:bg-cyan-500/90"
+                  }`}
               >
                 {isLoading ? "Iniciando sesión..." : "Ingresar"}
               </button>

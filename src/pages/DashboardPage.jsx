@@ -1,10 +1,9 @@
-import React from 'react';
+import { ChatContainer } from '../components/DashboardPage/ChatContainer';
+import { ChatHeader } from '../components/DashboardPage/ChatHeader';
+import { ChatNavbar } from '../components/DashboardPage/ChatNavbar';
 import { ChatProvider } from '../context/ChatContext';
-import { ChatNavbar } from '../components/ChatPage/ChatNavbar';
-import { ChatHeader } from '../components/ChatPage/ChatHeader';
-import { ChatContainer } from '../components/ChatPage/ChatContainer';
 
-export const ChatPage = () => {
+export const DashboardPage = () => {
   return (
     <ChatProvider>
       <div className="h-screen flex flex-col lg:flex-row overflow-hidden bg-slate-900">
