@@ -1,6 +1,5 @@
-import React from "react"
 
-export const ChatHeader = () => {
+export const DashboardHeader = () => {
   return (
     <div className="bg-slate-800/30 backdrop-blur-xl px-4 py-3 relative">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
