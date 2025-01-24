@@ -26,9 +26,9 @@ const AppRouter = () => {
             <Route
                 path="/dashboard"
                 element={
-                    <ProtectedRoute>
+                    // <ProtectedRoute>
                         <DashboardPage />
-                    </ProtectedRoute>
+                    // </ProtectedRoute>
                 }
             />
 

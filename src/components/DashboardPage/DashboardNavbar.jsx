@@ -89,56 +89,7 @@ export const DashboardNavbar = () => {
         </div>
       </div>
 
-      {/* Filtros, Estadísticas y Reporte */}
-      {!isCollapsed && (
-        <div
-          className={`px-6 flex-1 space-y-3 transition-opacity duration-700 ${isLoaded ? "opacity-100" : "opacity-0"
-            }`}
-          
-        >
-          <div className="flex flex-col justify-items-start ml-3">
-            {/* Selector de Fecha de Inicio */}
-            <div>
-              <label className="text-white/70 text-sm block mb-1">Fecha Inicio</label>
-              <input
-                type="date"
-                className="w-full px-3 py-2 bg-[#2A303C] text-white rounded-lg border border-[#00D8D6]
-             focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
-              />
-            </div>
-
-            {/* Selector de Fecha de Fin */}
-            <div>
-              <label className="text-white/70 text-sm block mb-1">Fecha Fin</label>
-              <input
-                type="date"
-                className="w-full px-3 py-2 bg-[#2A303C] text-white rounded-lg border border-[#00D8D6]
-             focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
-              />
-            </div>
-          </div>
-
-          {/* Botón Aplicar Filtro */}
-          <button
-            className="w-full mt-4 px-4 py-2 bg-cyan-400 text-white rounded-lg font-semibold hover:bg-cyan-500/90
-         transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          >
-            Aplicar Filtro
-          </button>
-
-          {/* Botón Descargar Reporte */}
-          <button
-            className="w-full mt-4 px-4 py-2 bg-[#2A303C] text-white rounded-lg font-semibold hover:bg-[#1B2430]/90
-         border border-cyan-400 hover:bg-cyan-500/10 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            onClick={() => {
-              console.log("Descargando reporte...");
-            }}
-          >
-            Descargar Reporte
-          </button>
-        </div>
-      )}
-
+     
 
       {/* Botón Logout */}
       <div
