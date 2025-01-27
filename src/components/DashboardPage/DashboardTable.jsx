@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FiltrosReportes } from './FiltrosReportes';
 import { TarjetaContador } from './TarjetaContador';
 
-export const DashboardContainer = () => {
+export const DashboardTable = () => {
 
   const [selectedUser, setSelectedUser] = useState(null); // Usuario seleccionado para el modal
   const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal

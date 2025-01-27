@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
@@ -9,35 +10,27 @@ import {
   BarChart2,
   HelpCircle,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { LazyImage } from "../common/LazyImage";
-import { GeneralConsult } from "./GeneralConsult"; // Importamos el componente de Consulta General
 
 export const DashboardNavbar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation(); // Hook para obtener la ruta actual
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [activeView, setActiveView] = useState("general"); // Estado para controlar la vista activa
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 50);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleLogout = () => {
     logout();
     navigate("/auth/login");
   };
 
-
-
   const menuItems = [
+    {
+      icon: <BarChart2 className="h-5 w-5" />,
+      label: "Reportes",
+      path: "/dashboard",
+    },
     {
       icon: <HelpCircle className="h-5 w-5" />,
       label: "Consulta General",
@@ -46,26 +39,19 @@ export const DashboardNavbar = () => {
     {
       icon: <MessageCircle className="h-5 w-5" />,
       label: "Mensajes",
-      path: "messages",
+      path: "/dashboard/messages",
     },
     {
       icon: <Settings className="h-5 w-5" />,
       label: "Configuración",
-      path: "settings",
+      path: "/dashboard/settings",
     },
     {
       icon: <Users className="h-5 w-5" />,
       label: "Usuarios",
-      path: "users",
-    },
-    {
-      icon: <BarChart2 className="h-5 w-5" />,
-      label: "Reportes",
-      path: "reports",
+      path: "/dashboard/users",
     },
   ];
-
-
 
   return (
     <>
@@ -79,26 +65,12 @@ export const DashboardNavbar = () => {
         {isMenuOpen ? <ChevronLeft /> : <ChevronRight />}
       </button>
 
-      {/* Botón colapso (desktop) */}
-      <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="hidden lg:flex justify-center items-center fixed top-1/2 -translate-y-1/2 z-50 w-8 h-8 
-        bg-slate-800 text-white rounded-full shadow-sm border-cyan-400/10 
-        hover:bg-slate-700/90 transition-all duration-200"
-        style={{
-          left: isCollapsed ? "44px" : "284px",
-          transition: "all 300ms ease-in-out",
-        }}
-      >
-        {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
-      </button>
-
       {/* Navbar */}
       <div
         className={`fixed lg:relative lg:translate-x-0 inset-y-0 left-0 z-40
                   bg-slate-800/50 backdrop-blur-xl border-cyan-400/10
                   flex flex-col transform transition-all duration-300
-                  ${isMenuOpen ? "translate-x-0" : "-translate-x-[calc(100%-6px)]"}
+                  ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}
                   ${isCollapsed ? "lg:w-[64px]" : "lg:w-80"}`}
       >
         {/* Contenido del navbar */}
@@ -107,11 +79,10 @@ export const DashboardNavbar = () => {
             <div
               className={`ring-2 ring-cyan-400/20 rounded-full bg-slate-800 
               flex items-center justify-center overflow-hidden
-              ${isCollapsed ? "h-12 w-12" : "h-28 w-28"}
-              ${isLoaded ? "opacity-100 transition-opacity duration-700" : "opacity-0"}`}
+              ${isCollapsed ? "h-12 w-12" : "h-28 w-28"}`}
             >
               <LazyImage
-                src="https://camper-stories.s3.us-east-2.amazonaws.com/assets/iza-campus.webp "
+                src="https://camper-stories.s3.us-east-2.amazonaws.com/assets/iza-campus.webp"
                 alt="Iza Campus"
                 className="w-full h-full object-cover"
               />
@@ -130,8 +101,11 @@ export const DashboardNavbar = () => {
             <button
               key={index}
               onClick={() => navigate(item.path)}
-              className={`w-full flex items-center px-4 py-2 text-white/70 hover:text-cyan-400 hover:bg-cyan-400/5 rounded-lg 
-              group transition-all duration-300 ${isCollapsed ? "justify-center" : ""}`}
+              className={`w-full flex items-center px-4 py-2 rounded-lg 
+                group transition-all duration-300 ${location.pathname === item.path
+                  ? "bg-cyan-400/10 text-cyan-400"
+                  : "text-white/70 hover:text-cyan-400 hover:bg-cyan-400/5"
+                } ${isCollapsed ? "justify-center" : ""}`}
             >
               {item.icon}
               {!isCollapsed && <span className="ml-3">{item.label}</span>}
@@ -139,13 +113,13 @@ export const DashboardNavbar = () => {
           ))}
         </div>
 
-        {/* Cerrar session*/}
-        <div className="p-6 border-t border-cyan-400/10 flex flex-col space-y-6">
+        {/* Cerrar sesión */}
+        <div className="p-6 border-t border-cyan-400/10 flex flex-col">
           <button
             onClick={handleLogout}
-            className={`w-full flex items-center justify-center px-4 py-1 text-white/70 hover:text-red-400 hover:bg-red-400/5 rounded-lg 
-                   group transition-all duration-300
-                   ${isCollapsed ? "justify-center" : ""}`}
+            className={`w-full flex items-center justify-center px-4 py-2 text-white/70 hover:text-red-400 hover:bg-red-400/5 rounded-lg 
+                     group transition-all duration-300
+                     ${isCollapsed ? "justify-center" : ""}`}
           >
             <LogOut className={`h-5 w-5 ${isCollapsed ? "" : "mr-3"}`} />
             {!isCollapsed && <span>Cerrar Sesión</span>}
@@ -161,7 +135,5 @@ export const DashboardNavbar = () => {
         />
       )}
     </>
-
-
   );
 };
