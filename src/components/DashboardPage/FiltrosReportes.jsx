@@ -9,7 +9,6 @@ export const FiltrosReportes = ({ onDataFetched }) => {
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]); // Valor por defecto como la fecha de hoy
     const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]); // Valor por defecto como la fecha de hoy
     const [isLoading, setIsLoading] = useState(false);
-    const [filteredData, setFilteredData] = useState([]); // Para almacenar los datos filtrados
 
     useEffect(() => {
         // Simulamos un retraso de 500ms para la animación de opacidad
@@ -35,36 +34,6 @@ export const FiltrosReportes = ({ onDataFetched }) => {
         });
     };
 
-    const fetchDataFromJson = (startDate, endDate) => {
-        try {
-            setIsLoading(true);
-
-            const startDateFormatted = new Date(startDate).toISOString().split('T')[0];
-            const endDateFormatted = new Date(endDate).toISOString().split('T')[0];
-
-            // Filtrar los datos del JSON según las fechas seleccionadas
-            const filteredData = jsonData.filter(item => {
-                let messageTime = item.Messages.map(message => {
-                    const date = new Date(message.Time);
-                    return isNaN(date) ? new Date('1970-01-01T00:00:00Z') : date;
-                });
-
-                return messageTime.some(date => {
-                    const itemDate = date.toISOString().split('T')[0];
-                    return itemDate >= startDateFormatted && itemDate <= endDateFormatted;
-                });
-            });
-
-            console.log(filteredData);
-            setFilteredData(normalizeData(filteredData)); // Actualizamos los datos filtrados
-            onDataFetched(normalizeData(filteredData)); // Llamamos a la función del padre con los datos filtrados
-            setIsLoading(false);
-        } catch (error) {
-            console.log('Error al consultar el JSON:', error);
-            setIsLoading(false);
-        }
-    };
-
     const fetchData = async () => {
         if (!startDate || !endDate) {
             console.error("Las fechas de inicio y fin son necesarias");
@@ -77,7 +46,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
             const startDateFormatted = new Date(startDate).toISOString().split('T')[0];
             const endDateFormatted = new Date(endDate).toISOString().split('T')[0];
 
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}admin/users/today`, {
+            const responseUsers = await axios.get(`${import.meta.env.VITE_API_BASE_URL}admin/users/today`, {
                 params: {
                     start: startDateFormatted,
                     end: endDateFormatted,
@@ -86,12 +55,23 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                 headers: myHeaders(),
             });
 
-            if (!response.data || response.data.length === 0) {
-                fetchDataFromJson(startDateFormatted, endDateFormatted);
+            if (!responseUsers.data || responseUsers.data.length === 0) {
+               throw new Error(responseUsers?.status)
             } else {
-                console.log('Data encontrada desde el backend:', response.data);
-                setFilteredData(normalizeData(response.data));
-                onDataFetched(normalizeData(response.data)); // Llamamos a la función del padre con los datos filtrados
+                const responseMessages = await axios.get(`${import.meta.env.VITE_API_BASE_URL}admin/messages/today`, {
+                    params: {
+                        start: startDateFormatted,
+                        end: endDateFormatted,
+                        city: 'Bucaramanga'
+                    },
+                    headers: myHeaders(),
+                });
+                if (!responseMessages.data || responseMessages.data.length === 0) {
+                    throw new Error(responseUsers?.status)
+                } else {
+                    onDataFetched(normalizeData(responseUsers.data, responseMessages.data)); // Llamamos a la función del padre con los datos filtrados
+                }
+
             }
             setIsLoading(false);
         } catch (error) {
@@ -101,28 +81,51 @@ export const FiltrosReportes = ({ onDataFetched }) => {
         }
     };
 
-    const normalizeData = (data) => {
+    const normalizeData = (usersData, messagesData) => {
         const normalizedData = {};
-        data.forEach(user => {
-            const phone = user.PhoneNumber;
-            const validMessages = user.Messages.filter(message => {
-                return message.MessageId !== phone && message.Message !== user.Username;
-            });
 
-            if (normalizedData[phone]) {
-                validMessages.forEach(message => {
-                    if (!normalizedData[phone].Messages.some(existingMessage => existingMessage.MessageId === message.MessageId)) {
-                        normalizedData[phone].Messages.push(message);
-                    }
-                });
-            } else {
-                normalizedData[phone] = { ...user, Messages: validMessages };
+        // Crear un mapa de mensajes agrupados por userId
+        const messagesByUserId = messagesData.reduce((acc, message) => {
+            if (!acc[message.userId]) {
+                acc[message.userId] = [];
             }
-            normalizedData[phone].messageCount = normalizedData[phone].Messages.length;
+            acc[message.userId].push({
+                Message: message.content,
+                MessageId: message.messageId,
+                Time: message.messageTime,
+            });
+            return acc;
+        }, {});
+
+        // Procesar los usuarios y asociarles los mensajes correspondientes
+        usersData.forEach(user => {
+            const userId = user.id;
+            const phoneNumber = user.telefono;
+
+            // Filtrar mensajes válidos
+            const validMessages = (messagesByUserId[userId] || []).filter(
+                message => message.MessageId !== phoneNumber && message.Message !== user.username
+            );
+
+            // Agregar usuario al resultado normalizado
+            normalizedData[userId] = {
+                UserId: userId,
+                Username: user.username.trim(),
+                PhoneNumber: phoneNumber,
+                Age: user.age,
+                Availability: user.availability,
+                ContactWay: user.contact_way,
+                Messages: validMessages,
+            };
+
+            // Agregar conteo de mensajes
+            normalizedData[userId].messageCount = validMessages.length;
         });
+
         return Object.values(normalizedData);
     };
 
+    
     const handleDownload = () => {
         const ws = XLSX.utils.json_to_sheet(filteredData);
         const wb = XLSX.utils.book_new();

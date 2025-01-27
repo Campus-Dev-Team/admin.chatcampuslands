@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
       port: parseInt(env.VITE_PORT_FRONTEND, 10) || 3000, // Puerto del frontend desde variables de entorno o 3000 por defecto
       proxy: {
         '/api': {
-          target: env.VITE_API_BASE_URL || 'https://chatcampuslands.com:8443/chatbot--TEST/', // URL base para el backend
+          target: env.VITE_API_BASE_URL || 'https://chatcampuslands.com:8443/chatbot/', // URL base para el backend
           changeOrigin: true, // Cambiar el origen del encabezado Host
           secure: true, // Asegurar que las solicitudes sean HTTPS
         },
