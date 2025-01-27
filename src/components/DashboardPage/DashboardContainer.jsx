@@ -3,56 +3,10 @@ import { FiltrosReportes } from './FiltrosReportes';
 import { TarjetaContador } from './TarjetaContador';
 
 export const DashboardContainer = () => {
-  // Datos de ejemplo
-  const totalMessages = 1240; // Contador de mensajes
-  const totalUsers = 320; // Contador de usuarios
-  const userList = [
-    {
-      id: 1,
-      name: "Juan Pérez",
-      phone: "300-123-4567",
-      age: 25,
-      availability: "Available",
-      contactWay: "Email",
-      messagesSent: 45,
-      messages: [
-        { id: "m1", content: "Hola", time: "10:15 AM" },
-        { id: "m2", content: "¿Cómo estás?", time: "10:20 AM" },
-        { id: "m3", content: "Nos vemos mañana", time: "10:30 AM" },
-      ],
-    },
-    {
-      id: 2,
-      name: "Ana Gómez",
-      phone: "311-987-6543",
-      age: 30,
-      availability: "Busy",
-      contactWay: "Phone",
-      messagesSent: 60,
-      messages: [
-        { id: "m1", content: "Hola", time: "9:00 AM" },
-        { id: "m2", content: "Estoy ocupada", time: "9:15 AM" },
-        { id: "m3", content: "Te llamo luego", time: "9:30 AM" },
-      ],
-    },
-    {
-      id: 3,
-      name: "Carlos Torres",
-      phone: "322-654-7890",
-      age: 28,
-      availability: "Available",
-      contactWay: "WhatsApp",
-      messagesSent: 30,
-      messages: [
-        { id: "m1", content: "Buenas tardes", time: "3:00 PM" },
-        { id: "m2", content: "Gracias por tu ayuda", time: "3:15 PM" },
-      ],
-    },
-  ];
 
   const [selectedUser, setSelectedUser] = useState(null); // Usuario seleccionado para el modal
   const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
-  const [filteredData, setFilteredData] = useState(userList); // Usar los datos filtrados o el JSON simulado
+  const [filteredData, setFilteredData] = useState([]); // Usar los datos filtrados o el JSON simulado
 
   const openModal = (user) => {
     setSelectedUser(user);
@@ -66,7 +20,6 @@ export const DashboardContainer = () => {
 
   // Función que maneja los datos obtenidos después de aplicar los filtros
   const handleDataFetched = (fetchedData) => {
-    console.log('Datos filtrados:', fetchedData);
     setFilteredData(fetchedData);
   };
 
@@ -88,7 +41,6 @@ export const DashboardContainer = () => {
               <th className="px-4 py-2">Teléfono</th>
               <th className="px-4 py-2">Edad</th>
               <th className="px-4 py-2">Disponibilidad</th>
-              <th className="px-4 py-2">Método de Contacto</th>
               <th className="px-4 py-2">Mensajes Enviados</th>
               <th className="px-4 py-2">Ciudad</th>
               <th className="px-4 py-2">Acciones</th>
@@ -96,7 +48,7 @@ export const DashboardContainer = () => {
           </thead>
           <tbody>
             {filteredData.map((user) => (
-              <tr key={user.id} className="border-b border-gray-600 hover:bg-[#3B3F47]">
+              <tr key={user.UserId} className="border-b border-gray-600 hover:bg-[#3B3F47]">
                 <td className="px-4 py-2">{user.UserId}</td>
                 <td className="px-4 py-2">{user.Username}</td>
                 <td className="px-4 py-2">{user.PhoneNumber}</td>
@@ -107,9 +59,8 @@ export const DashboardContainer = () => {
                 >
                   {user.Availability}
                 </td>
-                <td className="px-4 py-2">{user.ContactWay}</td>
                 <td className="px-4 py-2 text-center">{user.messageCount || 'No disponible'}</td>
-                <td className="px-4 py-2 text-center">{user.City || 'No disponible'}</td>
+                <td className="px-4 py-2 text-center">{user.city || 'No disponible'}</td>
                 <td className="px-4 py-2">
                   <button
                     className="px-4 py-1 bg-color-primary text-white rounded-lg hover:bg-color-primary-hover transition-all duration-300"
@@ -121,6 +72,7 @@ export const DashboardContainer = () => {
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
 
@@ -158,6 +110,7 @@ export const DashboardContainer = () => {
                   </tr>
                 ))}
               </tbody>
+
             </table>
 
           </div>
