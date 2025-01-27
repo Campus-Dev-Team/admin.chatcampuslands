@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { DashboardPage } from '../pages/DashboardPage';
 import LoginPage from '../pages/LoginPage';
 import { ProtectedRoute } from '../router/ProtectedRoute';
+import { GeneralConsult } from '../components/DashboardPage/GeneralConsult';
 
 const AppRouter = () => {
     const { isAuthenticated } = useAuth();
@@ -30,6 +31,12 @@ const AppRouter = () => {
                         <DashboardPage />
                     // </ProtectedRoute>
                 }
+            />  
+
+            {/* Ruta para consulta general */}
+            <Route 
+                path="/dashboard/general"  
+                element={<GeneralConsult />} 
             />
 
             {/* Ruta para cualquier otra dirección */}
