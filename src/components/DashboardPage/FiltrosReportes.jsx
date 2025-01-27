@@ -74,7 +74,6 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                     const normalizedData = (normalizeData(responseUsers.data, responseMessages.data));
                     onDataFetched(normalizedData); // Llamamos a la función del padre con los datos filtrados
                     setFilteredData(normalizedData);
-                    console.log(filteredData);
                 }
 
             }
