@@ -4,45 +4,49 @@ import { DashboardPage } from '../pages/DashboardPage';
 import LoginPage from '../pages/LoginPage';
 import { ProtectedRoute } from '../router/ProtectedRoute';
 import { GeneralConsult } from '../components/DashboardPage/GeneralConsult';
+import { DashboardTable } from '../components/DashboardPage/DashboardTable';
 
 const AppRouter = () => {
-    const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
-    return (
-        <Routes>
-            {/* Ruta por defecto */}
-            <Route path="/" element={
-                isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/auth/login" />
-            } />
+  return (
+    <Routes>
+      {/* Ruta por defecto */}
+      <Route path="/" element={
+        isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/auth/login" />
+      } />
 
-            {/* Ruta de login */}
-            <Route
-                path="/auth/login"
-                element={
-                    isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />
-                }
-            />
+      {/* Ruta de login */}
+      <Route
+        path="/auth/login"
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />
+        }
+      />
 
-            {/* Ruta protegida del chat */}
-            <Route
-                path="/dashboard"
-                element={
-                    <ProtectedRoute>
-                        <DashboardPage />
-                    </ProtectedRoute>
-                }
-            />  
+      {/* Rutas protegidas del dashboard */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      >
+        {/* Ruta por defecto del dashboard */}
+        <Route index element={<DashboardTable />} />
 
-            {/* Ruta para consulta general */}
-            <Route 
-                path="/dashboard/general"  
-                element={<GeneralConsult />} 
-            />
+        {/* Rutas específicas dentro del dashboard */}
+        <Route path="general" element={<GeneralConsult />} />
+        <Route path="settings" element={<div className='flex w-full h-full justify-center items-center text-white'>Pronto habra algo aquí ⚙️ </div>} />
+        <Route path="users" element={<div className='flex w-full h-full justify-center items-center text-white'>Pronto habra algo aquí 😊 </div>} />
+        <Route path="messages" element={<div className='flex w-full h-full justify-center items-center text-white'>Pronto habra algo aquí 💬 </div>} />
+      </Route>
 
-            {/* Ruta para cualquier otra dirección */}
-            <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-    );
+      {/* Ruta para cualquier otra dirección */}
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
 };
 
 export default AppRouter;

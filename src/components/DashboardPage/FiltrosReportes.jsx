@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import jsonData from './usuarios_mensajes.json';
 import * as XLSX from 'xlsx'; // Importamos la librería XLSX
 
 export const FiltrosReportes = ({ onDataFetched }) => {
