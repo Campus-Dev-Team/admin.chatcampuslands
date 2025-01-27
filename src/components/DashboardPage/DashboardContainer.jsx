@@ -41,7 +41,6 @@ export const DashboardContainer = () => {
               <th className="px-4 py-2">Teléfono</th>
               <th className="px-4 py-2">Edad</th>
               <th className="px-4 py-2">Disponibilidad</th>
-              <th className="px-4 py-2">Método de Contacto</th>
               <th className="px-4 py-2">Mensajes Enviados</th>
               <th className="px-4 py-2">Ciudad</th>
               <th className="px-4 py-2">Acciones</th>
@@ -60,9 +59,8 @@ export const DashboardContainer = () => {
                 >
                   {user.Availability}
                 </td>
-                <td className="px-4 py-2">{user.ContactWay}</td>
                 <td className="px-4 py-2 text-center">{user.messageCount || 'No disponible'}</td>
-                <td className="px-4 py-2 text-center">{user.City || 'No disponible'}</td>
+                <td className="px-4 py-2 text-center">{user.city || 'No disponible'}</td>
                 <td className="px-4 py-2">
                   <button
                     className="px-4 py-1 bg-color-primary text-white rounded-lg hover:bg-color-primary-hover transition-all duration-300"

@@ -9,6 +9,8 @@ export const FiltrosReportes = ({ onDataFetched }) => {
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]); // Valor por defecto como la fecha de hoy
     const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]); // Valor por defecto como la fecha de hoy
     const [isLoading, setIsLoading] = useState(false);
+    const [filteredData, setFilteredData] = useState([]); // Para almacenar los datos filtrados
+
 
     useEffect(() => {
         // Simulamos un retraso de 500ms para la animación de opacidad
@@ -56,7 +58,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
             });
 
             if (!responseUsers.data || responseUsers.data.length === 0) {
-               throw new Error(responseUsers?.status)
+                throw new Error(responseUsers?.status)
             } else {
                 const responseMessages = await axios.get(`${import.meta.env.VITE_API_BASE_URL}admin/messages/today`, {
                     params: {
@@ -69,7 +71,10 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                 if (!responseMessages.data || responseMessages.data.length === 0) {
                     throw new Error(responseUsers?.status)
                 } else {
-                    onDataFetched(normalizeData(responseUsers.data, responseMessages.data)); // Llamamos a la función del padre con los datos filtrados
+                    const normalizedData = (normalizeData(responseUsers.data, responseMessages.data));
+                    onDataFetched(normalizedData); // Llamamos a la función del padre con los datos filtrados
+                    setFilteredData(normalizedData);
+                    console.log(filteredData);
                 }
 
             }
@@ -116,6 +121,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                 Availability: user.availability,
                 ContactWay: user.contact_way,
                 Messages: validMessages,
+                city: user.city
             };
 
             // Agregar conteo de mensajes
@@ -125,11 +131,43 @@ export const FiltrosReportes = ({ onDataFetched }) => {
         return Object.values(normalizedData);
     };
 
-    
+
     const handleDownload = () => {
-        const ws = XLSX.utils.json_to_sheet(filteredData);
+        const usersData = filteredData
+        
+        // Convertir la información de los usuarios en formato adecuado para la hoja de usuarios
+        const usersSheetData = usersData.map(user => ({
+            UserId: user.UserId,
+            Username: user.Username,
+            PhoneNumber: user.PhoneNumber,
+            Age: user.Age,
+            Availability: user.Availability,
+            ContactWay: user.ContactWay,
+            City: user.city,
+            MessageCount: user.messageCount
+        }));
+
+        // Convertir la información de los mensajes en formato adecuado para la hoja de mensajes
+        const messagesSheetData = usersData.flatMap(user =>
+            user.Messages.map(message => ({
+                UserId: user.UserId,
+                Username: user.Username,
+                Message: message.Message,
+                MessageId: message.MessageId,
+                Time: message.Time
+            }))
+        );
+
+        // Crear las hojas del libro de trabajo
+        const wsUsers = XLSX.utils.json_to_sheet(usersSheetData);
+        const wsMessages = XLSX.utils.json_to_sheet(messagesSheetData);
+
+        // Crear un libro nuevo
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
+        XLSX.utils.book_append_sheet(wb, wsUsers, 'Usuarios');
+        XLSX.utils.book_append_sheet(wb, wsMessages, 'Mensajes');
+
+        // Escribir el archivo Excel
         XLSX.writeFile(wb, 'reporte.xlsx');
     };
 
