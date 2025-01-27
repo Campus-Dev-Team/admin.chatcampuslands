@@ -78,9 +78,16 @@ export const DashboardContainer = () => {
 
       {/* Modal */}
       {isModalOpen && selectedUser && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+          onClick={(e) => {
+            // Verificar si el clic ocurrió fuera del modal
+            if (e.target === e.currentTarget) {
+              closeModal();
+            }
+          }}
+        >
           <div className="bg-[#162033] p-6 rounded-lg shadow-lg text-white h-[420px] w-[920px] overflow-y-scroll scrollbar-custom">
-
             {/* Contenedor para el título y el botón */}
             <div className="flex flex-row justify-between items-center mb-4">
               <h3 className="text-xl font-bold">Mensajes de {selectedUser.Username}</h3>
@@ -110,12 +117,11 @@ export const DashboardContainer = () => {
                   </tr>
                 ))}
               </tbody>
-
             </table>
-
           </div>
         </div>
       )}
+
 
     </div>
   );
