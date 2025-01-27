@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { FiltrosReportes } from './FiltrosReportes';
+
 
 // Datos de ejemplo para los gráficos
 const exampleData = [
@@ -18,6 +19,12 @@ export const GeneralConsult = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [ciudad, setCiudad] = useState("Bogotá"); // Estado para la ciudad seleccionada
+  const [filteredData, setFilteredData] = useState([]); // Usar los datos filtrados o el JSON simulado
+
+  // Función que maneja los datos obtenidos después de aplicar los filtros
+  const handleDataFetched = (fetchedData) => {
+    setFilteredData(fetchedData);
+  };
 
   const handleDateChange = (dates) => {
     const [start, end] = dates;
@@ -35,11 +42,11 @@ export const GeneralConsult = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 bg-slate-900 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Consulta General</h2>
+    <div className="p-4 md:p-6 bg-slate-900 rounded-lg shadow-lg overflow-y-scroll scrollbar-custom">
+      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Informe de Conversión Iza ChatBot </h2>
 
       {/* Filtros: Ciudad y Fecha */}
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
+      <div className="flex flex-col md:flex-row gap-4 mb-8 items-center">
         {/* Filtro de Ciudad */}
         <div className="w-full md:w-1/2">
           <label className="block text-sm font-medium text-indigo-400 mb-2">
@@ -56,18 +63,8 @@ export const GeneralConsult = () => {
         </div>
 
         {/* Filtro de Fechas */}
-        <div className="w-full md:w-1/2">
-          <label className="block text-sm font-medium text-indigo-400 mb-2">
-            Selecciona un rango de fechas:
-          </label>
-          <DatePicker
-            selectsRange
-            startDate={startDate}
-            endDate={endDate}
-            onChange={handleDateChange}
-            className="w-full bg-slate-700 text-white p-2 rounded-lg"
-            dateFormat="dd/MM/yyyy"
-          />
+        <div>
+          <FiltrosReportes onDataFetched={handleDataFetched} />
         </div>
       </div>
 

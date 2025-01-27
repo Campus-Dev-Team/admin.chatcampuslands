@@ -199,8 +199,8 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                 </div>
 
                 <button
-                    className="px-4 py-1 sm:px-6 sm:py-2 lg:px-8 lg:py-3 bg-color-primary text-white rounded-lg font-semibold hover:bg-color-primary-hover
-                        transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base lg:text-lg"
+                    className=" px-4 py-1 sm:px-6 sm:py-1 lg:px-8 lg:py-2 bg-color-primary text-white rounded-lg font-semibold hover:bg-color-primary-hover
+                        transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base lg:text-md"
                     onClick={fetchData}
                     disabled={isLoading}
                 >
