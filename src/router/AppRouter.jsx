@@ -1,9 +1,8 @@
-import React from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
-import LoginPage from '../pages/LoginPage'
-import { ChatPage } from '../pages/ChatPage'
-import { ProtectedRoute } from '../router/ProtectedRoute';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { DashboardPage } from '../pages/DashboardPage';
+import LoginPage from '../pages/LoginPage';
+import { ProtectedRoute } from '../router/ProtectedRoute';
 
 const AppRouter = () => {
     const { isAuthenticated } = useAuth();
@@ -12,24 +11,24 @@ const AppRouter = () => {
         <Routes>
             {/* Ruta por defecto */}
             <Route path="/" element={
-                isAuthenticated ? <Navigate to="/chat" /> : <Navigate to="/auth/login" />
+                isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/auth/login" />
             } />
 
             {/* Ruta de login */}
             <Route
                 path="/auth/login"
                 element={
-                    isAuthenticated ? <Navigate to="/chat" /> : <LoginPage />
+                    isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />
                 }
             />
 
             {/* Ruta protegida del chat */}
             <Route
-                path="/chat"
+                path="/dashboard"
                 element={
-                    <ProtectedRoute>
-                        <ChatPage />
-                    </ProtectedRoute>
+                    // <ProtectedRoute>
+                        <DashboardPage />
+                    // </ProtectedRoute>
                 }
             />
 

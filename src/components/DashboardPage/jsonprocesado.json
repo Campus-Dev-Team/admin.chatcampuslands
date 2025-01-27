@@ -1,0 +1,462 @@
+[
+    {
+        "UserId": 248,
+        "Username": "Luis Miguel",
+        "PhoneNumber": 573505343701,
+        "Age": 26,
+        "Availability": "no",
+        "ContactWay": "mensaje",
+        "Messages": [
+            {
+                "Message": "Me gustaría inscribirme",
+                "MessageId": 2793,
+                "Time": "2025-01-23 13:18:17"
+            },
+            {
+                "Message": "que es campuslands",
+                "MessageId": 2796,
+                "Time": "2025-01-23 13:28:39"
+            },
+            {
+                "Message": "hola",
+                "MessageId": 2808,
+                "Time": "2025-01-23 15:11:39"
+            },
+            {
+                "Message": "que vale",
+                "MessageId": 2809,
+                "Time": "2025-01-23 15:11:56"
+            },
+            {
+                "Message": "puedo conseguir novio en campus",
+                "MessageId": 2834,
+                "Time": "2025-01-24 07:56:23"
+            },
+            {
+                "Message": "Luis Miguel",
+                "MessageId": 573505343701,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Luis Miguel",
+                "MessageId": 573505343701,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Luis Miguel",
+                "MessageId": 573505343701,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Luis Miguel",
+                "MessageId": 573505343701,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Luis Miguel",
+                "MessageId": 573505343701,
+                "Time": "1970-01-01 00:00:00"
+            }
+        ]
+    },
+    {
+        "UserId": 1236,
+        "Username": "santiago laguado osorio",
+        "PhoneNumber": 573157645002,
+        "Age": 20,
+        "Availability": "no",
+        "ContactWay": null,
+        "Messages": [
+            {
+                "Message": "quiero saber como funcionan los pagos",
+                "MessageId": 2787,
+                "Time": "2025-01-23 13:12:41"
+            },
+            {
+                "Message": "si",
+                "MessageId": 2789,
+                "Time": "2025-01-23 13:12:57"
+            },
+            {
+                "Message": "osea de a como quedan las cuotas con el plan campus",
+                "MessageId": 2790,
+                "Time": "2025-01-23 13:14:44"
+            },
+            {
+                "Message": "cuanto vale",
+                "MessageId": 2850,
+                "Time": "2025-01-24 09:12:09"
+            },
+            {
+                "Message": "santiago laguado osorio",
+                "MessageId": 573157645002,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "santiago laguado osorio",
+                "MessageId": 573157645002,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "santiago laguado osorio",
+                "MessageId": 573157645002,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "santiago laguado osorio",
+                "MessageId": 573157645002,
+                "Time": "1970-01-01 00:00:00"
+            }
+        ]
+    },
+    {
+        "UserId": 1262,
+        "Username": "Jhonatan lozada",
+        "PhoneNumber": 573173323999,
+        "Age": 26,
+        "Availability": "no",
+        "ContactWay": null,
+        "Messages": [
+            {
+                "Message": "Cómo puedo inscribirme",
+                "MessageId": 2826,
+                "Time": "2025-01-23 19:48:31"
+            },
+            {
+                "Message": "Jhonatan lozada",
+                "MessageId": 573173323999,
+                "Time": "1970-01-01 00:00:00"
+            }
+        ]
+    },
+    {
+        "UserId": 1263,
+        "Username": "Alexer Valero",
+        "PhoneNumber": 573008485579,
+        "Age": 22,
+        "Availability": "no",
+        "ContactWay": null,
+        "Messages": [
+            {
+                "Message": "Cuánto cuesta el curso",
+                "MessageId": 2827,
+                "Time": "2025-01-23 21:29:36"
+            },
+            {
+                "Message": "Alexer Valero",
+                "MessageId": 573008485579,
+                "Time": "1970-01-01 00:00:00"
+            }
+        ]
+    },
+    {
+        "UserId": 1264,
+        "Username": "Johan eduardo pabon ortega",
+        "PhoneNumber": 573173879032,
+        "Age": 18,
+        "Availability": "no",
+        "ContactWay": null,
+        "Messages": [
+            {
+                "Message": "En poder matricularme",
+                "MessageId": 2828,
+                "Time": "2025-01-23 21:30:57"
+            },
+            {
+                "Message": "Si",
+                "MessageId": 2829,
+                "Time": "2025-01-23 21:31:09"
+            },
+            {
+                "Message": "En poderme matricular",
+                "MessageId": 2830,
+                "Time": "2025-01-23 21:33:11"
+            },
+            {
+                "Message": "Johan eduardo pabon ortega",
+                "MessageId": 573173879032,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Johan eduardo pabon ortega",
+                "MessageId": 573173879032,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Johan eduardo pabon ortega",
+                "MessageId": 573173879032,
+                "Time": "1970-01-01 00:00:00"
+            }
+        ]
+    },
+    {
+        "UserId": 1266,
+        "Username": "Cristhian Camilo castrillo",
+        "PhoneNumber": 573027882303,
+        "Age": 24,
+        "Availability": "no",
+        "ContactWay": null,
+        "Messages": [
+            {
+                "Message": "La ayuda económica es real",
+                "MessageId": 2835,
+                "Time": "2025-01-24 08:09:11"
+            },
+            {
+                "Message": "Que áreas cubre la ayuda económica",
+                "MessageId": 2836,
+                "Time": "2025-01-24 08:10:49"
+            },
+            {
+                "Message": "Cuales son las ayudas",
+                "MessageId": 2837,
+                "Time": "2025-01-24 08:12:26"
+            },
+            {
+                "Message": "Cristhian Camilo castrillo",
+                "MessageId": 573027882303,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Cristhian Camilo castrillo",
+                "MessageId": 573027882303,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Cristhian Camilo castrillo",
+                "MessageId": 573027882303,
+                "Time": "1970-01-01 00:00:00"
+            }
+        ]
+    },
+    {
+        "UserId": 1267,
+        "Username": "Josefa Eugenio Cely",
+        "PhoneNumber": 573219252301,
+        "Age": 17,
+        "Availability": "no",
+        "ContactWay": null,
+        "Messages": [
+            {
+                "Message": "Quiero saber cómo ingresar al programa, requisitos,valor y forma de pago",
+                "MessageId": 2838,
+                "Time": "2025-01-24 08:57:24"
+            },
+            {
+                "Message": "Josefa Eugenio Cely",
+                "MessageId": 573219252301,
+                "Time": "1970-01-01 00:00:00"
+            }
+        ]
+    },
+    {
+        "UserId": 1268,
+        "Username": "daniel florez vargas",
+        "PhoneNumber": 573174393185,
+        "Age": 26,
+        "Availability": "no",
+        "ContactWay": null,
+        "Messages": [
+            {
+                "Message": "Estoy intentando inscribirme por la página del link pero me sale un mensaje de cuentas de Google que bloquea el acceso",
+                "MessageId": 2839,
+                "Time": "2025-01-24 09:02:20"
+            },
+            {
+                "Message": "ya se pudo",
+                "MessageId": 2840,
+                "Time": "2025-01-24 09:03:28"
+            },
+            {
+                "Message": "pero tocó por PC por celular no se puede",
+                "MessageId": 2841,
+                "Time": "2025-01-24 09:03:34"
+            },
+            {
+                "Message": "Pero que horarios hay actualmente de estudio?",
+                "MessageId": 2842,
+                "Time": "2025-01-24 09:04:03"
+            },
+            {
+                "Message": "Si podría servir",
+                "MessageId": 2843,
+                "Time": "2025-01-24 09:04:58"
+            },
+            {
+                "Message": "Para el tema de alimentación allá hay lugar para comprar la cena y el almuerzo?",
+                "MessageId": 2844,
+                "Time": "2025-01-24 09:05:40"
+            },
+            {
+                "Message": "bueno, gracias y una última pregunta",
+                "MessageId": 2845,
+                "Time": "2025-01-24 09:06:13"
+            },
+            {
+                "Message": "bueno en realidad son 2 preguntas",
+                "MessageId": 2846,
+                "Time": "2025-01-24 09:06:30"
+            },
+            {
+                "Message": "que precio tiene el bootcamp?",
+                "MessageId": 2847,
+                "Time": "2025-01-24 09:07:01"
+            },
+            {
+                "Message": "LUMINI",
+                "MessageId": 2848,
+                "Time": "2025-01-24 09:07:42"
+            },
+            {
+                "Message": "Si, me surgió otra pregunta, hay alguna facilidad de transporte para las personas que salen a las 10:00 pm del lugar del bootcamp?",
+                "MessageId": 2849,
+                "Time": "2025-01-24 09:12:01"
+            },
+            {
+                "Message": "Se puede juntar el patrocinio del 50% con el modelo LUMNI?",
+                "MessageId": 2851,
+                "Time": "2025-01-24 09:13:53"
+            },
+            {
+                "Message": "Hasta cuando hay inscripciones abiertas para la jornada de la tarde?",
+                "MessageId": 2852,
+                "Time": "2025-01-24 09:14:51"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "daniel florez vargas",
+                "MessageId": 573174393185,
+                "Time": "1970-01-01 00:00:00"
+            }
+        ]
+    },
+    {
+        "UserId": 1269,
+        "Username": "Nicolás Amaya",
+        "PhoneNumber": 573015880950,
+        "Age": 23,
+        "Availability": "no",
+        "ContactWay": null,
+        "Messages": [
+            {
+                "Message": "Información",
+                "MessageId": 2853,
+                "Time": "2025-01-24 09:15:35"
+            },
+            {
+                "Message": "Precio y financiamiento",
+                "MessageId": 2854,
+                "Time": "2025-01-24 09:15:57"
+            },
+            {
+                "Message": "Tiempo de duración y horarios",
+                "MessageId": 2855,
+                "Time": "2025-01-24 09:17:18"
+            },
+            {
+                "Message": "Cómo adaptarme a este horario",
+                "MessageId": 2856,
+                "Time": "2025-01-24 09:17:50"
+            },
+            {
+                "Message": "Nicolás Amaya",
+                "MessageId": 573015880950,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Nicolás Amaya",
+                "MessageId": 573015880950,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Nicolás Amaya",
+                "MessageId": 573015880950,
+                "Time": "1970-01-01 00:00:00"
+            },
+            {
+                "Message": "Nicolás Amaya",
+                "MessageId": 573015880950,
+                "Time": "1970-01-01 00:00:00"
+            }
+        ]
+    },
+    {
+        "UserId": 1270,
+        "Username": "gomezeugenioluisalejandro319@gmail.com",
+        "PhoneNumber": 573102994618,
+        "Age": 17,
+        "Availability": "no",
+        "ContactWay": null,
+        "Messages": [
+            {
+                "Message": "Cómo sería la inscripción?",
+                "MessageId": 2857,
+                "Time": "2025-01-24 09:49:00"
+            },
+            {
+                "Message": "gomezeugenioluisalejandro319@gmail.com",
+                "MessageId": 573102994618,
+                "Time": "1970-01-01 00:00:00"
+            }
+        ]
+    }
+]
