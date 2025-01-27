@@ -32,8 +32,8 @@ export const DashboardContainer = () => {
       <TarjetaContador userList={filteredData} />
 
       {/* Tabla de Usuarios */}
-      <div className="overflow-x-auto bg-[#2A303C] text-white rounded-lg shadow-md">
-        <table className="min-w-full text-left">
+      <div className="overflow-x-auto bg-[#162033] text-white rounded-lg shadow-md overflow-y-scroll scrollbar-custom max-h-[35rem]">
+        <table className="min-w-full text-left ">
           <thead>
             <tr className="border-b border-cyan-400">
               <th className="px-4 py-2">Usuario ID</th>
@@ -79,7 +79,7 @@ export const DashboardContainer = () => {
       {/* Modal */}
       {isModalOpen && selectedUser && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-[#2A303C] p-6 rounded-lg shadow-lg text-white h-[420px] w-[920px] overflow-y-scroll">
+          <div className="bg-[#162033] p-6 rounded-lg shadow-lg text-white h-[420px] w-[920px] overflow-y-scroll scrollbar-custom">
 
             {/* Contenedor para el título y el botón */}
             <div className="flex flex-row justify-between items-center mb-4">
