@@ -66,8 +66,6 @@ export const DashboardNavbar = () => {
 
 
   return (
-    <div className="flex h-screen">
-      {/* Menú Lateral */}
       <div
         className={`fixed lg:relative lg:translate-x-0 inset-y-0 left-0 z-40
         bg-slate-800/50 backdrop-blur-xl border-cyan-400/10
@@ -156,7 +154,6 @@ export const DashboardNavbar = () => {
             {!isCollapsed && <span>Cerrar Sesión</span>}
           </button>
         </div>
-      </div>
 
     </div>
   );
