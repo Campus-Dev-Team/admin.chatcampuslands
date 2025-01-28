@@ -20,6 +20,7 @@ export const DashboardTable = () => {
 
   // Función que maneja los datos obtenidos después de aplicar los filtros
   const handleDataFetched = (fetchedData) => {
+    console.log(fetchedData);
     setFilteredData(fetchedData);
   };
 
