@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, MessageSquare, TrendingUp, Upload, X } from "lucide-react";
+import { Users, MessageSquare, TrendingUp, Upload, X, Download } from "lucide-react";
 import { FiltrosReportes } from './FiltrosReportes';
 import * as XLSX from "xlsx";
 
@@ -9,16 +9,16 @@ export const GeneralConsult = () => {
   const [ciudad, setCiudad] = useState("Bucaramanga");
   const [showModal, setShowModal] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
+  const [spentAmount, setSpentAmount] = useState(0);
   const [files, setFiles] = useState({
     usuariosBogota: null,
-    usuariosBucaramanga: null,
-    costos: null
+    usuariosBucaramanga: null
   });
   const [stats, setStats] = useState({
     totalUsers: 0,
     registeredUsers: 0,
     conversionRate: 0,
-    averageMessagesPerUser: 0
+    costPerUser: 0
   });
 
   // Función para normalizar números telefónicos
@@ -54,6 +54,84 @@ export const GeneralConsult = () => {
     }
   };
 
+  // Nueva función para exportar a Excel
+  const exportToExcel = () => {
+    try {
+      // Preparar datos de estadísticas generales
+      const generalStats = [
+        {
+          'Métrica': 'Usuarios Totales',
+          'Valor': stats.totalUsers,
+          'Descripción': 'Total de usuarios únicos'
+        },
+        {
+          'Métrica': 'Usuarios Registrados',
+          'Valor': stats.registeredUsers,
+          'Descripción': 'Usuarios que completaron registro'
+        },
+        {
+          'Métrica': 'Tasa de Conversión',
+          'Valor': `${stats.conversionRate}%`,
+          'Descripción': 'Porcentaje de usuarios registrados'
+        },
+        {
+          'Métrica': 'Costo Global por Usuario',
+          'Valor': `$${stats.costPerUser}`,
+          'Descripción': 'Costo promedio por usuario'
+        },
+        {
+          'Métrica': 'Gasto Total',
+          'Valor': `$${spentAmount}`,
+          'Descripción': 'Monto total invertido'
+        }
+      ];
+
+      // Obtener datos de usuarios
+      const { registered, unregistered } = getUsersList(filteredData);
+      
+      // Preparar datos detallados de usuarios
+      const usersData = [...registered, ...unregistered].map(user => ({
+        'Estado': registered.includes(user) ? 'Registrado' : 'No Registrado',
+        'Usuario': user.Username || '',
+        'Teléfono': user.PhoneNumber || '',
+        'Ciudad': user.city || '',
+        'Cantidad de Mensajes': user.Messages?.length || 0
+      }));
+
+      // Crear nuevo libro de Excel
+      const workbook = XLSX.utils.book_new();
+
+      // Crear y agregar hoja de estadísticas
+      const wsStats = XLSX.utils.json_to_sheet(generalStats);
+      XLSX.utils.book_append_sheet(workbook, wsStats, 'Estadísticas Generales');
+
+      // Crear y agregar hoja de usuarios
+      const wsUsers = XLSX.utils.json_to_sheet(usersData);
+      XLSX.utils.book_append_sheet(workbook, wsUsers, 'Detalle de Usuarios');
+
+      // Ajustar anchos de columna
+      const wscols = [
+        {wch: 20}, // Estado/Métrica
+        {wch: 30}, // Usuario/Valor
+        {wch: 15}, // Teléfono
+        {wch: 15}, // Ciudad
+        {wch: 20}  // Mensajes/Descripción
+      ];
+
+      wsStats['!cols'] = wscols;
+      wsUsers['!cols'] = wscols;
+
+      // Generar nombre del archivo con fecha
+      const date = new Date().toISOString().split('T')[0];
+      const fileName = `Reporte_ChatBot_${ciudad}_${date}.xlsx`;
+
+      // Guardar archivo
+      XLSX.writeFile(workbook, fileName);
+    } catch (error) {
+      console.error('Error al exportar a Excel:', error);
+    }
+  };
+
   const handleFileChange = (e, fileType) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -73,46 +151,32 @@ export const GeneralConsult = () => {
 
   const handleUpload = async () => {
     try {
-      // Validar que todos los archivos estén cargados
-      if (!files.usuariosBogota || !files.usuariosBucaramanga || !files.costos) {
-        throw new Error('Por favor carga todos los archivos requeridos');
+      let mergedUsers = [];
+
+      // Procesar archivos Excel si están presentes
+      if (files.usuariosBogota) {
+        const bogotaData = await processExcelFile(files.usuariosBogota, 'Bogotá');
+        mergedUsers = [...mergedUsers, ...bogotaData];
       }
 
-      // Procesar archivos Excel
-      const bogotaData = await processExcelFile(files.usuariosBogota, 'Bogotá');
-      const bucaramangaData = await processExcelFile(files.usuariosBucaramanga, 'Bucaramanga');
+      if (files.usuariosBucaramanga) {
+        const bucaramangaData = await processExcelFile(files.usuariosBucaramanga, 'Bucaramanga');
+        mergedUsers = [...mergedUsers, ...bucaramangaData];
+      }
 
-      // Combinar datos de usuarios
-      const mergedUsers = [...bogotaData, ...bucaramangaData];
+      // Si hay archivos cargados, guardar en localStorage
+      if (mergedUsers.length > 0) {
+        localStorage.setItem('mergedUsers', JSON.stringify(mergedUsers));
+      }
 
-      // Procesar archivo de costos
-      const costosReader = new FileReader();
-      costosReader.onload = async (e) => {
-        try {
-          const costosData = JSON.parse(e.target.result);
-
-          // Guardar en localStorage
-          localStorage.setItem('mergedUsers', JSON.stringify(mergedUsers));
-          localStorage.setItem('costos', JSON.stringify(costosData));
-
-          // Recalcular estadísticas
-          calculateStats(filteredData);
-
-          setShowModal(false);
-        } catch (err) {
-          console.error("Error procesando archivo de costos:", err);
-        }
-      };
-
-      costosReader.readAsText(files.costos);
+      // Recalcular estadísticas
+      calculateStats(filteredData);
+      setShowModal(false);
 
     } catch (err) {
       console.error("Error en la carga de archivos:", err);
     }
   };
-
- 
-  
 
   // Función que calcula las estadísticas
   const calculateStats = (data) => {
@@ -120,13 +184,12 @@ export const GeneralConsult = () => {
 
     // Filtrar por ciudad
     const cityFilteredData = data.filter(user => !ciudad || user.city === ciudad);
-    console.log('registros de isa para ',ciudad ,cityFilteredData);
-
+    console.log('registros de isa para ', ciudad, cityFilteredData);
 
     // Obtener datos del localStorage
     const storedData = localStorage.getItem("mergedUsers");
     const registeredUsers = storedData ? JSON.parse(storedData) : [];
-    
+
     // Cálculo de estadísticas
     const totalUsers = cityFilteredData.length;
 
@@ -137,23 +200,22 @@ export const GeneralConsult = () => {
         const normalizedUserPhone = normalizePhoneNumber(user.PhoneNumber);
         return normalizedStoredPhone === normalizedUserPhone;
       })
-    )
-    console.log('usuarios registrados' , registeredCount);
+    );
+    console.log('usuarios registrados', registeredCount);
 
     // Calcular tasa de conversión
     const conversionRate = totalUsers > 0 ? ((registeredCount.length / totalUsers) * 100).toFixed(2) : 0;
-        console.log('tasa de comversion', conversionRate);
+    console.log('tasa de conversión', conversionRate);
 
-    // Calcular promedio de mensajes
-    const totalMessages = cityFilteredData.reduce((acc, user) => acc + (user.Messages?.length || 0), 0);
-    const averageMessages = totalUsers > 0 ? (totalMessages / totalUsers).toFixed(1) : 0;
+    // Calcular costo por usuario (usando el total de usuarios sin filtrar por ciudad)
+    const costPerUser = data.length > 0 ? (spentAmount / data.length).toFixed(2) : 0;
 
     // Actualizar estado
     setStats({
       totalUsers,
       registeredUsers: registeredCount.length,
       conversionRate,
-      averageMessagesPerUser: averageMessages
+      costPerUser
     });
   };
 
@@ -166,7 +228,7 @@ export const GeneralConsult = () => {
   // Efecto para recalcular cuando cambia la ciudad
   useEffect(() => {
     calculateStats(filteredData);
-  }, [ciudad]);
+  }, [ciudad, spentAmount]);
 
   // Definición de las tarjetas de estadísticas
   const statsCards = [
@@ -192,16 +254,42 @@ export const GeneralConsult = () => {
       description: "Porcentaje de usuarios registrados"
     },
     {
-      title: "Mensajes Promedio",
+      title: "Costo Global por Usuario",
       icon: MessageSquare,
-      value: stats.averageMessagesPerUser,
+      value: `$${stats.costPerUser}`,
       color: "cyan",
-      description: "Mensajes por usuario"
+      description: "Costo promedio por usuario"
     }
   ];
 
+  // Función para clasificar los usuarios
+  const getUsersList = (data) => {
+    if (!Array.isArray(data)) return { registered: [], unregistered: [] };
+
+    const storedData = localStorage.getItem("mergedUsers");
+    const registeredUsers = storedData ? JSON.parse(storedData) : [];
+
+    const registered = data.filter(user =>
+      registeredUsers.some(regUser => {
+        const normalizedStoredPhone = normalizePhoneNumber(regUser.Celular);
+        const normalizedUserPhone = normalizePhoneNumber(user.PhoneNumber);
+        return normalizedStoredPhone === normalizedUserPhone;
+      })
+    );
+
+    const unregistered = data.filter(user =>
+      !registeredUsers.some(regUser => {
+        const normalizedStoredPhone = normalizePhoneNumber(regUser.Celular);
+        const normalizedUserPhone = normalizePhoneNumber(user.PhoneNumber);
+        return normalizedStoredPhone === normalizedUserPhone;
+      })
+    );
+
+    return { registered, unregistered };
+  };
+
   return (
-    <div className="p-6 space-y-6 bg-slate-900">
+    <div className="p-6 space-y-6 bg-slate-900 overflow-y-scroll scrollbar-custom">
       <div className="mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col lg:flex-row items-center justify-between">
@@ -219,6 +307,13 @@ export const GeneralConsult = () => {
             </select>
 
             <FiltrosReportes onDataFetched={handleDataFetched} />
+
+            <button
+              onClick={exportToExcel}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center gap-2"
+            >
+              <Download className="w-5 h-5" /> Exportar Excel
+            </button>
 
             <button
               className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-all flex items-center gap-2"
@@ -254,12 +349,89 @@ export const GeneralConsult = () => {
           ))}
         </div>
 
+        <div className="mt-8">
+          <div className="bg-slate-800/50 rounded-lg border border-slate-700">
+            <div className="p-4 border-b border-slate-700">
+              <h3 className="text-xl font-semibold text-cyan-400">Detalle de Usuarios</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-slate-700/50">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Estado
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Usuario
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Teléfono
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Ciudad
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Mensajes
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700">
+                  {/* Usuarios Registrados */}
+                  {getUsersList(filteredData).registered.map((user, index) => (
+                    <tr key={`registered-${index}`} className="bg-green-900/10">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          Registrado
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.Username}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.PhoneNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.city}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.Messages?.length || 0}
+                      </td>
+                    </tr>
+                  ))}
+                  {/* Usuarios No Registrados */}
+                  {getUsersList(filteredData).unregistered.map((user, index) => (
+                    <tr key={`unregistered-${index}`} className="bg-red-900/10">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                          No Registrado
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.Username}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.PhoneNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.city}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.Messages?.length || 0}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         {/* Modal */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-slate-800 p-6 rounded-lg w-[32rem] space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold text-cyan-400">Cargar Archivos</h3>
+                <h3 className="text-xl font-bold text-cyan-400">Cargar Archivos y Gastos</h3>
                 <button
                   onClick={() => setShowModal(false)}
                   className="text-slate-400 hover:text-slate-200"
@@ -268,10 +440,24 @@ export const GeneralConsult = () => {
                 </button>
               </div>
 
+              {/* Input para el gasto total */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">
+                  Gasto Total ($)
+                </label>
+                <input
+                  type="number"
+                  value={spentAmount}
+                  onChange={(e) => setSpentAmount(Number(e.target.value))}
+                  className="w-full bg-slate-700 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                  placeholder="Ingrese el monto gastado"
+                />
+              </div>
+
               {/* Usuarios Bogotá */}
               <div>
                 <label className="block text-sm font-medium text-white mb-1">
-                  Usuarios Bogotá (Excel)
+                  Usuarios Bogotá (Excel) - Opcional
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -302,7 +488,7 @@ export const GeneralConsult = () => {
               {/* Usuarios Bucaramanga */}
               <div>
                 <label className="block text-sm font-medium text-white mb-1">
-                  Usuarios Bucaramanga (Excel)
+                  Usuarios Bucaramanga (Excel) - Opcional
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -330,37 +516,6 @@ export const GeneralConsult = () => {
                 </div>
               </div>
 
-              {/* Archivo de Costos */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-1">
-                  Archivo de Costos (JSON)
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="file"
-                    accept=".json"
-                    onChange={(e) => handleFileChange(e, 'costos')}
-                    className="hidden"
-                    id="costosFile"
-                  />
-                  <button
-                    onClick={() => document.getElementById('costosFile').click()}
-                    className="flex-1 bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition-all flex items-center gap-2"
-                  >
-                    <Upload className="w-4 h-4" />
-                    {files.costos ? files.costos.name : 'Seleccionar archivo'}
-                  </button>
-                  {files.costos && (
-                    <button
-                      onClick={() => removeFile('costos')}
-                      className="p-2 text-slate-400 hover:text-slate-200"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
               <div className="flex justify-end gap-2 pt-4">
                 <button
                   className="px-4 py-2 text-slate-300 hover:text-white transition-all"
@@ -369,10 +524,10 @@ export const GeneralConsult = () => {
                   Cancelar
                 </button>
                 <button
-                  className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-all"
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg transition-all"
                   onClick={handleUpload}
                 >
-                  Subir Archivos
+                  Guardar
                 </button>
               </div>
             </div>
