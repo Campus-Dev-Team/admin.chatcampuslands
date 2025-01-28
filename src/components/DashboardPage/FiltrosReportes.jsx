@@ -170,7 +170,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
     };
 
     return (
-        <div className="bg-transparent p-4 md:p-0 text-white rounded-md w-full">
+        <div className="bg-transparent m-2 p-4 md:p-0 text-white rounded-md ">
             <div
                 className={`flex flex-wrap md:flex-nowrap justify-center items-center gap-5 transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
             >

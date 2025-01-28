@@ -24,7 +24,7 @@ export const DashboardTable = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 overflow-y-scroll scrollbar-custom">
       <div className="flex flex-col lg:flex-row items-center justify-between  h-24">
         <h2 className="text-3xl font-bold text-cyan-400 w-full ">
           Informe General
@@ -36,7 +36,7 @@ export const DashboardTable = () => {
       <TarjetaContador userList={filteredData} />
 
       {/* Tabla de Usuarios */}
-      <div className="overflow-x-auto bg-[#162033] text-white rounded-lg shadow-md overflow-y-scroll scrollbar-custom max-h-[35rem]">
+      <div className="overflow-x-auto bg-[#162033] text-white rounded-lg shadow-md max-h-[35rem]">
         <table className="min-w-full text-left ">
           <thead>
             <tr className="border-b border-cyan-400">

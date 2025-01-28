@@ -77,14 +77,14 @@ export const GeneralConsult = () => {
   const stats = getTotalStats();
 
   return (
-    <div className="flex-1 overflow-y-auto mt-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="p-6 space-y-6">
+      <div className=" mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col lg:flex-row items-center justify-between  h-24">
           <h2 className="text-3xl font-bold text-cyan-400 w-full ">
             Informe de Conversión Iza ChatBot
           </h2>
-          <div className="w-full flex flex-col md:flex-row justify-center items-center">
+          <div className="w-full flex flex-col md:flex-row justify-end items-center">
             <select
               value={ciudad}
               onChange={(e) => setCiudad(e.target.value)}
