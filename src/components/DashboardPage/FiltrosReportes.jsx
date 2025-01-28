@@ -87,6 +87,33 @@ export const FiltrosReportes = ({ onDataFetched }) => {
     const normalizeData = (usersData, messagesData) => {
         const normalizedData = {};
 
+        // Función para normalizar el número de teléfono
+        const normalizePhoneNumber = (phone) => {
+            if (!phone) return phone;
+            const phoneStr = phone.toString();
+            return phoneStr.startsWith('57') ? parseInt(phoneStr.slice(2)) : parseInt(phoneStr);
+        };
+
+        // Función para normalizar el nombre de la ciudad
+        const normalizeCity = (city) => {
+            if (!city) return city;
+
+            // Convertir a string, por si acaso viene otro tipo de dato
+            const cityStr = city.toString();
+
+            // Convertir a minúsculas y luego capitalizar la primera letra
+            const normalized = cityStr
+                // Eliminar acentos y caracteres especiales
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                // Convertir a minúsculas
+                .toLowerCase()
+                // Capitalizar primera letra
+                .replace(/^\w/, c => c.toUpperCase());
+
+            return normalized;
+        };
+
         // Crear un mapa de mensajes agrupados por userId
         const messagesByUserId = messagesData.reduce((acc, message) => {
             if (!acc[message.userId]) {
@@ -103,7 +130,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
         // Procesar los usuarios y asociarles los mensajes correspondientes
         usersData.forEach(user => {
             const userId = user.id;
-            const phoneNumber = user.telefono;
+            const phoneNumber = normalizePhoneNumber(user.telefono);
 
             // Filtrar mensajes válidos
             const validMessages = (messagesByUserId[userId] || []).filter(
@@ -119,7 +146,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                 Availability: user.availability,
                 ContactWay: user.contact_way,
                 Messages: validMessages,
-                city: user.city
+                city: normalizeCity(user.city) // Aplicamos la normalización de la ciudad
             };
 
             // Agregar conteo de mensajes
@@ -205,7 +232,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                         className="py-2 px-1 text-white rounded-lg text-[0.875rem] flex flex-row justify-center items-center gap-1"
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Cargando...' : <>Filtro Aplicado <Check size={15}/></>}
+                        {isLoading ? 'Cargando...' : <>Filtro Aplicado <Check size={15} /></>}
 
                     </span>
                 </div>
@@ -219,7 +246,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                         transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base lg:text-md"
                     onClick={handleDownload} // Llamamos a la función de descarga
                 >
-                    <FileDown size={25}/>
+                    <FileDown size={25} />
                 </button>
             </div>
         </div>
