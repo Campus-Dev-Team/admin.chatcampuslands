@@ -1,0 +1,838 @@
+{
+"estudiantes":[
+ {
+  "Nombre": "Sandra Johana Torres Cristiano",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-06 07:40:54",
+  "Celular": 3222439194
+ },
+ {
+  "Nombre": "Santiago Florez Avendaño",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-06 09:42:59",
+  "Celular": 3184153751
+ },
+ {
+  "Nombre": "Kevin David Sánchez Mejia",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-06 17:03:47",
+  "Celular": 3008314028
+ },
+ {
+  "Nombre": "Santiago Fonseca Castellanos ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-06 22:50:48",
+  "Celular": 3164087194
+ },
+ {
+  "Nombre": "Julian Andrés Agudelo Vega",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-07 07:47:56",
+  "Celular": 3222288597
+ },
+ {
+  "Nombre": "Santiago Andrés Cubides Castro",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-07 13:30:25",
+  "Celular": 3228977277
+ },
+ {
+  "Nombre": "Kevin Eduardo",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-07 14:12:54",
+  "Celular": 3187284554
+ },
+ {
+  "Nombre": "María Camila Vargas Beleño",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-07 14:25:36",
+  "Celular": 3114941118
+ },
+ {
+  "Nombre": "Ricardo Palomino",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-07 16:10:26",
+  "Celular": 3009604658
+ },
+ {
+  "Nombre": "Juan Carlos Arregoces Torres ",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-07 18:16:44",
+  "Celular": 3188560482
+ },
+ {
+  "Nombre": "Nicolás Gómez Gámez",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-07 21:16:43",
+  "Celular": 3204070772
+ },
+ {
+  "Nombre": "Davisson Adriel Roman Carreño",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-07 21:53:46",
+  "Celular": 3504062046
+ },
+ {
+  "Nombre": "Joshep Martinez",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-07 22:05:09",
+  "Celular": 3052288355
+ },
+ {
+  "Nombre": "Isabela Carrillo Azain",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-07 22:07:08",
+  "Celular": 3003284889
+ },
+ {
+  "Nombre": "Jhon Carlos Meneses Peinado",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-07 23:44:13",
+  "Celular": 3116039256
+ },
+ {
+  "Nombre": "Yhwrr Samuel Suárez Vega",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-08 10:23:24",
+  "Celular": 3150462944
+ },
+ {
+  "Nombre": "Yosser Andres Villanueva Cañavera",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-08 14:37:20",
+  "Celular": 3244951416
+ },
+ {
+  "Nombre": "Gianmarcos Satizábal Valencia ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-08 14:43:24",
+  "Celular": 3028615578
+ },
+ {
+  "Nombre": "Luis Miguel Diaz Rueda",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-08 14:50:25",
+  "Celular": 3188543721
+ },
+ {
+  "Nombre": "Jose Aminabad Mendoza Ospina",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-08 17:08:45",
+  "Celular": 3125848458
+ },
+ {
+  "Nombre": "Carla Juliana Cala Lopez",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-08 17:19:34",
+  "Celular": 3245824018
+ },
+ {
+  "Nombre": "Juan Sebastián",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-08 18:04:56",
+  "Celular": 3123038723
+ },
+ {
+  "Nombre": "Juan Sebastian Rodríguez Jaimes",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-08 18:48:04",
+  "Celular": 3204751994
+ },
+ {
+  "Nombre": "Josthyn Alexander Guayazan Muete",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-08 19:22:05",
+  "Celular": 3107968434
+ },
+ {
+  "Nombre": "Andrea Diaz",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-08 22:15:19",
+  "Celular": 3242023372
+ },
+ {
+  "Nombre": "Oscar Mauricio Moreno Lamus",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-09 11:32:46",
+  "Celular": 3165415258
+ },
+ {
+  "Nombre": "Johan Cruz",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-09 12:12:04",
+  "Celular": 3192799416
+ },
+ {
+  "Nombre": "Andrea Salazar",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-09 13:34:38",
+  "Celular": 3188612899
+ },
+ {
+  "Nombre": "Anylorena Torres Avila",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-09 15:17:52",
+  "Celular": 3242562477
+ },
+ {
+  "Nombre": "Camilo Pinzon",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-09 16:46:28",
+  "Celular": 3124078772
+ },
+ {
+  "Nombre": "Daniel Steven Perdomo Tarazona",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-09 17:09:07",
+  "Celular": 3186588908
+ },
+ {
+  "Nombre": "Juan Pablo Cifuentes",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-09 21:23:47",
+  "Celular": 3127971765
+ },
+ {
+  "Nombre": "Juan Pablo Bareño Sierra",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-09 22:09:32",
+  "Celular": 3043312036
+ },
+ {
+  "Nombre": "Tomás Cárdenas",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-09 22:15:07",
+  "Celular": 3106969570
+ },
+ {
+  "Nombre": "Dylan Acevedo",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-10 01:36:54",
+  "Celular": 3223384038
+ },
+ {
+  "Nombre": "David Espitia",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-10 04:39:32",
+  "Celular": 3003646597
+ },
+ {
+  "Nombre": "Juan Arias ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-10 16:31:55",
+  "Celular": 3102663247
+ },
+ {
+  "Nombre": "Yohan Parrado",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-11 01:56:45",
+  "Celular": 3155284545
+ },
+ {
+  "Nombre": "Maria Fernanda Acevedo Salazar",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-11 15:18:39",
+  "Celular": 3022872352
+ },
+ {
+  "Nombre": "Andres Bello Bernal",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-11 19:46:21",
+  "Celular": 3004779782
+ },
+ {
+  "Nombre": "Andres Santiago ",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-12 07:48:55",
+  "Celular": 3227496827
+ },
+ {
+  "Nombre": "Sofía Novoa Arrieta",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-12 09:18:54",
+  "Celular": 3004483348
+ },
+ {
+  "Nombre": "Pablo Tomas Rojas Vargas ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-12 16:28:48",
+  "Celular": 3178246305
+ },
+ {
+  "Nombre": "Freddy Rueda",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-12 23:35:11",
+  "Celular": 3154402132
+ },
+ {
+  "Nombre": "Andres Santiago Moncaleano Escobar",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-13 09:29:17",
+  "Celular": 3219582642
+ },
+ {
+  "Nombre": "Brigitte Claros Viola",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-13 17:43:02",
+  "Celular": 3105697135
+ },
+ {
+  "Nombre": "Sergio David Fester Gonzalez",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-13 18:51:16",
+  "Celular": 3128230516
+ },
+ {
+  "Nombre": "Brayan Snehyder Castro Velandia ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-13 22:26:26",
+  "Celular": 3182226431
+ },
+ {
+  "Nombre": "Jesus Eduardo Moyano Herreño ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-14 08:16:31",
+  "Celular": 3104707365
+ },
+ {
+  "Nombre": "Brayan Villabona",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-14 08:34:44",
+  "Celular": 3175819813
+ },
+ {
+  "Nombre": "Laura Juliana Cala Gomez",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-14 10:20:30",
+  "Celular": 3208758850
+ },
+ {
+  "Nombre": "Danna Julieth Atencia Bernal ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-14 11:33:53",
+  "Celular": 3239973881
+ },
+ {
+  "Nombre": "Carlos Steven Mariño Bautista",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-14 11:34:56",
+  "Celular": 3134205522
+ },
+ {
+  "Nombre": "Ronaldo Ramirez Casanova",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-14 12:21:23",
+  "Celular": 3014424706
+ },
+ {
+  "Nombre": "David Ardila",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-14 14:45:26",
+  "Celular": 3008412389
+ },
+ {
+  "Nombre": "Sergio Andres Mendoza Alarcon",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-14 14:49:22",
+  "Celular": 3177957497
+ },
+ {
+  "Nombre": "Rene Villazón",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-14 14:59:48",
+  "Celular": 3203543994
+ },
+ {
+  "Nombre": "Jesús David Olarte Landinez",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-14 15:44:14",
+  "Celular": 3187785439
+ },
+ {
+  "Nombre": "Deivid Santiago Serna Gómez",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-14 15:49:27",
+  "Celular": 3006910539
+ },
+ {
+  "Nombre": "K ́schneider",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-14 23:09:53",
+  "Celular": 3022755750
+ },
+ {
+  "Nombre": "Kevin Stiven Rodríguez Gamba ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-15 07:12:24",
+  "Celular": 3169649999
+ },
+ {
+  "Nombre": "Daniel Camilo Martinez Mantilla",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-15 11:25:17",
+  "Celular": 3182256934
+ },
+ {
+  "Nombre": "Ana Sofia Plata Parada",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-15 12:50:49",
+  "Celular": 3015496605
+ },
+ {
+  "Nombre": "Libardo Cardozo Martínez",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-15 18:57:45",
+  "Celular": 3137188028
+ },
+ {
+  "Nombre": "Stiven Lopez",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-15 20:31:38",
+  "Celular": 3193640511
+ },
+ {
+  "Nombre": "Daniel Gonzalez",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-15 20:52:23",
+  "Celular": 3177924976
+ },
+ {
+  "Nombre": "Andris Fuentes",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-16 08:10:47",
+  "Celular": 3168535017
+ },
+ {
+  "Nombre": "Sergio Lopez",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-16 10:31:18",
+  "Celular": 3222161241
+ },
+ {
+  "Nombre": "Heidy Mejía",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-16 12:07:22",
+  "Celular": 3133310881
+ },
+ {
+  "Nombre": "Carlos Mario Villamizar Medina",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-16 12:09:26",
+  "Celular": 3112858476
+ },
+ {
+  "Nombre": "Diego Alejandro Arciniegas Vera ",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-16 12:38:20",
+  "Celular": 3178610248
+ },
+ {
+  "Nombre": "Daniel Felipe Hernández Jaimes",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-16 15:24:15",
+  "Celular": 3007210125
+ },
+ {
+  "Nombre": "Andrés Narváez",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-16 15:47:40",
+  "Celular": 3502367221
+ },
+ {
+  "Nombre": "Juan David Oviedo Daza",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-16 17:33:20",
+  "Celular": 3187987027
+ },
+ {
+  "Nombre": "Jose Sánchez Herreño",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-16 22:17:52",
+  "Celular": 3184740373
+ },
+ {
+  "Nombre": "Lucianna Alejandra Vargas Vásquez",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-17 12:12:26",
+  "Celular": 3002147669
+ },
+ {
+  "Nombre": "Juan Zárate",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-17 13:59:23",
+  "Celular": 3236857349
+ },
+ {
+  "Nombre": "Jeferson Lopez Rincon",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-17 15:35:56",
+  "Celular": 3105167275
+ },
+ {
+  "Nombre": "Said Armando Caro Cuitiva",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-17 20:14:37",
+  "Celular": 3227687913
+ },
+ {
+  "Nombre": "Karentmelissa Sanabria Medina",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-17 22:35:52",
+  "Celular": 3228835766
+ },
+ {
+  "Nombre": "Carlos Santiago Rodriguez Sarmiento",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-18 08:41:27",
+  "Celular": 3158324585
+ },
+ {
+  "Nombre": "Isis Lucia Mora Zárate",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-18 19:14:11",
+  "Celular": 3195082488
+ },
+ {
+  "Nombre": "Paula Luna",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-19 08:15:27",
+  "Celular": 3028315297
+ },
+ {
+  "Nombre": "Eliu Josue Edina Delgado",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-19 11:37:21",
+  "Celular": 3177422883
+ },
+ {
+  "Nombre": "Maria Fernández",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-19 12:21:45",
+  "Celular": 3227284901
+ },
+ {
+  "Nombre": "Jonathan Alexis Navarro Mendoza ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-19 16:54:56",
+  "Celular": 3239014220
+ },
+ {
+  "Nombre": "Sebastian Soto",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-20 09:14:29",
+  "Celular": 3118282760
+ },
+ {
+  "Nombre": "Juan Camilo Guerrero Carrillo",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-20 11:59:58",
+  "Celular": 3102188606
+ },
+ {
+  "Nombre": "Wilmar Polentino",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-20 13:52:44",
+  "Celular": 1010132339
+ },
+ {
+  "Nombre": "Deinver Fabian Estupiñan",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-20 13:59:18",
+  "Celular": 3138985434
+ },
+ {
+  "Nombre": "David Pedrozo",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-20 14:26:38",
+  "Celular": 3154543899
+ },
+ {
+  "Nombre": "Johan Sebastian Duarte",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-20 14:38:46",
+  "Celular": 3194192570
+ },
+ {
+  "Nombre": "Daniela Florian Gulloso",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-20 15:12:10",
+  "Celular": 3209371045
+ },
+ {
+  "Nombre": "María Alejandra Durán Cala",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-20 15:14:28",
+  "Celular": 3175668754
+ },
+ {
+  "Nombre": "Kevin Santiago Pinto Monsalve",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-20 15:15:32",
+  "Celular": 3138594357
+ },
+ {
+  "Nombre": "Santiago Villamizar Pinto",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-20 15:23:33",
+  "Celular": 3043654176
+ },
+ {
+  "Nombre": "Duwan Duran",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-20 16:02:44",
+  "Celular": 3118863578
+ },
+ {
+  "Nombre": "Cristian David Cardenas Garcia",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-20 18:37:23",
+  "Celular": 3022276537
+ },
+ {
+  "Nombre": "Nicolás Ardila Rosas",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-20 19:22:34",
+  "Celular": 3163500000
+ },
+ {
+  "Nombre": "Karolain Huerfano Reyes",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-21 07:53:27",
+  "Celular": 3236736422
+ },
+ {
+  "Nombre": "Johanson Peña Sanchez ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-21 10:13:54",
+  "Celular": 3213472347
+ },
+ {
+  "Nombre": "Richard Alexander Briceño Santiago",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-21 10:40:22",
+  "Celular": 3219837759
+ },
+ {
+  "Nombre": "Frank David Bohorquez Usuga",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-21 11:30:47",
+  "Celular": 3215089118
+ },
+ {
+  "Nombre": "Javier Rafael Torres Vergara",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-21 12:15:46",
+  "Celular": 3053410051
+ },
+ {
+  "Nombre": "Sneider Gonzalez",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-21 12:19:12",
+  "Celular": 3169969631
+ },
+ {
+  "Nombre": "Arley Archila",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-21 15:28:09",
+  "Celular": 3176559806
+ },
+ {
+  "Nombre": "Jesus Adrian Poveda",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-21 15:58:37",
+  "Celular": 3115510052
+ },
+ {
+  "Nombre": "Larry",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-21 16:00:04",
+  "Celular": 3024512965
+ },
+ {
+  "Nombre": "Michel Rubio",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-21 17:36:56",
+  "Celular": 3204255157
+ },
+ {
+  "Nombre": "Alejandra Gómez",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-22 08:50:32",
+  "Celular": 3163340529
+ },
+ {
+  "Nombre": "Cristian Miguel Perez Hernandez",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-22 10:11:23",
+  "Celular": 3107051516
+ },
+ {
+  "Nombre": "Cristian Navarrete",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-22 12:52:37",
+  "Celular": 3207485681
+ },
+ {
+  "Nombre": "Jose Daniel Barreto Monroy",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-22 13:04:09",
+  "Celular": 3170970955
+ },
+ {
+  "Nombre": "Melani González Iglesias",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-22 14:35:36",
+  "Celular": 3116580072
+ },
+ {
+  "Nombre": "Sebastian López Lopez",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-22 14:35:54",
+  "Celular": 3136318994
+ },
+ {
+  "Nombre": "Lorena Mendoza",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-22 15:06:11",
+  "Celular": 3172192928
+ },
+ {
+  "Nombre": "Juan David Maurello Florian ",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-22 17:29:43",
+  "Celular": 3173784693
+ },
+ {
+  "Nombre": "David Flórez Ruz",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-22 18:58:03",
+  "Celular": 3146457630
+ },
+ {
+  "Nombre": "Karoll Juliana Barreto Garcia",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-22 21:11:17",
+  "Celular": 3169779779
+ },
+ {
+  "Nombre": "Hermes Yesid Rolón Alfonso ",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-22 23:38:28",
+  "Celular": 3183495519
+ },
+ {
+  "Nombre": "Stiven Salinas",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-22 23:52:26",
+  "Celular": 3229095218
+ },
+ {
+  "Nombre": "Danna Valentina Monroy Leon",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-23 10:00:54",
+  "Celular": 3506446808
+ },
+ {
+  "Nombre": "Diego Toscano",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-23 11:26:21",
+  "Celular": 3209186710
+ },
+ {
+  "Nombre": "Jose David Briceño Pacheco",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-23 12:11:24",
+  "Celular": 3214972445
+ },
+ {
+  "Nombre": "Angie Jaimes",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-23 13:07:28",
+  "Celular": 3173393982
+ },
+ {
+  "Nombre": "Juan David Maurello Florian",
+  "Estado": "Admitido",
+  "Fecha registro": "2025-01-23 13:23:53",
+  "Celular": 3173784693
+ },
+ {
+  "Nombre": "Nelson Jhair Meneses Ramírez ",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-23 16:46:10",
+  "Celular": 3138348311
+ },
+ {
+  "Nombre": "Luis Miguel Lambraño",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-23 17:11:18",
+  "Celular": 3108719224
+ },
+ {
+  "Nombre": "Danna Gabriela Ramírez Niño",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-23 17:21:58",
+  "Celular": 3202436666
+ },
+ {
+  "Nombre": "Mariana Alfonso",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-23 19:09:41",
+  "Celular": 304327392
+ },
+ {
+  "Nombre": "Alexer Valero",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-23 22:30:48",
+  "Celular": 3008485579
+ },
+ {
+  "Nombre": "Melani Gonzalez Iglesias",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-23 23:20:41",
+  "Celular": 3116580072
+ },
+ {
+  "Nombre": "Juan Sebastian Gualdron Gallo",
+  "Estado": "Agendado",
+  "Fecha registro": "2025-01-24 14:00:32",
+  "Celular": 3182018997
+ },
+ {
+  "Nombre": "Alexis Gómez",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-24 19:11:50",
+  "Celular": 3216245648
+ },
+ {
+  "Nombre": "David Rodríguez Gómez",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-25 13:54:30",
+  "Celular": 3176873830
+ },
+ {
+  "Nombre": "Steven Alzate",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-25 19:09:40",
+  "Celular": 3144784960
+ },
+ {
+  "Nombre": "Andres Felipe Montalvo Gómez ",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-25 21:02:17",
+  "Celular": 3152738241
+ },
+ {
+  "Nombre": "Jonathan Steven Araque Correa",
+  "Estado": "Registrado",
+  "Fecha registro": "2025-01-26 00:26:39",
+  "Celular": 3182288780
+ },
+ {
+  "Nombre": "Juan Sebastan Infante Rojas",
+  "Estado": "Preseleccionado",
+  "Fecha registro": "2025-01-26 17:21:14",
+  "Celular": 3161692968
+ }
+]
+}
