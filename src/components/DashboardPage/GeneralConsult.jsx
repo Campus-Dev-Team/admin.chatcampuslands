@@ -1,180 +1,538 @@
-import React, { useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
-// Datos de ejemplo para los gráficos
-const exampleData = [
-  { name: "Lunes", Mensajes: 400, Usuarios: 240, UsuariosRegistrados: 120, TasaConversion: 50, UsuariosPorDia: 240 },
-  { name: "Martes", Mensajes: 300, Usuarios: 139, UsuariosRegistrados: 70, TasaConversion: 50, UsuariosPorDia: 139 },
-  { name: "Miércoles", Mensajes: 200, Usuarios: 980, UsuariosRegistrados: 490, TasaConversion: 50, UsuariosPorDia: 980 },
-  { name: "Jueves", Mensajes: 278, Usuarios: 390, UsuariosRegistrados: 195, TasaConversion: 50, UsuariosPorDia: 390 },
-  { name: "Viernes", Mensajes: 189, Usuarios: 480, UsuariosRegistrados: 240, TasaConversion: 50, UsuariosPorDia: 480 },
-  { name: "Sábado", Mensajes: 239, Usuarios: 380, UsuariosRegistrados: 190, TasaConversion: 50, UsuariosPorDia: 380 },
-  { name: "Domingo", Mensajes: 349, Usuarios: 430, UsuariosRegistrados: 215, TasaConversion: 50, UsuariosPorDia: 430 },
-];
+import React, { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Users, MessageSquare, TrendingUp, Upload, X, Download } from "lucide-react";
+import { FiltrosReportes } from './FiltrosReportes';
+import * as XLSX from "xlsx";
 
 export const GeneralConsult = () => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const [ciudad, setCiudad] = useState("Bogotá"); // Estado para la ciudad seleccionada
+  // Estados principales
+  const [ciudad, setCiudad] = useState("Bucaramanga");
+  const [showModal, setShowModal] = useState(false);
+  const [filteredData, setFilteredData] = useState([]);
+  const [spentAmount, setSpentAmount] = useState(0);
+  const [files, setFiles] = useState({
+    usuariosBogota: null,
+    usuariosBucaramanga: null
+  });
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    registeredUsers: 0,
+    conversionRate: 0,
+    costPerUser: 0
+  });
 
-  const handleDateChange = (dates) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
+  // Función para normalizar números telefónicos
+  const normalizePhoneNumber = (phone) => {
+    if (!phone) return '';
+    const phoneStr = phone.toString();
+    return phoneStr.startsWith('57') ? phoneStr.slice(2) : phoneStr;
   };
 
-  // Datos de ejemplo para las métricas
-  const metricsData = {
-    costoGlobalPorUsuario: 50, // Costo global por usuario registrado
-    usuariosTotales: 1000, // Usuarios totales
-    usuariosRegistrados: 500, // Usuarios registrados
-    tasaConversion: 50, // Tasa de conversión
-    tasaConversionDiaria: 5, // Tasa de conversión diaria
+  // Función para procesar archivos Excel y agregar campo ciudad
+  const processExcelFile = async (file, ciudad) => {
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, {
+        cellDates: true,
+        cellStyles: true,
+        cellNF: true
+      });
+
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+
+      // Convertir a JSON y agregar el campo ciudad
+      const jsonData = XLSX.utils.sheet_to_json(worksheet).map(row => ({
+        ...row,
+        ciudad
+      }));
+
+      return jsonData;
+    } catch (err) {
+      console.error("Error procesando archivo Excel:", err);
+      throw new Error(`Error procesando archivo Excel: ${err.message}`);
+    }
+  };
+
+  // Nueva función para exportar a Excel
+  const exportToExcel = () => {
+    try {
+      // Preparar datos de estadísticas generales
+      const generalStats = [
+        {
+          'Métrica': 'Usuarios Totales',
+          'Valor': stats.totalUsers,
+          'Descripción': 'Total de usuarios únicos'
+        },
+        {
+          'Métrica': 'Usuarios Registrados',
+          'Valor': stats.registeredUsers,
+          'Descripción': 'Usuarios que completaron registro'
+        },
+        {
+          'Métrica': 'Tasa de Conversión',
+          'Valor': `${stats.conversionRate}%`,
+          'Descripción': 'Porcentaje de usuarios registrados'
+        },
+        {
+          'Métrica': 'Costo Global por Usuario',
+          'Valor': `$${stats.costPerUser}`,
+          'Descripción': 'Costo promedio por usuario'
+        },
+        {
+          'Métrica': 'Gasto Total',
+          'Valor': `$${spentAmount}`,
+          'Descripción': 'Monto total invertido'
+        }
+      ];
+
+      // Obtener datos de usuarios
+      const { registered, unregistered } = getUsersList(filteredData);
+      
+      // Preparar datos detallados de usuarios
+      const usersData = [...registered, ...unregistered].map(user => ({
+        'Estado': registered.includes(user) ? 'Registrado' : 'No Registrado',
+        'Usuario': user.Username || '',
+        'Teléfono': user.PhoneNumber || '',
+        'Ciudad': user.city || '',
+        'Cantidad de Mensajes': user.Messages?.length || 0
+      }));
+
+      // Crear nuevo libro de Excel
+      const workbook = XLSX.utils.book_new();
+
+      // Crear y agregar hoja de estadísticas
+      const wsStats = XLSX.utils.json_to_sheet(generalStats);
+      XLSX.utils.book_append_sheet(workbook, wsStats, 'Estadísticas Generales');
+
+      // Crear y agregar hoja de usuarios
+      const wsUsers = XLSX.utils.json_to_sheet(usersData);
+      XLSX.utils.book_append_sheet(workbook, wsUsers, 'Detalle de Usuarios');
+
+      // Ajustar anchos de columna
+      const wscols = [
+        {wch: 20}, // Estado/Métrica
+        {wch: 30}, // Usuario/Valor
+        {wch: 15}, // Teléfono
+        {wch: 15}, // Ciudad
+        {wch: 20}  // Mensajes/Descripción
+      ];
+
+      wsStats['!cols'] = wscols;
+      wsUsers['!cols'] = wscols;
+
+      // Generar nombre del archivo con fecha
+      const date = new Date().toISOString().split('T')[0];
+      const fileName = `Reporte_ChatBot_${ciudad}_${date}.xlsx`;
+
+      // Guardar archivo
+      XLSX.writeFile(workbook, fileName);
+    } catch (error) {
+      console.error('Error al exportar a Excel:', error);
+    }
+  };
+
+  const handleFileChange = (e, fileType) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setFiles(prev => ({
+      ...prev,
+      [fileType]: file
+    }));
+  };
+
+  const removeFile = (fileType) => {
+    setFiles(prev => ({
+      ...prev,
+      [fileType]: null
+    }));
+  };
+
+  const handleUpload = async () => {
+    try {
+      let mergedUsers = [];
+
+      // Procesar archivos Excel si están presentes
+      if (files.usuariosBogota) {
+        const bogotaData = await processExcelFile(files.usuariosBogota, 'Bogotá');
+        mergedUsers = [...mergedUsers, ...bogotaData];
+      }
+
+      if (files.usuariosBucaramanga) {
+        const bucaramangaData = await processExcelFile(files.usuariosBucaramanga, 'Bucaramanga');
+        mergedUsers = [...mergedUsers, ...bucaramangaData];
+      }
+
+      // Si hay archivos cargados, guardar en localStorage
+      if (mergedUsers.length > 0) {
+        localStorage.setItem('mergedUsers', JSON.stringify(mergedUsers));
+      }
+
+      // Recalcular estadísticas
+      calculateStats(filteredData);
+      setShowModal(false);
+
+    } catch (err) {
+      console.error("Error en la carga de archivos:", err);
+    }
+  };
+
+  // Función que calcula las estadísticas
+  const calculateStats = (data) => {
+    if (!Array.isArray(data)) return;
+
+    // Filtrar por ciudad
+    const cityFilteredData = data.filter(user => !ciudad || user.city === ciudad);
+    console.log('registros de isa para ', ciudad, cityFilteredData);
+
+    // Obtener datos del localStorage
+    const storedData = localStorage.getItem("mergedUsers");
+    const registeredUsers = storedData ? JSON.parse(storedData) : [];
+
+    // Cálculo de estadísticas
+    const totalUsers = cityFilteredData.length;
+
+    // Contar usuarios registrados
+    const registeredCount = cityFilteredData.filter(user =>
+      registeredUsers.some(regUser => {
+        const normalizedStoredPhone = normalizePhoneNumber(regUser.Celular);
+        const normalizedUserPhone = normalizePhoneNumber(user.PhoneNumber);
+        return normalizedStoredPhone === normalizedUserPhone;
+      })
+    );
+    console.log('usuarios registrados', registeredCount);
+
+    // Calcular tasa de conversión
+    const conversionRate = totalUsers > 0 ? ((registeredCount.length / totalUsers) * 100).toFixed(2) : 0;
+    console.log('tasa de conversión', conversionRate);
+
+    // Calcular costo por usuario (usando el total de usuarios sin filtrar por ciudad)
+    const costPerUser = data.length > 0 ? (spentAmount / data.length).toFixed(2) : 0;
+
+    // Actualizar estado
+    setStats({
+      totalUsers,
+      registeredUsers: registeredCount.length,
+      conversionRate,
+      costPerUser
+    });
+  };
+
+  // Función que maneja los datos recibidos de FiltrosReportes
+  const handleDataFetched = (data) => {
+    setFilteredData(data);
+    calculateStats(data);
+  };
+
+  // Efecto para recalcular cuando cambia la ciudad
+  useEffect(() => {
+    calculateStats(filteredData);
+  }, [ciudad, spentAmount]);
+
+  // Definición de las tarjetas de estadísticas
+  const statsCards = [
+    {
+      title: "Usuarios Totales",
+      icon: Users,
+      value: stats.totalUsers,
+      color: "cyan",
+      description: "Total de usuarios únicos"
+    },
+    {
+      title: "Usuarios Registrados",
+      icon: MessageSquare,
+      value: stats.registeredUsers,
+      color: "cyan",
+      description: "Usuarios que completaron registro"
+    },
+    {
+      title: "Tasa de Conversión",
+      icon: TrendingUp,
+      value: `${stats.conversionRate}%`,
+      color: "cyan",
+      description: "Porcentaje de usuarios registrados"
+    },
+    {
+      title: "Costo Global por Usuario",
+      icon: MessageSquare,
+      value: `$${stats.costPerUser}`,
+      color: "cyan",
+      description: "Costo promedio por usuario"
+    }
+  ];
+
+  // Función para clasificar los usuarios
+  const getUsersList = (data) => {
+    if (!Array.isArray(data)) return { registered: [], unregistered: [] };
+
+    const storedData = localStorage.getItem("mergedUsers");
+    const registeredUsers = storedData ? JSON.parse(storedData) : [];
+
+    const registered = data.filter(user =>
+      registeredUsers.some(regUser => {
+        const normalizedStoredPhone = normalizePhoneNumber(regUser.Celular);
+        const normalizedUserPhone = normalizePhoneNumber(user.PhoneNumber);
+        return normalizedStoredPhone === normalizedUserPhone;
+      })
+    );
+
+    const unregistered = data.filter(user =>
+      !registeredUsers.some(regUser => {
+        const normalizedStoredPhone = normalizePhoneNumber(regUser.Celular);
+        const normalizedUserPhone = normalizePhoneNumber(user.PhoneNumber);
+        return normalizedStoredPhone === normalizedUserPhone;
+      })
+    );
+
+    return { registered, unregistered };
   };
 
   return (
-    <div className="p-4 md:p-6 bg-slate-900 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Consulta General</h2>
+    <div className="p-6 space-y-6 bg-slate-900 overflow-y-scroll scrollbar-custom">
+      <div className="mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row items-center justify-between">
+          <h2 className="text-3xl font-bold text-cyan-400 mb-4 lg:mb-0">
+            Informe de Conversión Iza ChatBot
+          </h2>
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <select
+              value={ciudad}
+              onChange={(e) => setCiudad(e.target.value)}
+              className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
+            >
+              <option value="Bogota">Bogotá</option>
+              <option value="Bucaramanga">Bucaramanga</option>
+            </select>
 
-      {/* Filtros: Ciudad y Fecha */}
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
-        {/* Filtro de Ciudad */}
-        <div className="w-full md:w-1/2">
-          <label className="block text-sm font-medium text-indigo-400 mb-2">
-            Selecciona una ciudad:
-          </label>
-          <select
-            value={ciudad}
-            onChange={(e) => setCiudad(e.target.value)}
-            className="w-full bg-slate-700 text-white p-2 rounded-lg"
-          >
-            <option value="Bogotá">Bogotá</option>
-            <option value="Bucaramanga">Bucaramanga</option>
-          </select>
-        </div>
+            <FiltrosReportes onDataFetched={handleDataFetched} />
 
-        {/* Filtro de Fechas */}
-        <div className="w-full md:w-1/2">
-          <label className="block text-sm font-medium text-indigo-400 mb-2">
-            Selecciona un rango de fechas:
-          </label>
-          <DatePicker
-            selectsRange
-            startDate={startDate}
-            endDate={endDate}
-            onChange={handleDateChange}
-            className="w-full bg-slate-700 text-white p-2 rounded-lg"
-            dateFormat="dd/MM/yyyy"
-          />
-        </div>
-      </div>
+            <button
+              onClick={exportToExcel}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center gap-2"
+            >
+              <Download className="w-5 h-5" /> Exportar Excel
+            </button>
 
-      {/* Métricas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <div className="p-4 bg-slate-800 rounded-lg">
-          <h3 className="text-lg font-semibold text-cyan-400">Costo Global por Usuario Registrado</h3>
-          <p className="text-white">${metricsData.costoGlobalPorUsuario}</p>
-        </div>
-        <div className="p-4 bg-slate-800 rounded-lg">
-          <h3 className="text-lg font-semibold text-cyan-400">Ciudad Seleccionada</h3>
-          <p className="text-white">{ciudad}</p>
-        </div>
-        <div className="p-4 bg-slate-800 rounded-lg">
-          <h3 className="text-lg font-semibold text-cyan-400">Usuarios Totales</h3>
-          <p className="text-white">{metricsData.usuariosTotales}</p>
-        </div>
-        <div className="p-4 bg-slate-800 rounded-lg">
-          <h3 className="text-lg font-semibold text-cyan-400">Usuarios Registrados</h3>
-          <p className="text-white">{metricsData.usuariosRegistrados}</p>
-        </div>
-        <div className="p-4 bg-slate-800 rounded-lg">
-          <h3 className="text-lg font-semibold text-cyan-400">Tasa de Conversión</h3>
-          <p className="text-white">{metricsData.tasaConversion}%</p>
-        </div>
-        <div className="p-4 bg-slate-800 rounded-lg">
-          <h3 className="text-lg font-semibold text-cyan-400">Tasa de Conversión Diaria</h3>
-          <p className="text-white">{metricsData.tasaConversionDiaria}%</p>
-        </div>
-      </div>
-
-      {/* Gráficos */}
-      <div className="space-y-8">
-        {/* Gráfico de Mensajes */}
-        <div>
-          <h3 className="text-xl font-semibold text-cyan-400 mb-4">Mensajes Enviados</h3>
-          <ResponsiveContainer width="100%" height={300} className="lg:h-64">
-            <BarChart data={exampleData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Mensajes" fill="#00C9A7" />
-            </BarChart>
-          </ResponsiveContainer>
+            <button
+              className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-all flex items-center gap-2"
+              onClick={() => setShowModal(true)}
+            >
+              <Upload className="w-5 h-5" /> Cargar Archivos
+            </button>
+          </div>
         </div>
 
-        {/* Gráfico de Usuarios */}
-        <div>
-          <h3 className="text-xl font-semibold text-cyan-400 mb-4">Usuarios Activos</h3>
-          <ResponsiveContainer width="100%" height={300} className="lg:h-64">
-            <BarChart data={exampleData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Usuarios" fill="#845EC2" />
-            </BarChart>
-          </ResponsiveContainer>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {statsCards.map((stat, index) => (
+            <Card
+              key={index}
+              className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all"
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-400">{stat.title}</p>
+                    <p className={`text-2xl font-bold text-${stat.color}-400 mt-2`}>
+                      {stat.value}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {stat.description}
+                    </p>
+                  </div>
+                  <stat.icon className={`w-8 h-8 text-${stat.color}-400 opacity-80`} />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Gráfico de Usuarios Registrados */}
-        <div>
-          <h3 className="text-xl font-semibold text-cyan-400 mb-4">Usuarios Registrados</h3>
-          <ResponsiveContainer width="100%" height={300} className="lg:h-64">
-            <BarChart data={exampleData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="UsuariosRegistrados" fill="#FF6F91" />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="mt-8">
+          <div className="bg-slate-800/50 rounded-lg border border-slate-700">
+            <div className="p-4 border-b border-slate-700">
+              <h3 className="text-xl font-semibold text-cyan-400">Detalle de Usuarios</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-slate-700/50">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Estado
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Usuario
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Teléfono
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Ciudad
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                      Mensajes
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700">
+                  {/* Usuarios Registrados */}
+                  {getUsersList(filteredData).registered.map((user, index) => (
+                    <tr key={`registered-${index}`} className="bg-green-900/10">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          Registrado
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.Username}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.PhoneNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.city}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.Messages?.length || 0}
+                      </td>
+                    </tr>
+                  ))}
+                  {/* Usuarios No Registrados */}
+                  {getUsersList(filteredData).unregistered.map((user, index) => (
+                    <tr key={`unregistered-${index}`} className="bg-red-900/10">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                          No Registrado
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.Username}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.PhoneNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.city}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {user.Messages?.length || 0}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
-        {/* Gráfico de Tasa de Conversión */}
-        <div>
-          <h3 className="text-xl font-semibold text-cyan-400 mb-4">Tasa de Conversión</h3>
-          <ResponsiveContainer width="100%" height={300} className="lg:h-64">
-            <BarChart data={exampleData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="TasaConversion" fill="#FF9671" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        {/* Modal */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-slate-800 p-6 rounded-lg w-[32rem] space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-cyan-400">Cargar Archivos y Gastos</h3>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="text-slate-400 hover:text-slate-200"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
-        {/* Gráfico de Usuarios por Día */}
-        <div>
-          <h3 className="text-xl font-semibold text-cyan-400 mb-4">Usuarios por Día</h3>
-          <ResponsiveContainer width="100%" height={300} className="lg:h-64">
-            <BarChart data={exampleData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="UsuariosPorDia" fill="#FFC75F" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+              {/* Input para el gasto total */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">
+                  Gasto Total ($)
+                </label>
+                <input
+                  type="number"
+                  value={spentAmount}
+                  onChange={(e) => setSpentAmount(Number(e.target.value))}
+                  className="w-full bg-slate-700 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                  placeholder="Ingrese el monto gastado"
+                />
+              </div>
+
+              {/* Usuarios Bogotá */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">
+                  Usuarios Bogotá (Excel) - Opcional
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={(e) => handleFileChange(e, 'usuariosBogota')}
+                    className="hidden"
+                    id="bogotaFile"
+                  />
+                  <button
+                    onClick={() => document.getElementById('bogotaFile').click()}
+                    className="flex-1 bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition-all flex items-center gap-2"
+                  >
+                    <Upload className="w-4 h-4" />
+                    {files.usuariosBogota ? files.usuariosBogota.name : 'Seleccionar archivo'}
+                  </button>
+                  {files.usuariosBogota && (
+                    <button
+                      onClick={() => removeFile('usuariosBogota')}
+                      className="p-2 text-slate-400 hover:text-slate-200"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Usuarios Bucaramanga */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">
+                  Usuarios Bucaramanga (Excel) - Opcional
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={(e) => handleFileChange(e, 'usuariosBucaramanga')}
+                    className="hidden"
+                    id="bucaramangaFile"
+                  />
+                  <button
+                    onClick={() => document.getElementById('bucaramangaFile').click()}
+                    className="flex-1 bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition-all flex items-center gap-2"
+                  >
+                    <Upload className="w-4 h-4" />
+                    {files.usuariosBucaramanga ? files.usuariosBucaramanga.name : 'Seleccionar archivo'}
+                  </button>
+                  {files.usuariosBucaramanga && (
+                    <button
+                      onClick={() => removeFile('usuariosBucaramanga')}
+                      className="p-2 text-slate-400 hover:text-slate-200"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <button
+                  className="px-4 py-2 text-slate-300 hover:text-white transition-all"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg transition-all"
+                  onClick={handleUpload}
+                >
+                  Guardar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -20,19 +20,24 @@ export const DashboardTable = () => {
 
   // Función que maneja los datos obtenidos después de aplicar los filtros
   const handleDataFetched = (fetchedData) => {
+    console.log(fetchedData);
     setFilteredData(fetchedData);
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
+    <div className="p-6 space-y-6 overflow-y-scroll scrollbar-custom">
+      <div className="flex flex-col lg:flex-row items-center justify-between  h-24">
+        <h2 className="text-3xl font-bold text-cyan-400 w-full ">
+          Informe General
+        </h2>
+
         <FiltrosReportes onDataFetched={handleDataFetched} />
       </div>
       {/* Tarjetas de Contadores */}
       <TarjetaContador userList={filteredData} />
 
       {/* Tabla de Usuarios */}
-      <div className="overflow-x-auto bg-[#162033] text-white rounded-lg shadow-md overflow-y-scroll scrollbar-custom max-h-[35rem]">
+      <div className="overflow-x-auto bg-[#162033] text-white rounded-lg shadow-md max-h-[35rem]">
         <table className="min-w-full text-left ">
           <thead>
             <tr className="border-b border-cyan-400">
@@ -47,32 +52,39 @@ export const DashboardTable = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((user) => (
-              <tr key={user.UserId} className="border-b border-gray-600 hover:bg-[#3B3F47]">
-                <td className="px-4 py-2">{user.UserId}</td>
-                <td className="px-4 py-2">{user.Username}</td>
-                <td className="px-4 py-2">{user.PhoneNumber}</td>
-                <td className="px-4 py-2">{user.Age}</td>
-                <td
-                  className={`px-4 py-2 ${user.Availability === "Available" ? "text-green-400" : "text-red-400"
-                    }`}
-                >
-                  {user.Availability}
-                </td>
-                <td className="px-4 py-2 text-center">{user.messageCount || 'No disponible'}</td>
-                <td className="px-4 py-2 text-center">{user.city || 'No disponible'}</td>
-                <td className="px-4 py-2">
-                  <button
-                    className="px-4 py-1 bg-color-primary text-white rounded-lg hover:bg-color-primary-hover transition-all duration-300"
-                    onClick={() => openModal(user)}
+            {filteredData.length > 0 ? (
+              filteredData.map((user) => (
+                <tr key={user.UserId} className="border-b border-gray-600 hover:bg-[#3B3F47]">
+                  <td className="px-4 py-2">{user.UserId}</td>
+                  <td className="px-4 py-2">{user.Username}</td>
+                  <td className="px-4 py-2">{user.PhoneNumber}</td>
+                  <td className="px-4 py-2">{user.Age}</td>
+                  <td
+                    className={`px-4 py-2 ${user.Availability === "Available" ? "text-green-400" : "text-red-400"
+                      }`}
                   >
-                    Ver Mensajes
-                  </button>
+                    {user.Availability}
+                  </td>
+                  <td className="px-4 py-2 text-center">{user.messageCount || "No disponible"}</td>
+                  <td className="px-4 py-2 text-center">{user.city || "No disponible"}</td>
+                  <td className="px-4 py-2">
+                    <button
+                      className="px-4 py-1 bg-color-primary text-white rounded-lg hover:bg-color-primary-hover transition-all duration-300"
+                      onClick={() => openModal(user)}
+                    >
+                      Ver Mensajes
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8" className="text-center py-4 text-gray-400">
+                  No se encontraron datos en el periodo de fechas seleccionado.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
-
         </table>
       </div>
 

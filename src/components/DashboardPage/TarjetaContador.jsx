@@ -1,20 +1,36 @@
+import { MessageSquare, Users, TrendingUp } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+
 export const TarjetaContador = ({ userList }) => {
-    // Contar los mensajes y usuarios
-    const totalUsers = userList.length;
+  // Calcular estadísticas
+  const totalUsers = userList.length;
+  const totalMessages = userList.reduce((total, user) => total + (user.Messages ? user.Messages.length : 0), 0);
+  const averageRate = totalMessages > 0 ? ((totalMessages / totalUsers) * 100).toFixed(2) : 0;
 
-    // Contar el total de mensajes recorriendo cada usuario y sumando la cantidad de mensajes
-    const totalMessages = userList.reduce((total, user) => total + (user.Messages ? user.Messages.length : 0), 0);
+  // Definir datos de las tarjetas
+  const stats = [
+    { title: "Total Mensajes", icon: MessageSquare, value: totalMessages.toLocaleString(), color: "cyan" },
+    { title: "Usuarios Totales", icon: Users, value: totalUsers.toLocaleString(), color: "cyan" },
+  ];
 
-    return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-            <div className="p-4 bg-[#162033] text-white rounded-lg shadow-md flex flex-col items-center justify-center">
-                <h2 className="text-xl font-bold">Total Mensajes</h2>
-                <p className="text-3xl font-semibold text-cyan-400">{totalMessages}</p>
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 bg">
+      {stats.map((stat, index) => (
+        <Card
+          key={index}
+          className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all"
+        >
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-400">{stat.title}</p>
+                <p className={`text-2xl font-bold text-${stat.color}-400 mt-2`}>{stat.value}</p>
+              </div>
+              <stat.icon className={`w-8 h-8 text-${stat.color}-400 opacity-80`} />
             </div>
-            <div className="p-4 bg-[#162033] text-white rounded-lg shadow-md flex flex-col items-center justify-center">
-                <h2 className="text-xl font-bold">Total Usuarios</h2>
-                <p className="text-3xl font-semibold text-cyan-400">{totalUsers}</p>
-            </div>
-        </div>
-    );
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
 };

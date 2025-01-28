@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx'; // Importamos la librería XLSX
+import { Check, FileDown } from "lucide-react";
 
 export const FiltrosReportes = ({ onDataFetched }) => {
     // Controla si el contenido está "cargado" para la animación (opacity)
@@ -79,13 +80,39 @@ export const FiltrosReportes = ({ onDataFetched }) => {
             setIsLoading(false);
         } catch (error) {
             console.error("Error al obtener los datos desde el backend:", error);
-            fetchDataFromJson(startDate, endDate);
             setIsLoading(false);
         }
     };
 
     const normalizeData = (usersData, messagesData) => {
         const normalizedData = {};
+
+        // Función para normalizar el número de teléfono
+        const normalizePhoneNumber = (phone) => {
+            if (!phone) return phone;
+            const phoneStr = phone.toString();
+            return phoneStr.startsWith('57') ? parseInt(phoneStr.slice(2)) : parseInt(phoneStr);
+        };
+
+        // Función para normalizar el nombre de la ciudad
+        const normalizeCity = (city) => {
+            if (!city) return city;
+
+            // Convertir a string, por si acaso viene otro tipo de dato
+            const cityStr = city.toString();
+
+            // Convertir a minúsculas y luego capitalizar la primera letra
+            const normalized = cityStr
+                // Eliminar acentos y caracteres especiales
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                // Convertir a minúsculas
+                .toLowerCase()
+                // Capitalizar primera letra
+                .replace(/^\w/, c => c.toUpperCase());
+
+            return normalized;
+        };
 
         // Crear un mapa de mensajes agrupados por userId
         const messagesByUserId = messagesData.reduce((acc, message) => {
@@ -103,7 +130,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
         // Procesar los usuarios y asociarles los mensajes correspondientes
         usersData.forEach(user => {
             const userId = user.id;
-            const phoneNumber = user.telefono;
+            const phoneNumber = normalizePhoneNumber(user.telefono);
 
             // Filtrar mensajes válidos
             const validMessages = (messagesByUserId[userId] || []).filter(
@@ -119,7 +146,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                 Availability: user.availability,
                 ContactWay: user.contact_way,
                 Messages: validMessages,
-                city: user.city
+                city: normalizeCity(user.city) // Aplicamos la normalización de la ciudad
             };
 
             // Agregar conteo de mensajes
@@ -132,7 +159,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
 
     const handleDownload = () => {
         const usersData = filteredData
-        
+
         // Convertir la información de los usuarios en formato adecuado para la hoja de usuarios
         const usersSheetData = usersData.map(user => ({
             UserId: user.UserId,
@@ -170,51 +197,56 @@ export const FiltrosReportes = ({ onDataFetched }) => {
     };
 
     return (
-        <div className="bg-transparent p-4 text-white rounded-md w-full">
+        <div className="bg-transparent m-2 p-4 md:p-0 text-white rounded-md ">
             <div
-                className={`flex flex-wrap md:flex-nowrap justify-center items-end gap-4 transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                className={`flex flex-wrap md:flex-nowrap justify-center items-center gap-5 transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
             >
-                <div className="flex flex-wrap md:flex-nowrap items-center gap-4 w-full md:w-fit justify-center ">
-                    <div className="flex flex-col">
-                        <label className="text-white/70 text-sm mb-1">Fecha Inicio</label>
-                        <input
-                            type="date"
-                            className="px-3 py-2 bg-[#2A303C] text-white rounded-lg border border-[#00D8D6]
+                <div className="flex flex-col justify-center items-end shadow-md rounded-lg px-1 pt-4">
+                    <div className='flex flex-wrap md:flex-nowrap items-center gap-4 w-full md:w-fit justify-center'>
+                        <div className="flex flex-col">
+                            <label className="text-white/70 text-sm mb-1">Fecha Inicio</label>
+                            <input
+                                type="date"
+                                className="px-3 py-1 bg-[#2A303C] text-[0.9em] text-white rounded-lg border border-[#00D8D6]
                                 focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                        />
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-white/70 text-sm mb-1">Fecha Fin</label>
+                            <input
+                                type="date"
+                                className="px-3 py-1 bg-[#2A303C] text-[0.9em] text-white rounded-lg border border-[#00D8D6]
+                                focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                            />
+                        </div>
+
                     </div>
 
-                    <div className="flex flex-col">
-                        <label className="text-white/70 text-sm mb-1">Fecha Fin</label>
-                        <input
-                            type="date"
-                            className="px-3 py-2 bg-[#2A303C] text-white rounded-lg border border-[#00D8D6]
-                                focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                        />
-                    </div>
+
+
+                    <span
+                        className="py-2 px-1 text-white rounded-lg text-[0.875rem] flex flex-row justify-center items-center gap-1"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Cargando...' : <>Filtro Aplicado <Check size={15} /></>}
+
+                    </span>
                 </div>
 
-                <button
-                    className="px-4 py-1 sm:px-6 sm:py-2 lg:px-8 lg:py-3 bg-color-primary text-white rounded-lg font-semibold hover:bg-color-primary-hover
-                        transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base lg:text-lg"
-                    onClick={fetchData}
-                    disabled={isLoading}
-                >
-                    {isLoading ? 'Cargando...' : 'Aplicar Filtro'}
-                </button>
+
 
                 {/* Botón para descargar el reporte */}
                 <button
-                    className="px-4 py-1 sm:px-6 sm:py-2 lg:px-8 lg:py-3 bg-[#2A303C] text-white rounded-lg font-semibold
-                        hover:bg-[#1B2430]/90 border-b border-cyan-400 hover:bg-cyan-500/10
-                        transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base lg:text-lg"
+                    className="flex flex-row items-center gap-2 px-4 py-1 sm:px-6 sm:py-2 lg:px-8 lg:py-2 bg-[#2A303C] text-white rounded-lg font-semibold
+                        hover:bg-[#1B2430]/90 border-b border-cyan-40
+                        transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base lg:text-md"
                     onClick={handleDownload} // Llamamos a la función de descarga
                 >
-                    Descargar Reporte
+                    <FileDown size={25} />
                 </button>
             </div>
         </div>

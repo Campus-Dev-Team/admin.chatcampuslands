@@ -65,6 +65,20 @@ export const DashboardNavbar = () => {
         {isMenuOpen ? <ChevronLeft /> : <ChevronRight />}
       </button>
 
+      {/* Botón colapso (desktop) */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="hidden lg:flex justify-center items-center fixed top-1/2 -translate-y-1/2 z-50 w-8 h-8 
+        bg-slate-800 text-white rounded-full shadow-sm border-cyan-400/10 
+        hover:bg-slate-700/90 transition-all duration-200"
+        style={{
+          left: isCollapsed ? "44px" : "284px",
+          transition: "all 300ms ease-in-out",
+        }}
+      >
+        {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
+      </button>
+
       {/* Navbar */}
       <div
         className={`fixed lg:relative lg:translate-x-0 inset-y-0 left-0 z-40
