@@ -79,7 +79,6 @@ export const FiltrosReportes = ({ onDataFetched }) => {
             setIsLoading(false);
         } catch (error) {
             console.error("Error al obtener los datos desde el backend:", error);
-            fetchDataFromJson(startDate, endDate);
             setIsLoading(false);
         }
     };
