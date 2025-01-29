@@ -13,6 +13,11 @@ export const UploadFilesModal = ({
 }) => {
     if (!showModal) return null;
 
+    const handleSpentAmountChange = (e) => {
+        const value = e.target.value;
+        setSpentAmount(value === '' ? '' : Number(value));
+    };
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-slate-800 p-6 rounded-lg w-[32rem] space-y-4">
@@ -33,13 +38,14 @@ export const UploadFilesModal = ({
                     </label>
                     <input
                         type="number"
-                        value={spentAmount}
-                        onChange={(e) => setSpentAmount(Number(e.target.value))}
+                        value={spentAmount === 0 ? '' : spentAmount}
+                        onChange={handleSpentAmountChange}
                         className="w-full bg-slate-700 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                         placeholder="Ingrese el monto gastado"
                     />
                 </div>
 
+                {/* Resto del código permanece igual */}
                 {/* Usuarios Bogotá */}
                 <div>
                     <label className="block text-sm font-medium text-white mb-1">
