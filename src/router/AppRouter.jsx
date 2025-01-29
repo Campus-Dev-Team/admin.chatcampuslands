@@ -4,7 +4,7 @@ import { DashboardPage } from '../pages/DashboardPage';
 import LoginPage from '../pages/LoginPage';
 import { ProtectedRoute } from '../router/ProtectedRoute';
 import { GeneralConsult } from '../components/DashboardPage/GeneralConsult';
-import { DashboardTable } from '../components/DashboardPage/DashboardTable';
+import { DashboardIndex } from '../pages/Dashboard/DashboardIndex';
 import { MessageAdminPage } from '../components/DashboardPage/MessageAdminPage';
 
 const AppRouter = () => {
@@ -35,7 +35,7 @@ const AppRouter = () => {
         }
       >
         {/* Ruta por defecto del dashboard */}
-        <Route index element={<DashboardTable />} />
+        <Route index element={<DashboardIndex />} />
 
         {/* Rutas específicas dentro del dashboard */}
         <Route path="general" element={<GeneralConsult />} />
