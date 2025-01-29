@@ -3,8 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Users, MessageSquare, TrendingUp, Upload, X, Download } from "lucide-react";
 import { FiltrosReportes } from './FiltrosReportes';
 import * as XLSX from "xlsx";
+import { UploadFilesModal } from './UploadFilesModal';
+import { UserMessagesModal } from './UserMessagesModal';
+
+
 
 export const GeneralConsult = () => {
+  const [showMessagesModal, setShowMessagesModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
   // Estados principales
   const [ciudad, setCiudad] = useState("Bucaramanga");
   const [showModal, setShowModal] = useState(false);
@@ -20,6 +27,18 @@ export const GeneralConsult = () => {
     conversionRate: 0,
     costPerUser: 0
   });
+
+  // Add handler for opening messages modal
+  const handleOpenMessages = (user) => {
+    setSelectedUser(user);
+    setShowMessagesModal(true);
+  };
+
+  // Add handler for closing messages modal
+  const handleCloseMessages = () => {
+    setSelectedUser(null);
+    setShowMessagesModal(false);
+  };
 
   // Función para normalizar números telefónicos
   const normalizePhoneNumber = (phone) => {
@@ -88,7 +107,7 @@ export const GeneralConsult = () => {
 
       // Obtener datos de usuarios
       const { registered, unregistered } = getUsersList(filteredData);
-      
+
       // Preparar datos detallados de usuarios
       const usersData = [...registered, ...unregistered].map(user => ({
         'Estado': registered.includes(user) ? 'Registrado' : 'No Registrado',
@@ -111,11 +130,11 @@ export const GeneralConsult = () => {
 
       // Ajustar anchos de columna
       const wscols = [
-        {wch: 20}, // Estado/Métrica
-        {wch: 30}, // Usuario/Valor
-        {wch: 15}, // Teléfono
-        {wch: 15}, // Ciudad
-        {wch: 20}  // Mensajes/Descripción
+        { wch: 20 }, // Estado/Métrica
+        { wch: 30 }, // Usuario/Valor
+        { wch: 15 }, // Teléfono
+        { wch: 15 }, // Ciudad
+        { wch: 20 }  // Mensajes/Descripción
       ];
 
       wsStats['!cols'] = wscols;
@@ -269,7 +288,10 @@ export const GeneralConsult = () => {
     const storedData = localStorage.getItem("mergedUsers");
     const registeredUsers = storedData ? JSON.parse(storedData) : [];
 
-    const registered = data.filter(user =>
+    const cityFilteredData = data.filter(user => !ciudad || user.city === ciudad);
+
+
+    const registered = cityFilteredData.filter(user =>
       registeredUsers.some(regUser => {
         const normalizedStoredPhone = normalizePhoneNumber(regUser.Celular);
         const normalizedUserPhone = normalizePhoneNumber(user.PhoneNumber);
@@ -277,7 +299,7 @@ export const GeneralConsult = () => {
       })
     );
 
-    const unregistered = data.filter(user =>
+    const unregistered = cityFilteredData.filter(user =>
       !registeredUsers.some(regUser => {
         const normalizedStoredPhone = normalizePhoneNumber(regUser.Celular);
         const normalizedUserPhone = normalizePhoneNumber(user.PhoneNumber);
@@ -373,6 +395,8 @@ export const GeneralConsult = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
                       Mensajes
                     </th>
+
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-700">
@@ -396,6 +420,14 @@ export const GeneralConsult = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
                         {user.Messages?.length || 0}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        <button
+                          onClick={() => handleOpenMessages(user)}
+                          className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-all"
+                        >
+                          Ver Mensajes
+                        </button>
+                      </td>
                     </tr>
                   ))}
                   {/* Usuarios No Registrados */}
@@ -418,6 +450,14 @@ export const GeneralConsult = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
                         {user.Messages?.length || 0}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        <button
+                          onClick={() => handleOpenMessages(user)}
+                          className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-all"
+                        >
+                          Ver Mensajes
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -426,113 +466,24 @@ export const GeneralConsult = () => {
           </div>
         </div>
 
-        {/* Modal */}
-        {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-slate-800 p-6 rounded-lg w-[32rem] space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold text-cyan-400">Cargar Archivos y Gastos</h3>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="text-slate-400 hover:text-slate-200"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+        {/* Upload Files Modal */}
+        <UploadFilesModal
+          showModal={showModal}
+          onClose={() => setShowModal(false)}
+          spentAmount={spentAmount}
+          setSpentAmount={setSpentAmount}
+          files={files}
+          handleFileChange={handleFileChange}
+          removeFile={removeFile}
+          handleUpload={handleUpload}
+        />
 
-              {/* Input para el gasto total */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-1">
-                  Gasto Total ($)
-                </label>
-                <input
-                  type="number"
-                  value={spentAmount}
-                  onChange={(e) => setSpentAmount(Number(e.target.value))}
-                  className="w-full bg-slate-700 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                  placeholder="Ingrese el monto gastado"
-                />
-              </div>
-
-              {/* Usuarios Bogotá */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-1">
-                  Usuarios Bogotá (Excel) - Opcional
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="file"
-                    accept=".xlsx,.xls"
-                    onChange={(e) => handleFileChange(e, 'usuariosBogota')}
-                    className="hidden"
-                    id="bogotaFile"
-                  />
-                  <button
-                    onClick={() => document.getElementById('bogotaFile').click()}
-                    className="flex-1 bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition-all flex items-center gap-2"
-                  >
-                    <Upload className="w-4 h-4" />
-                    {files.usuariosBogota ? files.usuariosBogota.name : 'Seleccionar archivo'}
-                  </button>
-                  {files.usuariosBogota && (
-                    <button
-                      onClick={() => removeFile('usuariosBogota')}
-                      className="p-2 text-slate-400 hover:text-slate-200"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Usuarios Bucaramanga */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-1">
-                  Usuarios Bucaramanga (Excel) - Opcional
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="file"
-                    accept=".xlsx,.xls"
-                    onChange={(e) => handleFileChange(e, 'usuariosBucaramanga')}
-                    className="hidden"
-                    id="bucaramangaFile"
-                  />
-                  <button
-                    onClick={() => document.getElementById('bucaramangaFile').click()}
-                    className="flex-1 bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition-all flex items-center gap-2"
-                  >
-                    <Upload className="w-4 h-4" />
-                    {files.usuariosBucaramanga ? files.usuariosBucaramanga.name : 'Seleccionar archivo'}
-                  </button>
-                  {files.usuariosBucaramanga && (
-                    <button
-                      onClick={() => removeFile('usuariosBucaramanga')}
-                      className="p-2 text-slate-400 hover:text-slate-200"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <button
-                  className="px-4 py-2 text-slate-300 hover:text-white transition-all"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancelar
-                </button>
-                <button
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg transition-all"
-                  onClick={handleUpload}
-                >
-                  Guardar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Messages Modal */}
+        <UserMessagesModal
+          isOpen={showMessagesModal}
+          user={selectedUser}
+          onClose={handleCloseMessages}
+        />
       </div>
     </div>
   );
