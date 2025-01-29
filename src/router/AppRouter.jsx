@@ -5,6 +5,7 @@ import LoginPage from '../pages/LoginPage';
 import { ProtectedRoute } from '../router/ProtectedRoute';
 import { GeneralConsult } from '../components/DashboardPage/GeneralConsult';
 import { DashboardTable } from '../components/DashboardPage/DashboardTable';
+import { MessageAdminPage } from '../components/DashboardPage/MessageAdminPage';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -40,7 +41,7 @@ const AppRouter = () => {
         <Route path="general" element={<GeneralConsult />} />
         <Route path="settings" element={<div className='flex w-full h-full justify-center items-center text-white'>Pronto habra algo aquí ⚙️ </div>} />
         <Route path="users" element={<div className='flex w-full h-full justify-center items-center text-white'>Pronto habra algo aquí 😊 </div>} />
-        <Route path="messages" element={<div className='flex w-full h-full justify-center items-center text-white'>Pronto habra algo aquí 💬 </div>} />
+        <Route path="messages" element={<MessageAdminPage/>} />
       </Route>
 
       {/* Ruta para cualquier otra dirección */}
