@@ -197,13 +197,12 @@ export const GeneralConsult = () => {
     }
   };
 
-  // Función que calcula las estadísticas
+  // Dentro de la función calculateStats
   const calculateStats = (data) => {
     if (!Array.isArray(data)) return;
 
-    // Filtrar por ciudad
+    // Filtrar por ciudad (para las demás estadísticas)
     const cityFilteredData = data.filter(user => !ciudad || user.city === ciudad);
-    console.log('registros de isa para ', ciudad, cityFilteredData);
 
     // Obtener datos del localStorage
     const storedData = localStorage.getItem("mergedUsers");
@@ -212,7 +211,7 @@ export const GeneralConsult = () => {
     // Cálculo de estadísticas
     const totalUsers = cityFilteredData.length;
 
-    // Contar usuarios registrados
+    // Contar usuarios registrados (filtrado por ciudad)
     const registeredCount = cityFilteredData.filter(user =>
       registeredUsers.some(regUser => {
         const normalizedStoredPhone = normalizePhoneNumber(regUser.Celular);
@@ -220,14 +219,21 @@ export const GeneralConsult = () => {
         return normalizedStoredPhone === normalizedUserPhone;
       })
     );
-    console.log('usuarios registrados', registeredCount);
 
-    // Calcular tasa de conversión
+    // Calcular total de usuarios registrados en todas las ciudades
+    const totalRegisteredUsers = data.filter(user =>
+      registeredUsers.some(regUser => {
+        const normalizedStoredPhone = normalizePhoneNumber(regUser.Celular);
+        const normalizedUserPhone = normalizePhoneNumber(user.PhoneNumber);
+        return normalizedStoredPhone === normalizedUserPhone;
+      })
+    );
+
+    // Calcular tasa de conversión (mantiene el filtro por ciudad)
     const conversionRate = totalUsers > 0 ? ((registeredCount.length / totalUsers) * 100).toFixed(2) : 0;
-    console.log('tasa de conversión', conversionRate);
 
-    // Calcular costo por usuario (usando el total de usuarios sin filtrar por ciudad)
-    const costPerUser = data.length > 0 ? (spentAmount / data.length).toFixed(2) : 0;
+    // Calcular costo por usuario (usando TODOS los usuarios registrados)
+    const costPerUser = totalRegisteredUsers.length > 0 ? (spentAmount / totalRegisteredUsers.length).toFixed(2) : 0;
 
     // Actualizar estado
     setStats({
