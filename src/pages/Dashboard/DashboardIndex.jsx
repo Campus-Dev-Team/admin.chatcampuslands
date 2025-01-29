@@ -19,12 +19,12 @@ export const DashboardIndex = () => {
     { key: 'city', label: 'Ciudad', defaultValue: 'No disponible' }
   ];
 
-  const openModal = (user) => {
+  const handleOpenMessages = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
   };
 
-  const closeModal = () => {
+  const handleCloseMessages = () => {
     setSelectedUser(null);
     setIsModalOpen(false);
   };
@@ -48,7 +48,7 @@ export const DashboardIndex = () => {
       <DashboardTable 
         data={filteredData}
         columns={columns}
-        onRowAction={openModal}
+        onRowAction={handleOpenMessages}
         actionLabel="Ver Mensajes"
         emptyMessage="No se encontraron datos en el periodo de fechas seleccionado."
       />
@@ -56,7 +56,7 @@ export const DashboardIndex = () => {
       <UserMessagesModal 
         isOpen={isModalOpen}
         user={selectedUser}
-        onClose={closeModal}
+        onClose={handleCloseMessages}
       />
     </div>
   );
