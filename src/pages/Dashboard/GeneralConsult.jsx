@@ -1,7 +1,7 @@
-import { GeneralConsult } from '../components/DashboardPage/GeneralConsult';
-import { DashboardHeader } from '../components/DashboardPage/DashboardHeader';
-import { DashboardNavbar } from '../components/DashboardPage/DashboardNavbar';
-import { ChatProvider } from '../context/ChatContext';
+import { GeneralConsult } from '../../components/DashboardPage/GeneralConsult';
+import { DashboardHeader } from '../../components/DashboardPage/DashboardHeader';
+import { DashboardNavbar } from '../../components/DashboardPage/DashboardNavbar';
+import { ChatProvider } from '../../context/ChatContext';
 
 export const GeneralConsult = () => {
   return (
