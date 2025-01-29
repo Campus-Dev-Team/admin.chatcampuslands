@@ -1,21 +1,99 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Upload, X } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 export const UploadFilesModal = ({
     showModal,
     onClose,
     spentAmount,
     setSpentAmount,
-    files,
-    handleFileChange,
-    removeFile,
-    handleUpload
+    onUploadSuccess,
+    calculateStats,
+    filteredData
 }) => {
+    const [files, setFiles] = useState({
+        usuariosBogota: null,
+        usuariosBucaramanga: null
+    });
+
     if (!showModal) return null;
 
     const handleSpentAmountChange = (e) => {
         const value = e.target.value;
         setSpentAmount(value === '' ? '' : Number(value));
+    };
+
+    // Función para procesar archivos Excel y agregar campo ciudad
+    const processExcelFile = async (file, ciudad) => {
+        try {
+            const buffer = await file.arrayBuffer();
+            const workbook = XLSX.read(buffer, {
+                cellDates: true,
+                cellStyles: true,
+                cellNF: true
+            });
+
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+
+            // Convertir a JSON y agregar el campo ciudad
+            const jsonData = XLSX.utils.sheet_to_json(worksheet).map(row => ({
+                ...row,
+                ciudad
+            }));
+
+            return jsonData;
+        } catch (err) {
+            console.error("Error procesando archivo Excel:", err);
+            throw new Error(`Error procesando archivo Excel: ${err.message}`);
+        }
+    };
+
+    const handleFileChange = (e, fileType) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setFiles(prev => ({
+            ...prev,
+            [fileType]: file
+        }));
+    };
+
+    const removeFile = (fileType) => {
+        setFiles(prev => ({
+            ...prev,
+            [fileType]: null
+        }));
+    };
+
+    const handleUpload = async () => {
+        try {
+            let mergedUsers = [];
+
+            // Procesar archivos Excel si están presentes
+            if (files.usuariosBogota) {
+                const bogotaData = await processExcelFile(files.usuariosBogota, 'Bogotá');
+                mergedUsers = [...mergedUsers, ...bogotaData];
+            }
+
+            if (files.usuariosBucaramanga) {
+                const bucaramangaData = await processExcelFile(files.usuariosBucaramanga, 'Bucaramanga');
+                mergedUsers = [...mergedUsers, ...bucaramangaData];
+            }
+
+            // Si hay archivos cargados, guardar en localStorage
+            if (mergedUsers.length > 0) {
+                localStorage.setItem('mergedUsers', JSON.stringify(mergedUsers));
+            }
+
+            // Recalcular estadísticas y notificar al padre
+            calculateStats(filteredData);
+            onClose();
+            onUploadSuccess?.(); // Notificar al padre que la carga fue exitosa
+
+        } catch (err) {
+            console.error("Error en la carga de archivos:", err);
+        }
     };
 
     return (
@@ -45,7 +123,6 @@ export const UploadFilesModal = ({
                     />
                 </div>
 
-                {/* Resto del código permanece igual */}
                 {/* Usuarios Bogotá */}
                 <div>
                     <label className="block text-sm font-medium text-white mb-1">
