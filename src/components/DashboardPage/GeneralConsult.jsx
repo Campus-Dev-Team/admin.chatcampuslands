@@ -203,7 +203,7 @@ export const GeneralConsult = () => {
 
     // Filtrar por ciudad
     const cityFilteredData = data.filter(user => !ciudad || user.city === ciudad);
-    console.log('registros de isa para ', ciudad, cityFilteredData);
+    // console.log('registros de isa para ', ciudad, cityFilteredData);
 
     // Obtener datos del localStorage
     const storedData = localStorage.getItem("mergedUsers");
@@ -220,14 +220,12 @@ export const GeneralConsult = () => {
         return normalizedStoredPhone === normalizedUserPhone;
       })
     );
-    console.log('usuarios registrados', registeredCount);
 
     // Calcular tasa de conversión
     const conversionRate = totalUsers > 0 ? ((registeredCount.length / totalUsers) * 100).toFixed(2) : 0;
-    console.log('tasa de conversión', conversionRate);
 
     // Calcular costo por usuario (usando el total de usuarios sin filtrar por ciudad)
-    const costPerUser = data.length > 0 ? (spentAmount / data.length).toFixed(2) : 0;
+    const costPerUser = registeredCount.length > 0 ? (spentAmount / registeredCount.length).toFixed(2) : 0;
 
     // Actualizar estado
     setStats({
