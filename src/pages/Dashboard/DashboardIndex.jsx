@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { FiltrosReportes } from './../../components/DashboardPage/FiltrosReportes';
 import { TarjetaContador } from './../../components/DashboardPage/TarjetaContador';
 import { UserMessagesModal } from './../../components/DashboardPage/UserMessagesModal';
-import {DashboardTable} from './../../components/DashboardPage/DashboardTable';  // Asegúrate de ajustar la ruta de importación
+import {DashboardTable} from './../../components/DashboardPage/DashboardTable';  
+import { TitleHeader } from './../../components/DashboardPage/TitleHeader';
+
 
 export const DashboardIndex = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -37,9 +39,9 @@ export const DashboardIndex = () => {
   return (
     <div className="p-6 space-y-6 overflow-y-scroll scrollbar-custom">
       <div className="flex flex-col lg:flex-row items-center justify-between h-24">
-        <h2 className="text-3xl font-bold text-cyan-400 w-full">
-          Informe General
-        </h2>
+      <TitleHeader title={"Informe General"}/>
+         
+        
         <FiltrosReportes onDataFetched={handleDataFetched} />
       </div>
 

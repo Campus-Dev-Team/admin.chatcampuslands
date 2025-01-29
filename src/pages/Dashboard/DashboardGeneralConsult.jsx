@@ -7,6 +7,8 @@ import { UploadFilesModal } from './../../components/DashboardPage/UploadFilesMo
 import { UserMessagesModal } from './../../components/DashboardPage/UserMessagesModal';
 import { DashboardTable } from './../../components/DashboardPage/DashboardTable';
 import { ExcelDownloadButton } from './../../components/DashboardPage/ExcelDownloadButton';
+import { StatsOverview } from './../../components/DashboardPage/StatsOverview';
+import { TitleHeader } from './../../components/DashboardPage/TitleHeader';
 
 
 export const GeneralConsult = () => {
@@ -18,10 +20,7 @@ export const GeneralConsult = () => {
   const [showModalupload, setshowModalupload] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [spentAmount, setSpentAmount] = useState(0);
-  const [files, setFiles] = useState({
-    usuariosBogota: null,
-    usuariosBucaramanga: null
-  });
+
   const [stats, setStats] = useState({
     totalUsers: 0,
     registeredUsers: 0,
@@ -29,7 +28,6 @@ export const GeneralConsult = () => {
     costPerUser: 0
   });
 
-  //******************************************modularizado*************************************** */
   const tableColumns = [
     {
       key: 'status',
@@ -87,80 +85,6 @@ export const GeneralConsult = () => {
     setShowMessagesModal(false);
   };
 
-  //*************************************************************************** */
-
-
-  // Función para procesar archivos Excel y agregar campo ciudad
-  const processExcelFile = async (file, ciudad) => {
-    try {
-      const buffer = await file.arrayBuffer();
-      const workbook = XLSX.read(buffer, {
-        cellDates: true,
-        cellStyles: true,
-        cellNF: true
-      });
-
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-
-      // Convertir a JSON y agregar el campo ciudad
-      const jsonData = XLSX.utils.sheet_to_json(worksheet).map(row => ({
-        ...row,
-        ciudad
-      }));
-
-      return jsonData;
-    } catch (err) {
-      console.error("Error procesando archivo Excel:", err);
-      throw new Error(`Error procesando archivo Excel: ${err.message}`);
-    }
-  };
-
-  const handleFileChange = (e, fileType) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setFiles(prev => ({
-      ...prev,
-      [fileType]: file
-    }));
-  };
-
-  const removeFile = (fileType) => {
-    setFiles(prev => ({
-      ...prev,
-      [fileType]: null
-    }));
-  };
-
-  const handleUpload = async () => {
-    try {
-      let mergedUsers = [];
-
-      // Procesar archivos Excel si están presentes
-      if (files.usuariosBogota) {
-        const bogotaData = await processExcelFile(files.usuariosBogota, 'Bogotá');
-        mergedUsers = [...mergedUsers, ...bogotaData];
-      }
-
-      if (files.usuariosBucaramanga) {
-        const bucaramangaData = await processExcelFile(files.usuariosBucaramanga, 'Bucaramanga');
-        mergedUsers = [...mergedUsers, ...bucaramangaData];
-      }
-
-      // Si hay archivos cargados, guardar en localStorage
-      if (mergedUsers.length > 0) {
-        localStorage.setItem('mergedUsers', JSON.stringify(mergedUsers));
-      }
-
-      // Recalcular estadísticas
-      calculateStats(filteredData);
-      setshowModalupload(false);
-
-    } catch (err) {
-      console.error("Error en la carga de archivos:", err);
-    }
-  };
 
   // Dentro de la función calculateStats
   const calculateStats = (data) => {
@@ -218,39 +142,8 @@ export const GeneralConsult = () => {
     calculateStats(filteredData);
   }, [ciudad, spentAmount]);
 
-  // Definición de las tarjetas de estadísticas
-  const statsCards = [
-    {
-      title: "Usuarios Totales",
-      icon: Users,
-      value: stats.totalUsers,
-      color: "cyan",
-      description: "Total de usuarios únicos"
-    },
-    {
-      title: "Usuarios Registrados",
-      icon: MessageSquare,
-      value: stats.registeredUsers,
-      color: "cyan",
-      description: "Usuarios que completaron registro"
-    },
-    {
-      title: "Tasa de Conversión",
-      icon: TrendingUp,
-      value: `${stats.conversionRate}%`,
-      color: "cyan",
-      description: "Porcentaje de usuarios registrados"
-    },
-    {
-      title: "Costo Global por Usuario",
-      icon: MessageSquare,
-      value: `$${stats.costPerUser}`,
-      color: "cyan",
-      description: "Costo promedio por usuario"
-    }
-  ];
 
-  // Función para clasificar los usuarios
+  // Función para clasificar los usuarios por estado
   const getUsersList = (data) => {
     if (!Array.isArray(data)) return { registered: [], unregistered: [] };
 
@@ -280,9 +173,7 @@ export const GeneralConsult = () => {
       <div className="mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col lg:flex-row items-center justify-between">
-          <h2 className="text-3xl font-bold text-cyan-400 mb-4 lg:mb-0">
-            Informe de Conversión Iza ChatBot
-          </h2>
+          <TitleHeader title={"Informe de Conversión Iza ChatBot"} />
           <div className="flex flex-col md:flex-row items-center gap-4">
             <select
               value={ciudad}
@@ -295,7 +186,7 @@ export const GeneralConsult = () => {
 
             <FiltrosReportes onDataFetched={handleDataFetched} />
 
-            <ExcelDownloadButton 
+            <ExcelDownloadButton
               stats={stats}
               spentAmount={spentAmount}
               ciudad={ciudad}
@@ -313,29 +204,7 @@ export const GeneralConsult = () => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {statsCards.map((stat, index) => (
-            <Card
-              key={index}
-              className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all"
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-400">{stat.title}</p>
-                    <p className={`text-2xl font-bold text-${stat.color}-400 mt-2`}>
-                      {stat.value}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {stat.description}
-                    </p>
-                  </div>
-                  <stat.icon className={`w-8 h-8 text-${stat.color}-400 opacity-80`} />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <StatsOverview stats={stats} />
 
         <div className="mt-8">
           <div className="bg-slate-800/50 rounded-lg border border-slate-700">
@@ -357,13 +226,15 @@ export const GeneralConsult = () => {
         {/* Upload Files Modal */}
         <UploadFilesModal
           showModal={showModalupload}
-          onClose={() => setShowModal(false)}
+          onClose={() => setshowModalupload(false)}
           spentAmount={spentAmount}
           setSpentAmount={setSpentAmount}
-          files={files}
-          handleFileChange={handleFileChange}
-          removeFile={removeFile}
-          handleUpload={handleUpload}
+          calculateStats={calculateStats}
+          filteredData={filteredData}
+          onUploadSuccess={() => {
+            // Aquí puedes agregar cualquier lógica adicional después de una carga exitosa
+            setshowModalupload(false);
+          }}
         />
 
         {/* Messages Modal */}
