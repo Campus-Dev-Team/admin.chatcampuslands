@@ -1,7 +1,5 @@
-import * as XLSX from "xlsx";
 import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Users, MessageSquare, TrendingUp, Upload, X, Download } from "lucide-react";
+import { Upload, } from "lucide-react";
 import { FiltrosReportes } from './../../components/DashboardPage/FiltrosReportes';
 import { UploadFilesModal } from './../../components/DashboardPage/UploadFilesModal';
 import { UserMessagesModal } from './../../components/DashboardPage/UserMessagesModal';
@@ -20,6 +18,7 @@ export const GeneralConsult = () => {
   const [showModalupload, setshowModalupload] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [spentAmount, setSpentAmount] = useState(0);
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -219,6 +218,8 @@ export const GeneralConsult = () => {
               rowClassName={getRowClassName}
               statusColumn="status"
               emptyMessage="No hay usuarios disponibles para mostrar."
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
             />
           </div>
         </div>

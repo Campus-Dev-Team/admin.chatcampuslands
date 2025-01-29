@@ -2,16 +2,17 @@ import React, { useState } from "react";
 import { FiltrosReportes } from './../../components/DashboardPage/FiltrosReportes';
 import { TarjetaContador } from './../../components/DashboardPage/TarjetaContador';
 import { UserMessagesModal } from './../../components/DashboardPage/UserMessagesModal';
-import {DashboardTable} from './../../components/DashboardPage/DashboardTable';  
+import { DashboardTable } from './../../components/DashboardPage/DashboardTable';  
 import { TitleHeader } from './../../components/DashboardPage/TitleHeader';
-
 
 export const DashboardIndex = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const columns = [
+    { key: 'status', label: 'Estado' },  // Añadido el campo status
     { key: 'UserId', label: 'Usuario ID' },
     { key: 'Username', label: 'Nombre' },
     { key: 'PhoneNumber', label: 'Teléfono' },
@@ -31,28 +32,44 @@ export const DashboardIndex = () => {
     setIsModalOpen(false);
   };
 
+  // Función para preparar los datos y agregar el campo status
+  const prepareTableData = () => {
+    return filteredData.map(user => ({
+      ...user,
+      status: user.isRegistered || false, // Asumiendo que tienes un campo isRegistered o similar
+      messageCount: user.Messages?.length || 0
+    }));
+  };
+
+  // Función para aplicar estilo según el estado
+  const getRowClassName = (row) => {
+    return row.status ? 'bg-green-900/10' : 'bg-red-900/10';
+  };
+
   const handleDataFetched = (fetchedData) => {
-    console.log('informacion de isadata ', fetchedData);
+    console.log('información de isadata ', fetchedData);
     setFilteredData(fetchedData);
   };
 
   return (
     <div className="p-6 space-y-6 overflow-y-scroll scrollbar-custom">
       <div className="flex flex-col lg:flex-row items-center justify-between h-24">
-      <TitleHeader title={"Informe General"}/>
-         
-        
+        <TitleHeader title={"Informe General"}/>
         <FiltrosReportes onDataFetched={handleDataFetched} />
       </div>
 
       <TarjetaContador userList={filteredData} />
 
       <DashboardTable 
-        data={filteredData}
+        data={prepareTableData()}
         columns={columns}
         onRowAction={handleOpenMessages}
         actionLabel="Ver Mensajes"
+        rowClassName={getRowClassName}
+        statusColumn="status"
         emptyMessage="No se encontraron datos en el periodo de fechas seleccionado."
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
       />
 
       <UserMessagesModal 
