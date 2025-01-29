@@ -232,8 +232,10 @@ export const GeneralConsult = () => {
     // Calcular tasa de conversión (mantiene el filtro por ciudad)
     const conversionRate = totalUsers > 0 ? ((registeredCount.length / totalUsers) * 100).toFixed(2) : 0;
 
+
     // Calcular costo por usuario (usando TODOS los usuarios registrados)
     const costPerUser = totalRegisteredUsers.length > 0 ? (spentAmount / totalRegisteredUsers.length).toFixed(2) : 0;
+   
 
     // Actualizar estado
     setStats({
