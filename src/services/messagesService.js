@@ -24,3 +24,30 @@ export const addMessage = async (data) => {
     throw error;
   }
 };
+
+
+export const getMessagesByChatId = async (chatId) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("No se encontró el token de autenticación");
+    }
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    const endpoint = `${endpoints.getMessages}/${chatId}`
+
+    const response = await axios.get(endpoint, config);
+
+    return response;
+  } catch (error) {
+    console.error("Error saving a message", error);
+    throw error;
+  }
+};

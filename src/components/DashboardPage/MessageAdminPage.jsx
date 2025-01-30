@@ -1,18 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { SendHorizonal, MessageSquare, User, ToggleLeft, ToggleRight } from "lucide-react";
+import {
+  SendHorizonal,
+  MessageSquare,
+  User,
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react";
 import { LazyImage } from "../common/LazyImage";
-import isadata2 from "../DashboardPage/isadata.json"; // Importa el JSON de datos de chat
+import { getAllChats } from "@/services/chatsService";
+import { getMessagesByChatId } from "@/services/messagesService";
 
 export const MessageAdminPage = () => {
   const [selectedChat, setSelectedChat] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [isAIEnabled, setIsAIEnabled] = useState(true);
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
 
   // Simula la carga de chats desde el JSON
   useEffect(() => {
-    setChats(isadata2);
+    const fetchAllchats = async () => {
+      try {
+        const response = await getAllChats();
+
+        console.log("Respuesta al traer chats", response.data);
+        setChats(response.data);
+      } catch (error) {
+        console.error("error al traer los datos", error);
+      }
+    };
+    fetchAllchats();
   }, []);
 
   // Función para manejar el envío de mensajes
@@ -24,6 +42,17 @@ export const MessageAdminPage = () => {
 
     // Limpiar el campo de mensaje
     setMessage("");
+  };
+
+  const handleGetMessagesByChat = async (chat) => {
+    setSelectedChat(chat);
+    try {
+      const response = await getMessagesByChatId(chat.id);
+      setMessages(response.data);
+      console.log("respuesta al buscar todos los mensajes", response.data);
+    } catch (error) {
+      console.error("error al buscar los mensajes", error);
+    }
   };
 
   // Función para alternar la IA
@@ -47,26 +76,38 @@ export const MessageAdminPage = () => {
           {/* Lista de chats */}
           <Card className="bg-slate-800/50 h-[80.3vh] border-slate-700 backdrop-blur-sm overflow-x-clip overflow-y-scroll scrollbar-custom">
             <CardContent className="p-6 pr-2">
-              <h3 className="text-xl font-semibold text-cyan-400 mb-4">Chats</h3>
+              <h3 className="text-xl font-semibold text-cyan-400 mb-4">
+                Chats
+              </h3>
               <div className="space-y-4">
                 {chats.map((chat) => (
                   <div
-                    key={chat.UserId}
-                    onClick={() => setSelectedChat(chat)}
-                    className={`p-3 rounded-lg cursor-pointer p ${selectedChat?.UserId === chat.UserId
-                      ? "bg-cyan-400/10"
-                      : "bg-slate-700/50 hover:bg-slate-700/70"
-                      } transition-all`}
+                    key={chat.userId}
+                    onClick={() => handleGetMessagesByChat(chat)}
+                    className={`p-3 rounded-lg cursor-pointer p ${
+                      selectedChat?.UserId === chat.userId
+                        ? "bg-cyan-400/10"
+                        : "bg-slate-700/50 hover:bg-slate-700/70"
+                    } transition-all`}
                   >
                     <div className="flex items-center gap-4">
                       <div className="h-10 w-10 rounded-full bg-cyan-400/20 flex items-center justify-center">
                         <User className="w-5 h-5 min-w-[40px] text-cyan-400" />
                       </div>
                       <div>
-                        <p className="text-white font-medium">{chat.Username}</p>
-                        <p className="text-sm text-slate-400">
-                          {chat.Messages[chat.Messages.length - 1]?.Message || "No hay mensajes"}
+                        <p className="text-white font-medium">
+                          {chat.username}
                         </p>
+                        <p className="text-white font-thin text-sm">
+                          +{chat.phone}
+                        </p>
+                        <p className="text-white font-thin text-sm">
+                          #{chat.userId}
+                        </p>
+                        {/* <p className="text-sm text-slate-400">
+                          {chat.Messages[chat.Messages.length - 1]?.Message ||
+                            "No hay mensajes"}
+                        </p> */}
                       </div>
                     </div>
                   </div>
@@ -91,47 +132,50 @@ export const MessageAdminPage = () => {
                           className="opacity-0 absolute w-0 h-0"
                         />
                         <span
-                          className={`slider block w-full h-full rounded-full bg-gray-600 transition-all duration-300 ${isAIEnabled ? "bg-cyan-500" : "bg-gray-500"
-                            }`}
+                          className={`slider block w-full h-full rounded-full bg-gray-600 transition-all duration-300 ${
+                            isAIEnabled ? "bg-cyan-500" : "bg-gray-500"
+                          }`}
                         >
                           <span
-                            className={`flex items-center w-[2.4vh] h-[2.4vh] bg-white rounded-full shadow-md transition-all duration-300 transform ${isAIEnabled ? "translate-x-8" : "translate-x-0"
-                              }`}
+                            className={`flex items-center w-[2.4vh] h-[2.4vh] bg-white rounded-full shadow-md transition-all duration-300 transform ${
+                              isAIEnabled ? "translate-x-8" : "translate-x-0"
+                            }`}
                           ></span>
                         </span>
                       </label>
-                      <span className="ml-2 text-white">
-                        IZA
-                      </span>
+                      <span className="ml-2 text-white">IZA</span>
                     </div>
-
-
-
 
                     <div className=" flex">
                       <div className="h-10 w-10 rounded-full bg-cyan-400/20 flex items-center justify-center mx-3">
                         <User className="w-5 h-5 text-cyan-400" />
                       </div>
-                      <div><p className="text-white font-medium">{selectedChat.Username}</p>
+                      <div>
+                        <p className="text-white font-medium">
+                          {selectedChat.username}
+                        </p>
                         <p className="text-sm text-slate-400">
-                          {selectedChat.PhoneNumber}
-                        </p></div>
+                          {selectedChat.phone}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
                   {/* Mensajes */}
                   <div className="flex-1 overflow-y-auto scrollbar-custom py-4 space-y-4">
-                    {selectedChat.Messages.map((msg, index) => (
+                    {messages.map((msg, index) => (
                       <div
                         key={index}
-                        className={`flex ${msg.isAI ? "justify-start" : "justify-end"
-                          }`}
+                        className={`flex ${
+                          msg.isAI ? "justify-start" : "justify-end"
+                        }`}
                       >
                         <div
-                          className={`p-3 rounded-lg ${msg.isAI ? "bg-slate-700/50" : "bg-cyan-400/10"
-                            }`}
+                          className={`p-3 rounded-lg ${
+                            msg.isAI ? "bg-slate-700/50" : "bg-cyan-400/10"
+                          }`}
                         >
-                          <p className="text-white">{msg.Message}</p>
+                          <p className="text-white">{msg.content}</p>
                         </div>
                       </div>
                     ))}
@@ -165,7 +209,9 @@ export const MessageAdminPage = () => {
                     alt="Iza Campus"
                     className="w-32 h-32 mx-auto"
                   />
-                  <p className="text-slate-400">Selecciona un chat para comenzar</p>
+                  <p className="text-slate-400">
+                    Selecciona un chat para comenzar
+                  </p>
                 </div>
               </div>
             )}
