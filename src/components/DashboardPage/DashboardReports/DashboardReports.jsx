@@ -1,15 +1,15 @@
 import { Upload, } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ExcelDownloadButton } from './components/ExcelDownloadButton';
-import { FiltrosReportes } from '../FiltrosReportes';
+import { FiltrosReportes } from './components/FiltrosReportes';
 import { StatsOverview } from './components/StatsOverview';
 import { DashboardTable } from './components/DashboardTable';
-import { TitleHeader } from './components/TitleHeader';
+import { TitleHeader } from '../components/TitleHeader';
 import { UploadFilesModal } from './components/UploadFilesModal';
 import { UserMessagesModal } from './components/UserMessagesModal';
+import StatsCharts from './components/StatisticsCharts';
 
-
-export const GeneralConsult = () => {
+export const DashboardReports = () => {
   const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -17,7 +17,10 @@ export const GeneralConsult = () => {
   const [ciudad, setCiudad] = useState("Bucaramanga");
   const [showModalupload, setshowModalupload] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-  const [spentAmount, setSpentAmount] = useState(0);
+  const [spentAmount, setSpentAmount] = useState(() => {
+    const savedAmount = localStorage.getItem('spentAmount');
+    return savedAmount ? Number(savedAmount) : 0;
+  });
   const [statusFilter, setStatusFilter] = useState('all');
 
   const [stats, setStats] = useState({
@@ -26,6 +29,7 @@ export const GeneralConsult = () => {
     conversionRate: 0,
     costPerUser: 0
   });
+
 
   const tableColumns = [
     {
@@ -136,6 +140,7 @@ export const GeneralConsult = () => {
     calculateStats(data);
   };
 
+
   // Efecto para recalcular cuando cambia la ciudad
   useEffect(() => {
     calculateStats(filteredData);
@@ -205,6 +210,10 @@ export const GeneralConsult = () => {
         {/* Stats Overview */}
         <StatsOverview stats={stats} />
 
+        {/* Stats Charts */}
+        <StatsCharts filteredData={filteredData} />
+
+        {/* Users Table */}
         <div className="mt-8">
           <div className="bg-slate-800/50 rounded-lg border border-slate-700">
             <div className="p-4 border-b border-slate-700">
@@ -224,7 +233,7 @@ export const GeneralConsult = () => {
           </div>
         </div>
 
-        {/* Upload Files Modal */}
+        {/* Modals */}
         <UploadFilesModal
           showModal={showModalupload}
           onClose={() => setshowModalupload(false)}
@@ -233,12 +242,10 @@ export const GeneralConsult = () => {
           calculateStats={calculateStats}
           filteredData={filteredData}
           onUploadSuccess={() => {
-            // Aquí puedes agregar cualquier lógica adicional después de una carga exitosa
             setshowModalupload(false);
           }}
         />
 
-        {/* Messages Modal */}
         <UserMessagesModal
           isOpen={showMessagesModal}
           user={selectedUser}

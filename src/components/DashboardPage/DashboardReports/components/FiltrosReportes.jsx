@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import * as XLSX from 'xlsx'; // Importamos la librería XLSX
-import { Check, FileDown } from "lucide-react";
+import { Check } from "lucide-react";
 
 export const FiltrosReportes = ({ onDataFetched }) => {
     // Controla si el contenido está "cargado" para la animación (opacity)
@@ -156,46 +155,6 @@ export const FiltrosReportes = ({ onDataFetched }) => {
         return Object.values(normalizedData);
     };
 
-
-    const handleDownload = () => {
-        const usersData = filteredData
-
-        // Convertir la información de los usuarios en formato adecuado para la hoja de usuarios
-        const usersSheetData = usersData.map(user => ({
-            UserId: user.UserId,
-            Username: user.Username,
-            PhoneNumber: user.PhoneNumber,
-            Age: user.Age,
-            Availability: user.Availability,
-            ContactWay: user.ContactWay,
-            City: user.city,
-            MessageCount: user.messageCount
-        }));
-
-        // Convertir la información de los mensajes en formato adecuado para la hoja de mensajes
-        const messagesSheetData = usersData.flatMap(user =>
-            user.Messages.map(message => ({
-                UserId: user.UserId,
-                Username: user.Username,
-                Message: message.Message,
-                MessageId: message.MessageId,
-                Time: message.Time
-            }))
-        );
-
-        // Crear las hojas del libro de trabajo
-        const wsUsers = XLSX.utils.json_to_sheet(usersSheetData);
-        const wsMessages = XLSX.utils.json_to_sheet(messagesSheetData);
-
-        // Crear un libro nuevo
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, wsUsers, 'Usuarios');
-        XLSX.utils.book_append_sheet(wb, wsMessages, 'Mensajes');
-
-        // Escribir el archivo Excel
-        XLSX.writeFile(wb, 'reporte.xlsx');
-    };
-
     return (
         <div className="bg-transparent m-2 p-4 md:p-0 text-white rounded-md ">
             <div
@@ -237,17 +196,6 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                     </span>
                 </div>
 
-
-
-                {/* Botón para descargar el reporte */}
-                <button
-                    className="flex flex-row items-center gap-2 px-4 py-1 sm:px-6 sm:py-2 lg:px-8 lg:py-2 bg-[#2A303C] text-white rounded-lg font-semibold
-                        hover:bg-[#1B2430]/90 border-b border-cyan-40
-                        transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base lg:text-md"
-                    onClick={handleDownload} // Llamamos a la función de descarga
-                >
-                    <FileDown size={25} />
-                </button>
             </div>
         </div>
     );

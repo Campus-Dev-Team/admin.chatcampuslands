@@ -1,5 +1,5 @@
-import { DashboardHeader } from '../components/DashboardPage/DashboardHeader';
-import { DashboardNavbar } from '../components/DashboardPage/DashboardNavbar';
+import { DashboardHeader } from '../components/DashboardPage/components/DashboardHeader';
+import { DashboardNavbar } from '../components/DashboardPage/components/DashboardNavbar';
 import { Outlet } from 'react-router-dom';
 
 export const DashboardPage = () => {
