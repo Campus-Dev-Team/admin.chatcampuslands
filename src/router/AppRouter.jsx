@@ -3,9 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import { DashboardPage } from '../pages/DashboardPage';
 import LoginPage from '../pages/LoginPage';
 import { ProtectedRoute } from '../router/ProtectedRoute';
-import { GeneralConsult } from '../pages/Dashboard/DashboardGeneralConsult';
-import { DashboardIndex } from '../pages/Dashboard/DashboardIndex';
-import { MessageAdminPage } from '../components/DashboardPage/MessageAdminPage';
+import { GeneralConsult } from '../components/DashboardPage/GeneralConsults/DashboardGeneralConsult';
+import { DashboardIndex } from '../components/DashboardPage/index/DashboardIndex';
+import { MessageAdminPage } from '../components/DashboardPage/MessageAdminPage/MessageAdminPage';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
