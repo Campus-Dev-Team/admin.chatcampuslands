@@ -1,7 +1,7 @@
 import { Upload, } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ExcelDownloadButton } from './components/ExcelDownloadButton';
-import { FiltrosReportes } from '../FiltrosReportes';
+import { FiltrosReportes } from './components/FiltrosReportes';
 import { StatsOverview } from './components/StatsOverview';
 import { DashboardTable } from './components/DashboardTable';
 import { TitleHeader } from './components/TitleHeader';
@@ -9,7 +9,7 @@ import { UploadFilesModal } from './components/UploadFilesModal';
 import { UserMessagesModal } from './components/UserMessagesModal';
 
 
-export const GeneralConsult = () => {
+export const DashboardReports = () => {
   const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 

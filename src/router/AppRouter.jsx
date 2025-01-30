@@ -3,8 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { DashboardPage } from '../pages/DashboardPage';
 import LoginPage from '../pages/LoginPage';
 import { ProtectedRoute } from '../router/ProtectedRoute';
-import { GeneralConsult } from '../components/DashboardPage/GeneralConsults/DashboardGeneralConsult';
-import { DashboardIndex } from '../components/DashboardPage/index/DashboardIndex';
+import { DashboardReports } from '../components/DashboardPage/DashboardReports/DashboardReports';
 import { MessageAdminPage } from '../components/DashboardPage/MessageAdminPage/MessageAdminPage';
 
 const AppRouter = () => {
@@ -35,7 +34,7 @@ const AppRouter = () => {
         }
       >
         {/* Ruta por defecto del dashboard */}
-        <Route index element={<GeneralConsult />} />
+        <Route index element={<DashboardReports />} />
 
         {/* Rutas específicas dentro del dashboard */}
         
