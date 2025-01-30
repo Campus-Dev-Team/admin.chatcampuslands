@@ -35,10 +35,10 @@ const AppRouter = () => {
         }
       >
         {/* Ruta por defecto del dashboard */}
-        <Route index element={<DashboardIndex />} />
+        <Route index element={<GeneralConsult />} />
 
         {/* Rutas específicas dentro del dashboard */}
-        <Route path="general" element={<GeneralConsult />} />
+        
         <Route path="settings" element={<div className='flex w-full h-full justify-center items-center text-white'>Pronto habra algo aquí ⚙️ </div>} />
         <Route path="users" element={<div className='flex w-full h-full justify-center items-center text-white'>Pronto habra algo aquí 😊 </div>} />
         <Route path="messages" element={<MessageAdminPage/>} />
