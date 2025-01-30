@@ -1,98 +1,108 @@
-import React, { useState } from "react";
-import { FiltrosReportes } from './FiltrosReportes';
-import { TarjetaContador } from './TarjetaContador';
-import { UserMessagesModal } from './UserMessagesModal';
+// DashboardTable.jsx
+import React from 'react';
 
-export const DashboardTable = () => {
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filteredData, setFilteredData] = useState([]);
+export const DashboardTable = ({ 
+  data, 
+  columns, 
+  emptyMessage = "No hay datos disponibles.",
+  onRowAction,
+  actionLabel = "Acción",
+  rowClassName,
+  statusColumn,
+  statusFilter,
+  onStatusFilterChange
+}) => {
+  if (!Array.isArray(data) || !Array.isArray(columns)) {
+    return null;
+  }
 
-  const openModal = (user) => {
-    setSelectedUser(user);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setSelectedUser(null);
-    setIsModalOpen(false);
-  };
-
-  const handleDataFetched = (fetchedData) => {
-    console.log('informacion de isadata ',fetchedData);
-    setFilteredData(fetchedData);
-  };
+  // Filter data based on status filter
+  const filteredData = statusFilter === 'all' 
+    ? data 
+    : data.filter(row => row[statusColumn] === (statusFilter === 'registered'));
 
   return (
-    <div className="p-6 space-y-6 overflow-y-scroll scrollbar-custom">
-      <div className="flex flex-col lg:flex-row items-center justify-between  h-24">
-        <h2 className="text-3xl font-bold text-cyan-400 w-full ">
-          Informe General
-        </h2>
-
-        <FiltrosReportes onDataFetched={handleDataFetched} />
+    <div>
+      <div className="p-4 flex items-center gap-4">
+        <span className="text-slate-300 text-sm">Filtrar por estado:</span>
+        <select
+          value={statusFilter}
+          onChange={(e) => onStatusFilterChange(e.target.value)}
+          className="bg-slate-800 text-white text-sm border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
+        >
+          <option value="all">Todos</option>
+          <option value="registered">Registrados</option>
+          <option value="unregistered">No Registrados</option>
+        </select>
       </div>
-      {/* Tarjetas de Contadores */}
-      <TarjetaContador userList={filteredData} />
-
-      {/* Tabla de Usuarios */}
-      <div className="overflow-x-auto bg-[#162033] text-white rounded-lg shadow-md max-h-[35rem]">
-        <table className="min-w-full text-left ">
+      
+      <div className="overflow-x-auto">
+        <table className="w-full">
           <thead>
-            <tr className="border-b border-cyan-400">
-              <th className="px-4 py-2">Usuario ID</th>
-              <th className="px-4 py-2">Nombre</th>
-              <th className="px-4 py-2">Teléfono</th>
-              <th className="px-4 py-2">Edad</th>
-              <th className="px-4 py-2">Disponibilidad</th>
-              <th className="px-4 py-2">Mensajes Enviados</th>
-              <th className="px-4 py-2">Ciudad</th>
-              <th className="px-4 py-2">Acciones</th>
+            <tr className="bg-slate-700/50">
+              {columns.map((column) => (
+                <th 
+                  key={column.key} 
+                  className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider"
+                >
+                  {column.label}
+                </th>
+              ))}
+              {onRowAction && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                  {actionLabel}
+                </th>
+              )}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-700">
             {filteredData.length > 0 ? (
-              filteredData.map((user) => (
-                <tr key={user.UserId} className="border-b border-gray-600 hover:bg-[#3B3F47]">
-                  <td className="px-4 py-2">{user.UserId}</td>
-                  <td className="px-4 py-2">{user.Username}</td>
-                  <td className="px-4 py-2">{user.PhoneNumber}</td>
-                  <td className="px-4 py-2">{user.Age}</td>
-                  <td
-                    className={`px-4 py-2 ${user.Availability === "Available" ? "text-green-400" : "text-red-400"
-                      }`}
-                  >
-                    {user.Availability}
-                  </td>
-                  <td className="px-4 py-2 text-center">{user.messageCount || "No disponible"}</td>
-                  <td className="px-4 py-2 text-center">{user.city || "No disponible"}</td>
-                  <td className="px-4 py-2">
-                    <button
-                      className="px-4 py-1 bg-color-primary text-white rounded-lg hover:bg-color-primary-hover transition-all duration-300"
-                      onClick={() => openModal(user)}
+              filteredData.map((row, index) => (
+                <tr 
+                  key={row.id || row.UserId || `row-${index}`} 
+                  className={`${rowClassName ? rowClassName(row) : ''}`}
+                >
+                  {columns.map((column) => (
+                    <td 
+                      key={`${row.id || row.UserId || index}-${column.key}`} 
+                      className="px-6 py-4 whitespace-nowrap text-sm text-slate-300"
                     >
-                      Ver Mensajes
-                    </button>
-                  </td>
+                      {column.key === statusColumn ? (
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          row[statusColumn] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {row[statusColumn] ? 'Registrado' : 'No Registrado'}
+                        </span>
+                      ) : (
+                        row[column.key] || column.defaultValue || "No disponible"
+                      )}
+                    </td>
+                  ))}
+                  {onRowAction && (
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                      <button
+                        onClick={() => onRowAction(row)}
+                        className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-all"
+                      >
+                        {actionLabel}
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="8" className="text-center py-4 text-gray-400">
-                  No se encontraron datos en el periodo de fechas seleccionado.
+                <td 
+                  colSpan={columns.length + (onRowAction ? 1 : 0)} 
+                  className="px-6 py-4 text-center text-sm text-slate-400"
+                >
+                  {emptyMessage}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-
-      {/* Modal Component */}
-      <UserMessagesModal 
-        isOpen={isModalOpen}
-        user={selectedUser}
-        onClose={closeModal}
-      />
     </div>
   );
 };
