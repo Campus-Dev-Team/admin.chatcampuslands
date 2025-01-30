@@ -7,7 +7,7 @@ import { DashboardTable } from './components/DashboardTable';
 import { TitleHeader } from '../components/TitleHeader';
 import { UploadFilesModal } from './components/UploadFilesModal';
 import { UserMessagesModal } from './components/UserMessagesModal';
-
+import StatsCharts from './components/StatisticsCharts';
 
 export const DashboardReports = () => {
   const [showMessagesModal, setShowMessagesModal] = useState(false);
@@ -17,7 +17,10 @@ export const DashboardReports = () => {
   const [ciudad, setCiudad] = useState("Bucaramanga");
   const [showModalupload, setshowModalupload] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-  const [spentAmount, setSpentAmount] = useState(0);
+  const [spentAmount, setSpentAmount] = useState(() => {
+    const savedAmount = localStorage.getItem('spentAmount');
+    return savedAmount ? Number(savedAmount) : 0;
+  });
   const [statusFilter, setStatusFilter] = useState('all');
 
   const [stats, setStats] = useState({
@@ -26,6 +29,7 @@ export const DashboardReports = () => {
     conversionRate: 0,
     costPerUser: 0
   });
+
 
   const tableColumns = [
     {
@@ -136,6 +140,7 @@ export const DashboardReports = () => {
     calculateStats(data);
   };
 
+
   // Efecto para recalcular cuando cambia la ciudad
   useEffect(() => {
     calculateStats(filteredData);
@@ -205,6 +210,10 @@ export const DashboardReports = () => {
         {/* Stats Overview */}
         <StatsOverview stats={stats} />
 
+        {/* Stats Charts */}
+        <StatsCharts filteredData={filteredData} />
+
+        {/* Users Table */}
         <div className="mt-8">
           <div className="bg-slate-800/50 rounded-lg border border-slate-700">
             <div className="p-4 border-b border-slate-700">
@@ -224,7 +233,7 @@ export const DashboardReports = () => {
           </div>
         </div>
 
-        {/* Upload Files Modal */}
+        {/* Modals */}
         <UploadFilesModal
           showModal={showModalupload}
           onClose={() => setshowModalupload(false)}
@@ -233,12 +242,10 @@ export const DashboardReports = () => {
           calculateStats={calculateStats}
           filteredData={filteredData}
           onUploadSuccess={() => {
-            // Aquí puedes agregar cualquier lógica adicional después de una carga exitosa
             setshowModalupload(false);
           }}
         />
 
-        {/* Messages Modal */}
         <UserMessagesModal
           isOpen={showMessagesModal}
           user={selectedUser}

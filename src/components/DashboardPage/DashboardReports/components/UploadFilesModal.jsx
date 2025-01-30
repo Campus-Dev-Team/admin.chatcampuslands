@@ -18,11 +18,6 @@ export const UploadFilesModal = ({
 
     if (!showModal) return null;
 
-    const handleSpentAmountChange = (e) => {
-        const value = e.target.value;
-        setSpentAmount(value === '' ? '' : Number(value));
-    };
-
     // Función para procesar archivos Excel y agregar campo ciudad
     const processExcelFile = async (file, ciudad) => {
         try {
@@ -66,6 +61,14 @@ export const UploadFilesModal = ({
         }));
     };
 
+    const handleSpentAmountChange = (e) => {
+        const value = e.target.value;
+        const numValue = value === '' ? 0 : Number(value);
+        setSpentAmount(numValue);
+        // Guardar en localStorage cada vez que cambia
+        localStorage.setItem('spentAmount', numValue.toString());
+    };
+
     const handleUpload = async () => {
         try {
             let mergedUsers = [];
@@ -86,10 +89,13 @@ export const UploadFilesModal = ({
                 localStorage.setItem('mergedUsers', JSON.stringify(mergedUsers));
             }
 
+            // Guardar el spentAmount en localStorage
+            localStorage.setItem('spentAmount', spentAmount.toString());
+
             // Recalcular estadísticas y notificar al padre
             calculateStats(filteredData);
             onClose();
-            onUploadSuccess?.(); // Notificar al padre que la carga fue exitosa
+            onUploadSuccess?.();
 
         } catch (err) {
             console.error("Error en la carga de archivos:", err);
