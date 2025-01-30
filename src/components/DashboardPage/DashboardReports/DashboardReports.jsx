@@ -211,7 +211,7 @@ export const DashboardReports = () => {
         <StatsOverview stats={stats} />
 
         {/* Stats Charts */}
-        <StatsCharts filteredData={filteredData} />
+        <StatsCharts filteredData={filteredData.filter(user => !ciudad || user.city === ciudad)} />
 
         {/* Users Table */}
         <div className="mt-8">
