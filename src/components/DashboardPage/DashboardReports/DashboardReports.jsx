@@ -4,7 +4,7 @@ import { ExcelDownloadButton } from './components/ExcelDownloadButton';
 import { FiltrosReportes } from './components/FiltrosReportes';
 import { StatsOverview } from './components/StatsOverview';
 import { DashboardTable } from './components/DashboardTable';
-import { TitleHeader } from './components/TitleHeader';
+import { TitleHeader } from '../components/TitleHeader';
 import { UploadFilesModal } from './components/UploadFilesModal';
 import { UserMessagesModal } from './components/UserMessagesModal';
 
