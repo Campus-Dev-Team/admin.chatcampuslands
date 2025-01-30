@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   ChevronLeft,
@@ -8,10 +8,9 @@ import {
   Settings,
   Users,
   BarChart2,
-  HelpCircle,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { LazyImage } from "../common/LazyImage";
+import { LazyImage } from "../../common/LazyImage";
 
 export const DashboardNavbar = () => {
   const { logout } = useAuth();
@@ -27,29 +26,24 @@ export const DashboardNavbar = () => {
 
   const menuItems = [
     {
-      icon: <BarChart2 className="h-5 w-5" />,
-      label: "Reportes",
-      path: "/dashboard",
-    },
-    {
-      icon: <HelpCircle className="h-5 w-5" />,
-      label: "Consulta General",
-      path: "/dashboard/general",
-    },
-    {
       icon: <MessageCircle className="h-5 w-5" />,
       label: "Mensajes",
       path: "/dashboard/messages",
     },
     {
-      icon: <Settings className="h-5 w-5" />,
-      label: "Configuración",
-      path: "/dashboard/settings",
-    },
-    {
       icon: <Users className="h-5 w-5" />,
       label: "Usuarios",
       path: "/dashboard/users",
+    },
+    {
+      icon: <BarChart2 className="h-5 w-5" />,
+      label: "Reportes",
+      path: "/dashboard",
+    },
+    {
+      icon: <Settings className="h-5 w-5" />,
+      label: "Configuración",
+      path: "/dashboard/settings",
     },
   ];
 

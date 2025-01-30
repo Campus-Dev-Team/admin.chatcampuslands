@@ -1,13 +1,13 @@
 import React from 'react';
 import * as XLSX from 'xlsx';
-import { Download } from 'lucide-react';
+import { FileDown } from 'lucide-react';
 
-export const ExcelDownloadButton = ({ 
-  stats, 
-  spentAmount, 
-  ciudad, 
-  getUsersList, 
-  filteredData 
+export const ExcelDownloadButton = ({
+  stats,
+  spentAmount,
+  ciudad,
+  getUsersList,
+  filteredData
 }) => {
   const exportToExcel = () => {
     try {
@@ -52,6 +52,19 @@ export const ExcelDownloadButton = ({
         'Cantidad de Mensajes': user.Messages?.length || 0
       }));
 
+      // Preparar datos de mensajes
+      const messagesData = filteredData.flatMap(user => 
+        (user.Messages || []).map(message => ({
+          'Usuario': user.Username,
+          'Teléfono': user.PhoneNumber,
+          'Mensaje': message.Message,
+          'ID Mensaje': message.MessageId,
+          'Fecha y Hora': new Date(message.Time).toLocaleString('es-CO', {
+            timeZone: 'America/Bogota'
+          })
+        }))
+      );
+
       // Crear nuevo libro de Excel
       const workbook = XLSX.utils.book_new();
 
@@ -63,17 +76,36 @@ export const ExcelDownloadButton = ({
       const wsUsers = XLSX.utils.json_to_sheet(usersData);
       XLSX.utils.book_append_sheet(workbook, wsUsers, 'Detalle de Usuarios');
 
+      // Crear y agregar hoja de mensajes
+      const wsMessages = XLSX.utils.json_to_sheet(messagesData);
+      XLSX.utils.book_append_sheet(workbook, wsMessages, 'Historial de Mensajes');
+
       // Ajustar anchos de columna
-      const wscols = [
-        { wch: 20 }, // Estado/Métrica
-        { wch: 30 }, // Usuario/Valor
-        { wch: 15 }, // Teléfono
-        { wch: 15 }, // Ciudad
-        { wch: 20 }  // Mensajes/Descripción
+      const wscolsStats = [
+        { wch: 20 }, // Métrica
+        { wch: 30 }, // Valor
+        { wch: 40 }  // Descripción
       ];
 
-      wsStats['!cols'] = wscols;
-      wsUsers['!cols'] = wscols;
+      const wscolsUsers = [
+        { wch: 15 }, // Estado
+        { wch: 30 }, // Usuario
+        { wch: 15 }, // Teléfono
+        { wch: 15 }, // Ciudad
+        { wch: 20 }  // Cantidad de Mensajes
+      ];
+
+      const wscolsMessages = [
+        { wch: 30 }, // Usuario
+        { wch: 15 }, // Teléfono
+        { wch: 50 }, // Mensaje
+        { wch: 15 }, // ID Mensaje
+        { wch: 20 }  // Fecha y Hora
+      ];
+
+      wsStats['!cols'] = wscolsStats;
+      wsUsers['!cols'] = wscolsUsers;
+      wsMessages['!cols'] = wscolsMessages;
 
       // Generar nombre del archivo con fecha
       const date = new Date().toISOString().split('T')[0];
@@ -89,9 +121,11 @@ export const ExcelDownloadButton = ({
   return (
     <button
       onClick={exportToExcel}
-      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center gap-2"
+      className="flex flex-row items-center gap-2 px-4 py-1 sm:px-6 sm:py-2 lg:px-8 lg:py-2 bg-[#2A303C] text-white rounded-lg font-semibold
+      hover:bg-[#1B2430]/90 border-b border-cyan-40
+      transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base lg:text-md"
     >
-      <Download className="w-5 h-5" /> Exportar Excel
+      <FileDown size={25} />
     </button>
   );
 };
