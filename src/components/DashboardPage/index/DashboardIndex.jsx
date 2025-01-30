@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { FiltrosReportes } from './../../components/DashboardPage/FiltrosReportes';
-import { TarjetaContador } from './../../components/DashboardPage/TarjetaContador';
-import { UserMessagesModal } from './../../components/DashboardPage/UserMessagesModal';
-import { DashboardTable } from './../../components/DashboardPage/DashboardTable';  
-import { TitleHeader } from './../../components/DashboardPage/TitleHeader';
+import { useState } from "react";
+import { FiltrosReportes } from '../FiltrosReportes';
+import { DashboardTable } from '../GeneralConsults/components/DashboardTable';
+import { TitleHeader } from '../GeneralConsults/components/TitleHeader';
+import { UserMessagesModal } from '../GeneralConsults/components/UserMessagesModal';
+import { TarjetaContador } from '../TarjetaContador';
 
 export const DashboardIndex = () => {
   const [selectedUser, setSelectedUser] = useState(null);

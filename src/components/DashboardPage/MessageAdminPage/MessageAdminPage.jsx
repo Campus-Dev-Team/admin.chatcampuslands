@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { SendHorizonal, MessageSquare, User, ToggleLeft, ToggleRight } from "lucide-react";
-import { LazyImage } from "../common/LazyImage";
-import isadata2 from "../DashboardPage/isadata.json"; // Importa el JSON de datos de chat
+import { LazyImage } from "../../common/LazyImage";
+import isadata2 from "../isadata.json"; // Importa el JSON de datos de chat
 
 export const MessageAdminPage = () => {
   const [selectedChat, setSelectedChat] = useState(null);
