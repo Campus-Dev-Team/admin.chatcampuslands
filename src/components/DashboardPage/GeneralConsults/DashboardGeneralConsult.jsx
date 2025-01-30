@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
 import { Upload, } from "lucide-react";
-import { FiltrosReportes } from './../../components/DashboardPage/FiltrosReportes';
-import { UploadFilesModal } from './../../components/DashboardPage/UploadFilesModal';
-import { UserMessagesModal } from './../../components/DashboardPage/UserMessagesModal';
-import { DashboardTable } from './../../components/DashboardPage/DashboardTable';
-import { ExcelDownloadButton } from './../../components/DashboardPage/ExcelDownloadButton';
-import { StatsOverview } from './../../components/DashboardPage/StatsOverview';
-import { TitleHeader } from './../../components/DashboardPage/TitleHeader';
+import { useEffect, useState } from "react";
+import { ExcelDownloadButton } from './components/ExcelDownloadButton';
+import { FiltrosReportes } from '../FiltrosReportes';
+import { StatsOverview } from './components/StatsOverview';
+import { DashboardTable } from './components/DashboardTable';
+import { TitleHeader } from './components/TitleHeader';
+import { UploadFilesModal } from './components/UploadFilesModal';
+import { UserMessagesModal } from './components/UserMessagesModal';
 
 
 export const GeneralConsult = () => {

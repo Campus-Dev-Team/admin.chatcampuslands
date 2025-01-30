@@ -32,11 +32,6 @@ export const DashboardNavbar = () => {
       path: "/dashboard",
     },
     {
-      icon: <HelpCircle className="h-5 w-5" />,
-      label: "Consulta General",
-      path: "/dashboard/general",
-    },
-    {
       icon: <MessageCircle className="h-5 w-5" />,
       label: "Mensajes",
       path: "/dashboard/messages",
