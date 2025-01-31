@@ -1,87 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Check } from "lucide-react";
+import { fetchReportData } from '../../../../services/reportService';
 
 export const FiltrosReportes = ({ onDataFetched }) => {
-    // Controla si el contenido está "cargado" para la animación (opacity)
     const [isLoaded, setIsLoaded] = useState(false);
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]); // Valor por defecto como la fecha de hoy
-    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]); // Valor por defecto como la fecha de hoy
+    const [dates, setDates] = useState({
+        start: new Date().toISOString().split('T')[0],
+        end: new Date().toISOString().split('T')[0]
+    });
     const [isLoading, setIsLoading] = useState(false);
-    const [filteredData, setFilteredData] = useState([]); // Para almacenar los datos filtrados
-
 
     useEffect(() => {
-        // Simulamos un retraso de 500ms para la animación de opacidad
-        const timer = setTimeout(() => {
-            setIsLoaded(true);
-        }, 500);
-
+        const timer = setTimeout(() => setIsLoaded(true), 500);
         return () => clearTimeout(timer);
     }, []);
 
-    // Ejecutar fetchData al montar el componente
     useEffect(() => {
-        if (startDate && endDate) {
-            fetchData();  // Ejecuta la función fetchData cuando las fechas ya están configuradas
-        }
-    }, [startDate, endDate]);
+        if (dates.start && dates.end) fetchData();
+    }, [dates]);
 
-    const myHeaders = () => {
-        const token = localStorage.getItem("authToken");
-        return new Headers({
-            "content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        });
-    };
 
     const fetchData = async () => {
-        if (!startDate || !endDate) {
-            console.error("Las fechas de inicio y fin son necesarias");
-            return;
-        }
-
         try {
             setIsLoading(true);
-
-            const startDateFormatted = new Date(startDate).toISOString().split('T')[0];
-            const endDateFormatted = new Date(endDate).toISOString().split('T')[0];
-
-            const responseUsers = await axios.get(`${import.meta.env.VITE_API_BASE_URL}admin/users/today`, {
-                params: {
-                    start: startDateFormatted,
-                    end: endDateFormatted,
-                    city: 'Bucaramanga'
-                },
-                headers: myHeaders(),
-            });
-
-            if (!responseUsers.data || responseUsers.data.length === 0) {
-                throw new Error(responseUsers?.status)
-            } else {
-                const responseMessages = await axios.get(`${import.meta.env.VITE_API_BASE_URL}admin/messages/today`, {
-                    params: {
-                        start: startDateFormatted,
-                        end: endDateFormatted,
-                        city: 'Bucaramanga'
-                    },
-                    headers: myHeaders(),
-                });
-                if (!responseMessages.data || responseMessages.data.length === 0) {
-                    throw new Error(responseUsers?.status)
-                } else {
-                    const normalizedData = (normalizeData(responseUsers.data, responseMessages.data));
-                    onDataFetched(normalizedData); // Llamamos a la función del padre con los datos filtrados
-                    setFilteredData(normalizedData);
-                }
-
-            }
-            setIsLoading(false);
+            const data = await fetchReportData(
+                dates.start,
+                dates.end
+            );
+            const normalizedData = normalizeData(data.users, data.messages);
+            console.log(normalizedData);
+            
+            onDataFetched(normalizedData);
         } catch (error) {
-            console.error("Error al obtener los datos desde el backend:", error);
+            console.error("Error fetching report data:", error);
+        } finally {
             setIsLoading(false);
         }
     };
+
 
     const normalizeData = (usersData, messagesData) => {
         const normalizedData = {};
@@ -168,8 +124,8 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                                 type="date"
                                 className="px-3 py-1 bg-[#2A303C] text-[0.9em] text-white rounded-lg border border-[#00D8D6]
                                 focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
+                                value={dates.start}
+                                onChange={(e) => setDates(prev => ({ ...prev, start: e.target.value }))}
                             />
                         </div>
                         <div className="flex flex-col">
@@ -178,8 +134,8 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                                 type="date"
                                 className="px-3 py-1 bg-[#2A303C] text-[0.9em] text-white rounded-lg border border-[#00D8D6]
                                 focus:ring-2 focus:ring-[#00D8D6] focus:outline-none transition-all duration-300"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
+                                value={dates.end}
+                                onChange={(e) => setDates(prev => ({ ...prev, end: e.target.value }))}
                             />
                         </div>
 

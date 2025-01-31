@@ -15,6 +15,8 @@ export const UploadFilesModal = ({
         usuariosBogota: null,
         usuariosBucaramanga: null
     });
+    const [displayAmount, setDisplayAmount] = useState('');
+
 
     if (!showModal) return null;
 
@@ -62,11 +64,12 @@ export const UploadFilesModal = ({
     };
 
     const handleSpentAmountChange = (e) => {
-        const value = e.target.value;
-        const numValue = value === '' ? 0 : Number(value);
-        setSpentAmount(numValue);
-        // Guardar en localStorage cada vez que cambia
-        localStorage.setItem('spentAmount', numValue.toString());
+        const rawValue = e.target.value.replace(/[^0-9]/g, '');
+        setSpentAmount(Number(rawValue));
+        localStorage.setItem('spentAmount', rawValue);
+
+        const formatter = new Intl.NumberFormat('es-CO');
+        setDisplayAmount(rawValue ? formatter.format(rawValue) : '');
     };
 
     const handleUpload = async () => {
@@ -121,8 +124,8 @@ export const UploadFilesModal = ({
                         Gasto Total ($)
                     </label>
                     <input
-                        type="number"
-                        value={spentAmount === 0 ? '' : spentAmount}
+                        type="text"
+                        value={displayAmount}
                         onChange={handleSpentAmountChange}
                         className="w-full bg-slate-700 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                         placeholder="Ingrese el monto gastado"
