@@ -16,7 +16,8 @@ export const DashboardReports = () => {
   // Estados principales
   const [ciudad, setCiudad] = useState("Bucaramanga");
   const [showModalupload, setshowModalupload] = useState(false);
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredDataIza, setFilteredDataIza] = useState([]);
+  const [filteredDataCampus, setFilteredDataCampus] = useState([]);
   const [spentAmount, setSpentAmount] = useState(() => {
     const savedAmount = localStorage.getItem('spentAmount');
     return savedAmount ? Number(savedAmount) : 0;
@@ -55,7 +56,7 @@ export const DashboardReports = () => {
   ];
 
   const prepareTableData = () => {
-    const { registered, unregistered } = getUsersList(filteredData);
+    const { registered, unregistered } = getUsersList(filteredDataIza);
 
     const registeredData = registered.map(user => ({
       ...user,
@@ -135,15 +136,16 @@ export const DashboardReports = () => {
   };
 
   // Función que maneja los datos recibidos de FiltrosReportes
-  const handleDataFetched = (data) => {
-    setFilteredData(data);
-    calculateStats(data);
+  const handleDataFetched = (dataIza, dataCampus) => {
+    setFilteredDataIza(dataIza);
+    setFilteredDataCampus(dataCampus);
+    calculateStats(dataIza, dataCampus);
   };
 
 
   // Efecto para recalcular cuando cambia la ciudad
   useEffect(() => {
-    calculateStats(filteredData);
+    calculateStats(filteredDataIza, filteredDataCampus);
   }, [ciudad, spentAmount]);
 
 
@@ -195,7 +197,7 @@ export const DashboardReports = () => {
               spentAmount={spentAmount}
               ciudad={ciudad}
               getUsersList={getUsersList}
-              filteredData={filteredData}
+              filteredData={filteredDataIza}
             />
 
             <button
@@ -211,7 +213,7 @@ export const DashboardReports = () => {
         <StatsOverview stats={stats} />
 
         {/* Stats Charts */}
-        <StatsCharts filteredData={filteredData.filter(user => !ciudad || user.city === ciudad)} />
+        <StatsCharts filteredData={filteredDataIza.filter(user => !ciudad || user.city === ciudad)} />
 
         {/* Users Table */}
         <div className="mt-8">
@@ -240,7 +242,7 @@ export const DashboardReports = () => {
           spentAmount={spentAmount}
           setSpentAmount={setSpentAmount}
           calculateStats={calculateStats}
-          filteredData={filteredData}
+          filteredData={filteredDataIza}
           onUploadSuccess={() => {
             setshowModalupload(false);
           }}
