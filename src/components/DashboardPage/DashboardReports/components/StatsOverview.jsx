@@ -28,8 +28,10 @@ export const StatsOverview = ({ stats }) => {
     },
     {
       title: "Costo Global por Usuario",
-      icon: MessageSquare,
-      value: `$${stats.costPerUser}`,
+      icon: MessageSquare, value: `$${new Intl.NumberFormat('es-CO', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(stats.costPerUser)}`,
       color: "cyan",
       description: "Costo promedio por usuario"
     }
