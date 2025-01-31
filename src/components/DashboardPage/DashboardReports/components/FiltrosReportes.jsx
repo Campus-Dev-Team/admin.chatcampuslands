@@ -29,35 +29,39 @@ export const FiltrosReportes = ({ onDataFetched }) => {
 
     const myHeaders = () => {
         const token = localStorage.getItem("authToken");
-        return new Headers({
-            "content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        });
+        return {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }) // Solo añade si hay token
+        };
     };
+    
 
     const fetchData = async () => {
         if (!startDate || !endDate) {
             console.error("Las fechas de inicio y fin son necesarias");
             return;
         }
-
+    
         try {
             setIsLoading(true);
-
+    
             const startDateFormatted = new Date(startDate).toISOString().split('T')[0];
             const endDateFormatted = new Date(endDate).toISOString().split('T')[0];
-
+    
+            const headers = myHeaders(); // Obtén los headers correctamente
+    
             const responseUsers = await axios.get(`${import.meta.env.VITE_API_BASE_URL}admin/users/today`, {
                 params: {
                     start: startDateFormatted,
                     end: endDateFormatted,
                     city: 'Bucaramanga'
                 },
-                headers: myHeaders(),
+                headers, // ✅ Aquí ahora se pasa como objeto plano
             });
-
+    
             if (!responseUsers.data || responseUsers.data.length === 0) {
-                throw new Error(responseUsers?.status)
+                throw new Error(responseUsers?.status);
             } else {
                 const responseMessages = await axios.get(`${import.meta.env.VITE_API_BASE_URL}admin/messages/today`, {
                     params: {
@@ -65,16 +69,16 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                         end: endDateFormatted,
                         city: 'Bucaramanga'
                     },
-                    headers: myHeaders(),
+                    headers, // ✅ Aquí también
                 });
+    
                 if (!responseMessages.data || responseMessages.data.length === 0) {
-                    throw new Error(responseUsers?.status)
+                    throw new Error(responseUsers?.status);
                 } else {
-                    const normalizedData = (normalizeData(responseUsers.data, responseMessages.data));
-                    onDataFetched(normalizedData); // Llamamos a la función del padre con los datos filtrados
+                    const normalizedData = normalizeData(responseUsers.data, responseMessages.data);
+                    onDataFetched(normalizedData);
                     setFilteredData(normalizedData);
                 }
-
             }
             setIsLoading(false);
         } catch (error) {
@@ -82,6 +86,7 @@ export const FiltrosReportes = ({ onDataFetched }) => {
             setIsLoading(false);
         }
     };
+    
 
     const normalizeData = (usersData, messagesData) => {
         const normalizedData = {};
