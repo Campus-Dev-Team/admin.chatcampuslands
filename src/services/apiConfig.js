@@ -8,5 +8,9 @@ export const endpoints = {
   messages: `${API_BASE_URL}messages/add`,
   age: `${API_BASE_URL}user/age`,
   availability: `${API_BASE_URL}user/availability`,
+
+  //enpoints para consultar el historial de usuarios registrados y mensajes enviados (NO INCLUYE WHATSAPP)
+  usersToday: `${API_BASE_URL}admin/users/today`,
+  messagesToday: `${API_BASE_URL}admin/messages/today`
 };
 
