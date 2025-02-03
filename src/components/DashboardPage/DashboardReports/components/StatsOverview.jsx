@@ -4,7 +4,7 @@ import { Users, MessageSquare, TrendingUp } from "lucide-react";
 import CountUp from 'react-countup';
 
 export const StatsOverview = ({ stats }) => {
- const StatValue = ({ value, prefix = '', suffix = '' }) => (
+  const StatValue = ({ value, prefix = '', suffix = '' }) => (
     <CountUp
       end={Number(value) || 0}
       prefix={prefix}
@@ -62,15 +62,17 @@ export const StatsOverview = ({ stats }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-400">{stat.title}</p>
-                <CountUp
-                  end={Number(stat.value) || 0}
-                  className={`text-2xl font-bold text-${stat.color}-400 mt-2`}
-                  formattingFn={stat.format}
-                  duration={1}
-                />
+                <span className="text-2xl font-bold text-cyan-400 mt-2 block">
+                  <CountUp
+                    end={Number(stat.value)}
+                    preserveValue={true}
+                    formattingFn={stat.format}
+                    duration={1}
+                  />
+                </span>
                 <p className="text-xs text-slate-500 mt-1">{stat.description}</p>
               </div>
-              <stat.icon className={`w-8 h-8 text-${stat.color}-400 opacity-80`} />
+              <stat.icon className="w-8 h-8 text-cyan-400 opacity-80" />
             </div>
           </CardContent>
         </Card>

@@ -167,6 +167,7 @@ export const DashboardReports = () => {
             />
             
           </div>
+          <SpentAmountInput value={spentAmount} onChange={setSpentAmount} />
         </div>
 
         <StatsOverview stats={stats} />
