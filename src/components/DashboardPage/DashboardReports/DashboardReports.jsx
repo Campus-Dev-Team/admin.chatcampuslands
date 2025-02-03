@@ -1,12 +1,11 @@
-import { Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ExcelDownloadButton } from './components/ExcelDownloadButton';
 import { FiltrosReportes } from './components/FiltrosReportes';
 import { StatsOverview } from './components/StatsOverview';
 import { DashboardTable } from './components/DashboardTable';
 import { TitleHeader } from '../components/TitleHeader';
-import { UploadFilesModal } from './components/UploadFilesModal';
 import { UserMessagesModal } from './components/UserMessagesModal';
+import { SpentAmountInput } from './components/SpentAmountInput';
 import StatsCharts from './components/StatisticsCharts';
 import { fetchReportDataCampus } from '../../../services/reportService';
 
@@ -14,7 +13,6 @@ export const DashboardReports = () => {
   const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [ciudad, setCiudad] = useState("Bucaramanga");
-  const [showModalupload, setshowModalupload] = useState(false);
   const [filteredDataIza, setFilteredDataIza] = useState([]);
   const [campusData, setCampusData] = useState({ usersBucaramanga: [], usersBogota: [] });
   const [dates, setDates] = useState({ start: '', end: '' });
@@ -38,24 +36,23 @@ export const DashboardReports = () => {
     { key: 'messageCount', label: 'Mensajes' }
   ];
 
+ 
   useEffect(() => {
     if (dates.start && dates.end) {
       fetchCampusData();
     }
   }, [dates]);
 
-//para recalcular cuando campusData cambie
   useEffect(() => {
-    if (filteredDataIza.length > 0 && (campusData.usersBucaramanga.length > 0 || campusData.usersBogota.length > 0)) {
-      calculateStats(filteredDataIza);
+    if (dates.start && dates.end) {
+      calculateStats();
     }
-  }, [campusData, ciudad, filteredDataIza, spentAmount]);
+  }, [campusData, ciudad, filteredDataIza, spentAmount, dates]);
 
   const fetchCampusData = async () => {
     try {
       const dataCampus = await fetchReportDataCampus(dates.start, dates.end);
       setCampusData(dataCampus);
-      calculateStats(filteredDataIza);
     } catch (error) {
       console.error("Error fetching campus data:", error);
     }
@@ -63,32 +60,35 @@ export const DashboardReports = () => {
 
   const calculateStats = () => {
     if (!Array.isArray(filteredDataIza)) return;
-
+  
+    // Datos y usuarios registrados filtrados por ciudad
     const cityFilteredData = filteredDataIza.filter(user => !ciudad || user.city === ciudad);
     const registeredUsers = ciudad === "Bucaramanga"
       ? campusData.usersBucaramanga
       : campusData.usersBogota;
-
+  
+    // Totales por ciudad
     const totalUsers = cityFilteredData.length;
+    console.log(totalUsers);
+    
     const registeredCount = cityFilteredData.filter(user =>
       registeredUsers.some(regUser => String(regUser.phone) === String(user.PhoneNumber))
     );
-
-    const totalRegisteredUsers = filteredDataIza.filter(user =>
+  
+    // Cálculo global para costo por usuario
+    const allRegisteredUsers = filteredDataIza.filter(user =>
       [...campusData.usersBucaramanga, ...campusData.usersBogota]
         .some(regUser => String(regUser.phone) === String(user.PhoneNumber))
     );
-
-    const conversionRate = ((registeredCount.length / totalUsers) * 100).toFixed(2);
-    const costPerUser = (spentAmount / filteredDataIza.length).toFixed(2);
-    console.log(filteredDataIza);
-    
-
+  
+    const conversionRate = totalUsers > 0 ? ((registeredCount.length / totalUsers) * 100).toFixed(2) : 0;
+    const costPerUser = allRegisteredUsers.length > 0 ? (spentAmount / allRegisteredUsers.length).toFixed(2) : 0;
+  
     setStats({
       totalUsers,
-      registeredUsers: totalRegisteredUsers.length,
-      conversionRate,
-      costPerUser
+      registeredUsers: registeredCount.length,
+      conversionRate: Number(conversionRate),
+      costPerUser: Number(costPerUser)
     });
   };
 
@@ -116,9 +116,9 @@ export const DashboardReports = () => {
 
       return { registered, unregistered };
     } catch (error) {
-      console.error('salio algo mal al obtener la lista', error)
+      console.error('Error getting users list:', error);
+      return { registered: [], unregistered: [] };
     }
-
   };
 
   const prepareTableData = () => {
@@ -138,10 +138,9 @@ export const DashboardReports = () => {
 
       return [...registeredData, ...unregisteredData];
     } catch (error) {
-      console.error('error preparando la tabla ', error);
-
+      console.error('Error preparing table data:', error);
+      return [];
     }
-
   };
 
   return (
@@ -158,7 +157,6 @@ export const DashboardReports = () => {
               <option value="Bogota">Bogotá</option>
               <option value="Bucaramanga">Bucaramanga</option>
             </select>
-
             <FiltrosReportes onDataFetched={handleDataFetched} />
             <ExcelDownloadButton
               stats={stats}
@@ -167,13 +165,9 @@ export const DashboardReports = () => {
               getUsersList={getUsersList}
               filteredData={filteredDataIza}
             />
-            <button
-              className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-all flex items-center gap-2"
-              onClick={() => setshowModalupload(true)}
-            >
-              <Upload className="w-5 h-5" /> Cargar Archivos
-            </button>
+            
           </div>
+          <SpentAmountInput value={spentAmount} onChange={setSpentAmount} />
         </div>
 
         <StatsOverview stats={stats} />
@@ -204,16 +198,6 @@ export const DashboardReports = () => {
             />
           </div>
         </div>
-
-        <UploadFilesModal
-          showModal={showModalupload}
-          onClose={() => setshowModalupload(false)}
-          spentAmount={spentAmount}
-          setSpentAmount={setSpentAmount}
-          calculateStats={calculateStats}
-          filteredData={filteredDataIza}
-          onUploadSuccess={() => setshowModalupload(false)}
-        />
 
         <UserMessagesModal
           isOpen={showMessagesModal}
