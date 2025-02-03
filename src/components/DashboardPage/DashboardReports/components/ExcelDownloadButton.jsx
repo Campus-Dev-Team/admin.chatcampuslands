@@ -11,12 +11,19 @@ export const ExcelDownloadButton = ({
 }) => {
   const exportToExcel = () => {
     try {
+
+
       // Preparar datos de estadísticas generales
       const generalStats = [
         {
           'Métrica': 'Usuarios Totales',
           'Valor': stats.totalUsers,
           'Descripción': 'Total de usuarios únicos'
+        },
+        {
+          'Métrica': 'Ciudad',
+          'Valor': ciudad,
+          'Descripción': 'Ciudad seleccionada'
         },
         {
           'Métrica': 'Usuarios Registrados',
@@ -53,7 +60,7 @@ export const ExcelDownloadButton = ({
       }));
 
       // Preparar datos de mensajes
-      const messagesData = filteredData.flatMap(user => 
+      const messagesData = filteredData.flatMap(user =>
         (user.Messages || []).map(message => ({
           'Usuario': user.Username,
           'Teléfono': user.PhoneNumber,
@@ -65,12 +72,38 @@ export const ExcelDownloadButton = ({
         }))
       );
 
+      const headerStyle = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "2A303C" } },
+        alignment: { horizontal: "center" }
+      };
+
+      // Estilos para celdas normales
+      const cellStyle = {
+        alignment: { horizontal: "left" },
+        font: { color: { rgb: "000000" } }
+      };
+
+      function setCellStyles(worksheet, headerStyle, cellStyle) {
+        if (!worksheet['!ref']) return;
+        
+        const range = XLSX.utils.decode_range(worksheet['!ref']);
+        for (let row = range.s.r; row <= range.e.r; row++) {
+          for (let col = range.s.c; col <= range.e.c; col++) {
+            const cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+            worksheet[cellRef].s = row === 0 ? headerStyle : cellStyle;
+          }
+        }
+      }
+
       // Crear nuevo libro de Excel
       const workbook = XLSX.utils.book_new();
 
       // Crear y agregar hoja de estadísticas
       const wsStats = XLSX.utils.json_to_sheet(generalStats);
       XLSX.utils.book_append_sheet(workbook, wsStats, 'Estadísticas Generales');
+
+      setCellStyles(wsStats, headerStyle, cellStyle);
 
       // Crear y agregar hoja de usuarios
       const wsUsers = XLSX.utils.json_to_sheet(usersData);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check } from "lucide-react";
-import { fetchReportData } from '../../../../services/reportService';
+import { fetchReportDataIza } from '../../../../services/reportService';
 
 export const FiltrosReportes = ({ onDataFetched }) => {
     const [isLoaded, setIsLoaded] = useState(false);
@@ -21,16 +21,13 @@ export const FiltrosReportes = ({ onDataFetched }) => {
 
 
     const fetchData = async () => {
+
         try {
             setIsLoading(true);
-            const data = await fetchReportData(
-                dates.start,
-                dates.end
-            );
-            const normalizedData = normalizeData(data.users, data.messages);
-            console.log(normalizedData);
-            
-            onDataFetched(normalizedData);
+
+            const dataIza = await fetchReportDataIza(dates.start, dates.end)
+
+            onDataFetched(dataIza, dates);
         } catch (error) {
             console.error("Error fetching report data:", error);
         } finally {
@@ -39,77 +36,6 @@ export const FiltrosReportes = ({ onDataFetched }) => {
     };
 
 
-    const normalizeData = (usersData, messagesData) => {
-        const normalizedData = {};
-
-        // Función para normalizar el número de teléfono
-        const normalizePhoneNumber = (phone) => {
-            if (!phone) return phone;
-            const phoneStr = phone.toString();
-            return phoneStr.startsWith('57') ? parseInt(phoneStr.slice(2)) : parseInt(phoneStr);
-        };
-
-        // Función para normalizar el nombre de la ciudad
-        const normalizeCity = (city) => {
-            if (!city) return city;
-
-            // Convertir a string, por si acaso viene otro tipo de dato
-            const cityStr = city.toString();
-
-            // Convertir a minúsculas y luego capitalizar la primera letra
-            const normalized = cityStr
-                // Eliminar acentos y caracteres especiales
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                // Convertir a minúsculas
-                .toLowerCase()
-                // Capitalizar primera letra
-                .replace(/^\w/, c => c.toUpperCase());
-
-            return normalized;
-        };
-
-        // Crear un mapa de mensajes agrupados por userId
-        const messagesByUserId = messagesData.reduce((acc, message) => {
-            if (!acc[message.userId]) {
-                acc[message.userId] = [];
-            }
-            acc[message.userId].push({
-                Message: message.content,
-                MessageId: message.messageId,
-                Time: message.messageTime,
-            });
-            return acc;
-        }, {});
-
-        // Procesar los usuarios y asociarles los mensajes correspondientes
-        usersData.forEach(user => {
-            const userId = user.id;
-            const phoneNumber = normalizePhoneNumber(user.telefono);
-
-            // Filtrar mensajes válidos
-            const validMessages = (messagesByUserId[userId] || []).filter(
-                message => message.MessageId !== phoneNumber && message.Message !== user.username
-            );
-
-            // Agregar usuario al resultado normalizado
-            normalizedData[userId] = {
-                UserId: userId,
-                Username: user.username.trim(),
-                PhoneNumber: phoneNumber,
-                Age: user.age,
-                Availability: user.availability,
-                ContactWay: user.contact_way,
-                Messages: validMessages,
-                city: normalizeCity(user.city) // Aplicamos la normalización de la ciudad
-            };
-
-            // Agregar conteo de mensajes
-            normalizedData[userId].messageCount = validMessages.length;
-        });
-
-        return Object.values(normalizedData);
-    };
 
     return (
         <div className="bg-transparent m-2 p-4 md:p-0 text-white rounded-md ">
