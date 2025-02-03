@@ -6,7 +6,7 @@ const getHeaders = () => {
   return {
     "Content-Type": "application/json",
     "Accept": "application/json",
-    "Authorization": `Bearer ${token}`
+    "Authorization": `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiI2ODkzMTdhNS02ZGY2LTQyZWMtYjMzMS00N2IxMTYxZDg2MTIiLCJzdWIiOiJOaWNvbGFzIFBlZHJhemEiLCJpYXQiOjE3Mzg1OTUxNzIsImV4cCI6MTczODY4MTU3Mn0.rw1Hpwa-dK542Nkhvag2H6W1qCe_1D4WOzul7pBxG7U`
   };
 };
 
@@ -31,61 +31,50 @@ export const fetchReportDataIza = async (startDate, endDate) => {
 
 export const fetchReportDataCampus = async (startDate, endDate) => {
   try {
-    const params = { start: startDate, end: endDate };
+    if (!startDate) startDate = new Date().toISOString().split('T')[0]
+    if (!endDate) endDate = new Date().toISOString().split('T')[0]
+
+    const params = { startDate: startDate, endDate: endDate };
     const headers = getHeaders();
- 
+
+
+
     const [userCampusBogota, userCampusBucaramanga] = await Promise.all([
       axios.get(endpoints.usersCampusBogota, { params, headers }),
       axios.get(endpoints.usersCampusBucaramanga, { params, headers })
     ]);
-    
-    const storedData = JSON.parse(localStorage.getItem("mergedUsers") || "{}");
-    
     return {
-      usersBogota: userCampusBogota.data?.length ? userCampusBogota.data : storedData.usersBogota || [],
-      usersBucaramanga: userCampusBucaramanga.data?.length ? userCampusBucaramanga.data : storedData.usersBucaramanga || []
+      usersBogota: userCampusBogota.data,
+      usersBucaramanga: userCampusBucaramanga.data    
     };
+
   } catch (error) {
-    const storedData = JSON.parse(localStorage.getItem("mergedUsers") || "{}");
-    return storedData;
+
+    return "hubo un error conteniendo la data de campus ", error;
   }
- };
+};
 
 const normalizeDataIza = (usersData, messagesData) => {
   const normalizedData = {};
-
-  // Función para normalizar el número de teléfono
   const normalizePhoneNumber = (phone) => {
     if (!phone) return phone;
     const phoneStr = phone.toString();
     return phoneStr.startsWith('57') ? parseInt(phoneStr.slice(2)) : parseInt(phoneStr);
   };
 
-  // Función para normalizar el nombre de la ciudad
   const normalizeCity = (city) => {
-    if (!city) return city;
-
-    // Convertir a string, por si acaso viene otro tipo de dato
+    if (!city) return null;
     const cityStr = city.toString();
-
-    // Convertir a minúsculas y luego capitalizar la primera letra
     const normalized = cityStr
-      // Eliminar acentos y caracteres especiales
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
-      // Convertir a minúsculas
       .toLowerCase()
-      // Capitalizar primera letra
       .replace(/^\w/, c => c.toUpperCase());
-
-    return normalized;
+    return normalized === 'Bogota' ? 'Bogota' : normalized;
   };
 
-  // Crear un mapa de mensajes agrupados por userId
   const messagesByUserId = messagesData.reduce((acc, message) => {
-    if (!acc[message.userId]) {
-      acc[message.userId] = [];
-    }
+    if (!acc[message.userId]) acc[message.userId] = [];
     acc[message.userId].push({
       Message: message.content,
       MessageId: message.messageId,
@@ -94,31 +83,68 @@ const normalizeDataIza = (usersData, messagesData) => {
     return acc;
   }, {});
 
-  // Procesar los usuarios y asociarles los mensajes correspondientes
   usersData.forEach(user => {
-    const userId = user.id;
-    const phoneNumber = normalizePhoneNumber(user.telefono);
+    const normalizedCity = normalizeCity(user.city);
+    // Solo procesar usuarios con ciudad válida
+    if (normalizedCity) {
+      const userId = user.id;
+      const phoneNumber = normalizePhoneNumber(user.telefono);
+      const validMessages = (messagesByUserId[userId] || []).filter(
+        message => message.MessageId !== phoneNumber && message.Message !== user.username
+      );
 
-    // Filtrar mensajes válidos
-    const validMessages = (messagesByUserId[userId] || []).filter(
-      message => message.MessageId !== phoneNumber && message.Message !== user.username
-    );
-
-    // Agregar usuario al resultado normalizado
-    normalizedData[userId] = {
-      UserId: userId,
-      Username: user.username.trim(),
-      PhoneNumber: phoneNumber,
-      Age: user.age,
-      Availability: user.availability,
-      ContactWay: user.contact_way,
-      Messages: validMessages,
-      city: normalizeCity(user.city) // Aplicamos la normalización de la ciudad
-    };
-
-    // Agregar conteo de mensajes
-    normalizedData[userId].messageCount = validMessages.length;
+      normalizedData[userId] = {
+        UserId: userId,
+        Username: user.username.trim(),
+        PhoneNumber: phoneNumber,
+        Age: user.age,
+        Availability: user.availability,
+        ContactWay: user.contact_way,
+        Messages: validMessages,
+        city: normalizedCity,
+        messageCount: validMessages.length
+      };
+    }
   });
 
   return Object.values(normalizedData);
 };
+
+const tempDataUsersCampus = () => {
+  const tempData = {
+    usersBogota: [
+      {
+        "name": "Elizabeth Perez	",
+        "phone": "3117652435",
+        "email": "camiloandrespinzon0822@gmail.com",
+        "createdAt": "2025-01-30T11:19:53",
+        "state": "Registrado"
+      },
+      {
+        "name": "Elizabeth	",
+        "phone": "3117652435",
+        "email": "davidpatoo2003@gmail.com",
+        "createdAt": "2025-01-30T00:25:09",
+        "state": "Registrado"
+      }
+    ],
+    usersBucaramanga: [
+      {
+        "name": "Daniel Plazas",
+        "phone": "3208380860",
+        "email": "santi.mchacon14@gmail.com",
+        "createdAt": "2025-01-30T15:58:24",
+        "state": "Registrado"
+      },
+      {
+        "name": "Jefersson Alberto Garcés Blanco ",
+        "phone": "3123457215",
+        "email": "jgarcesblanco@gmail.com",
+        "createdAt": "2025-01-30T12:47:01",
+        "state": "Borrador"
+      },
+
+    ]
+  }
+  return tempData
+}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check } from "lucide-react";
-import { fetchReportDataIza, fetchReportDataCampus } from '../../../../services/reportService';
+import { fetchReportDataIza } from '../../../../services/reportService';
 
 export const FiltrosReportes = ({ onDataFetched }) => {
     const [isLoaded, setIsLoaded] = useState(false);
@@ -25,12 +25,9 @@ export const FiltrosReportes = ({ onDataFetched }) => {
         try {
             setIsLoading(true);
 
-            const [dataIza, dataCampus] = await Promise.all([
-                fetchReportDataIza(dates.start, dates.end),
-                fetchReportDataCampus(dates.start, dates.end)
-            ]);
+            const dataIza = await fetchReportDataIza(dates.start, dates.end)
 
-            onDataFetched(dataIza, dataCampus);
+            onDataFetched(dataIza, dates);
         } catch (error) {
             console.error("Error fetching report data:", error);
         } finally {
