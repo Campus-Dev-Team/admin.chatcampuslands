@@ -13,14 +13,14 @@ import {
 } from 'recharts';
 import _ from 'lodash';
 
-const StatsCharts = ({ filteredData }) => {
-  // Process data for charts
+const StatsCharts = ({ filteredData, campusData, ciudad }) => {
   const chartData = useMemo(() => {
     if (!Array.isArray(filteredData) || filteredData.length === 0) return [];
 
-    // Get stored registered users data
-    const storedData = localStorage.getItem("mergedUsers");
-    const registeredUsers = storedData ? JSON.parse(storedData) : [];
+    // Get registered users based on city
+    const registeredUsers = ciudad === "Bucaramanga" 
+      ? campusData?.usersBucaramanga || []
+      : campusData?.usersBogota || [];
 
     // Group messages by date
     const messagesByDate = _.groupBy(
@@ -28,10 +28,8 @@ const StatsCharts = ({ filteredData }) => {
       message => message.Time.split('T')[0]
     );
 
-    // Get all unique dates
     const dates = Object.keys(messagesByDate).sort();
 
-    // Calculate daily stats
     return dates.map(date => {
       const dailyMessages = messagesByDate[date];
       
@@ -45,15 +43,13 @@ const StatsCharts = ({ filteredData }) => {
         }).filter(Boolean)
       );
 
-      // Total unique users for the day
       const totalUsers = dailyUniqueUsers.size;
       
       // Count registered users for this date
       const registeredCount = Array.from(dailyUniqueUsers).filter(phoneNumber =>
-        registeredUsers.some(regUser => regUser.Celular === phoneNumber)
+        registeredUsers.some(regUser => String(regUser.phone) === String(phoneNumber))
       ).length;
 
-      // Calculate conversion rate
       const conversionRate = totalUsers > 0 
         ? (registeredCount / totalUsers) * 100 
         : 0;
@@ -65,11 +61,10 @@ const StatsCharts = ({ filteredData }) => {
         registeredUsers: registeredCount
       };
     });
-  }, [filteredData]);
+  }, [filteredData, campusData, ciudad]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-      {/* Conversion Rate Chart */}
       <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4">
         <h3 className="text-lg font-semibold text-cyan-400 mb-4">
           Tasa de Conversión Diaria
@@ -111,7 +106,6 @@ const StatsCharts = ({ filteredData }) => {
         </div>
       </div>
 
-      {/* Users Chart with Total and Registered */}
       <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4">
         <h3 className="text-lg font-semibold text-cyan-400 mb-4">
           Usuarios por Día

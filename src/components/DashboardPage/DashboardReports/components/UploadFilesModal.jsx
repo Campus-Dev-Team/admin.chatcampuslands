@@ -74,28 +74,36 @@ export const UploadFilesModal = ({
 
     const handleUpload = async () => {
         try {
-            let mergedUsers = [];
+            let mergedUsers = {
+                usersBogota: [],
+                usersBucaramanga: []
+            };
 
-            // Procesar archivos Excel si están presentes
             if (files.usuariosBogota) {
                 const bogotaData = await processExcelFile(files.usuariosBogota, 'Bogotá');
-                mergedUsers = [...mergedUsers, ...bogotaData];
+                mergedUsers.usersBogota = bogotaData.map(user => ({
+                    name: user.Username || user.Nombre,
+                    phone: user.PhoneNumber?.toString() || user.Celular?.toString(),
+                    email: user.Email || '',
+                    createdAt: new Date().toISOString(),
+                    state: user.state || user.Estado
+                }));
             }
 
             if (files.usuariosBucaramanga) {
                 const bucaramangaData = await processExcelFile(files.usuariosBucaramanga, 'Bucaramanga');
-                mergedUsers = [...mergedUsers, ...bucaramangaData];
+                mergedUsers.usersBucaramanga = bucaramangaData.map(user => ({
+                    name: user.Username || user.Nombre,
+                    phone: user.PhoneNumber?.toString() || user.Celular?.toString(),
+                    email: user.Email || '',
+                    createdAt: new Date().toISOString(),
+                    state:  user.state || user.Estado
+                }));
             }
 
-            // Si hay archivos cargados, guardar en localStorage
-            if (mergedUsers.length > 0) {
-                localStorage.setItem('mergedUsers', JSON.stringify(mergedUsers));
-            }
-
-            // Guardar el spentAmount en localStorage
+            localStorage.setItem('mergedUsers', JSON.stringify(mergedUsers));
             localStorage.setItem('spentAmount', spentAmount.toString());
 
-            // Recalcular estadísticas y notificar al padre
             calculateStats(filteredData);
             onClose();
             onUploadSuccess?.();
