@@ -36,7 +36,7 @@ export const DashboardReports = () => {
     { key: 'messageCount', label: 'Mensajes' }
   ];
 
- 
+
   useEffect(() => {
     if (dates.start && dates.end) {
       fetchCampusData();
@@ -59,39 +59,45 @@ export const DashboardReports = () => {
   };
 
   const calculateStats = () => {
-    if (!Array.isArray(filteredDataIza)) return;
-  
-    // Datos y usuarios registrados filtrados por ciudad
-    const cityFilteredData = filteredDataIza.filter(user => !ciudad || user.city === ciudad);
-    const registeredUsers = ciudad === "Bucaramanga"
-      ? campusData.usersBucaramanga
-      : campusData.usersBogota;
-  
-    // Totales por ciudad
-    const totalUsers = cityFilteredData.length;
-    console.log(totalUsers);
-    
-    const registeredCount = cityFilteredData.filter(user =>
-      registeredUsers.some(regUser => String(regUser.phone) === String(user.PhoneNumber))
-    );
-  
-    // Cálculo global para costo por usuario
-    const allRegisteredUsers = filteredDataIza.filter(user =>
-      [...campusData.usersBucaramanga, ...campusData.usersBogota]
-        .some(regUser => String(regUser.phone) === String(user.PhoneNumber))
-    );
-  
-    const conversionRate = totalUsers > 0 ? ((registeredCount.length / totalUsers) * 100).toFixed(2) : 0;
-    const costPerUser = allRegisteredUsers.length > 0 ? (spentAmount / allRegisteredUsers.length).toFixed(2) : 0;
-  
-    setStats({
-      totalUsers,
-      registeredUsers: registeredCount.length,
-      conversionRate: Number(conversionRate),
-      costPerUser: Number(costPerUser)
-    });
-  };
+    try {
 
+      if (!Array.isArray(filteredDataIza)) return;
+
+      // Datos y usuarios registrados filtrados por ciudad
+      const cityFilteredData = filteredDataIza.filter(user => !ciudad || user.city === ciudad);
+      const registeredUsers = ciudad === "Bucaramanga"
+        ? campusData.usersBucaramanga
+        : campusData.usersBogota;
+
+      // Totales por ciudad
+      const totalUsers = cityFilteredData.length;
+      console.log(totalUsers);
+
+      const registeredCount = cityFilteredData.filter(user =>
+        registeredUsers.some(regUser => String(regUser.phone) === String(user.PhoneNumber))
+      );
+
+      // Cálculo global para costo por usuario
+      const allRegisteredUsers = filteredDataIza.filter(user =>
+        [...campusData.usersBucaramanga, ...campusData.usersBogota]
+          .some(regUser => String(regUser.phone) === String(user.PhoneNumber))
+      );
+
+      const conversionRate = totalUsers > 0 ? ((registeredCount.length / totalUsers) * 100).toFixed(2) : 0;
+      const costPerUser = allRegisteredUsers.length > 0 ? (spentAmount / allRegisteredUsers.length).toFixed(2) : 0;
+
+      setStats({
+        totalUsers,
+        registeredUsers: registeredCount.length,
+        conversionRate: Number(conversionRate),
+        costPerUser: Number(costPerUser)
+      });
+
+    } catch (error) {
+      console.log('ha habido un error grabe ',error);
+      
+    }
+  }
   const handleDataFetched = (dataIza, newDates) => {
     setFilteredDataIza(dataIza);
     setDates(newDates);
@@ -165,7 +171,7 @@ export const DashboardReports = () => {
               getUsersList={getUsersList}
               filteredData={filteredDataIza}
             />
-            
+
           </div>
           <SpentAmountInput value={spentAmount} onChange={setSpentAmount} />
         </div>
