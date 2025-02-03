@@ -39,16 +39,11 @@ export const DashboardReports = () => {
  
   useEffect(() => {
     if (dates.start && dates.end) {
-      fetchCampusData();
+      calculateStats();
     }
   }, [dates]);
 
-  useEffect(() => {
-    if (dates.start && dates.end) {
-      calculateStats();
-    }
-  }, [campusData, ciudad, filteredDataIza, spentAmount, dates]);
-
+ 
   const fetchCampusData = async () => {
     try {
       const dataCampus = await fetchReportDataCampus(dates.start, dates.end);
@@ -59,6 +54,7 @@ export const DashboardReports = () => {
   };
 
   const calculateStats = () => {
+    fetchCampusData();
     if (!Array.isArray(filteredDataIza)) return;
   
     // Datos y usuarios registrados filtrados por ciudad
