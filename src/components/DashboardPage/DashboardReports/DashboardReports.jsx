@@ -92,7 +92,6 @@ export const DashboardReports = () => {
     const costPerUser = allRegisteredUsers.length > 0
       ? (spentAmount / allRegisteredUsers.length).toFixed(2)
       : 0;
-    console.log('me ejecute');
     
     setStats({
       totalUsers,

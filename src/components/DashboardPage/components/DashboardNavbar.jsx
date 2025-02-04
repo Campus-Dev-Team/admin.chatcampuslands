@@ -26,6 +26,11 @@ export const DashboardNavbar = () => {
 
   const menuItems = [
     {
+      icon: <BarChart2 className="h-5 w-5" />,
+      label: "Reportes",
+      path: "/dashboard",
+    },
+    {
       icon: <MessageCircle className="h-5 w-5" />,
       label: "Mensajes",
       path: "/dashboard/messages",
@@ -36,15 +41,10 @@ export const DashboardNavbar = () => {
       path: "/dashboard/users",
     },
     {
-      icon: <BarChart2 className="h-5 w-5" />,
-      label: "Reportes",
-      path: "/dashboard",
-    },
-    {
       icon: <Settings className="h-5 w-5" />,
       label: "Configuración",
       path: "/dashboard/settings",
-    },
+    }
   ];
 
   return (

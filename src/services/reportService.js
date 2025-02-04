@@ -6,7 +6,7 @@ const getHeaders = () => {
   return {
     "Content-Type": "application/json",
     "Accept": "application/json",
-    "Authorization": `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiI2ODkzMTdhNS02ZGY2LTQyZWMtYjMzMS00N2IxMTYxZDg2MTIiLCJzdWIiOiJOaWNvbGFzIFBlZHJhemEiLCJpYXQiOjE3Mzg1OTUxNzIsImV4cCI6MTczODY4MTU3Mn0.rw1Hpwa-dK542Nkhvag2H6W1qCe_1D4WOzul7pBxG7U`
+    "Authorization": `Bearer ${token}`
   };
 };
 
@@ -20,8 +20,11 @@ export const fetchReportDataIza = async (startDate, endDate) => {
       axios.get(endpoints.usersToday, { params, headers }),
       axios.get(endpoints.messagesToday, { params, headers })
     ]);
+    console.log('data encontrada sin normalizar ', usersResponse.data, messagesResponse.data);
+    
     const dataNormalized = normalizeDataIza(usersResponse.data, messagesResponse.data)
-
+    console.log('data normalizada ',dataNormalized);
+    
     return dataNormalized
 
   } catch (error) {
@@ -31,6 +34,8 @@ export const fetchReportDataIza = async (startDate, endDate) => {
 
 export const fetchReportDataCampus = async (startDate, endDate) => {
   try {
+    console.log('bu');
+    
     if (!startDate) startDate = new Date().toISOString().split('T')[0]
     if (!endDate) endDate = new Date().toISOString().split('T')[0]
 
@@ -43,6 +48,8 @@ export const fetchReportDataCampus = async (startDate, endDate) => {
       axios.get(endpoints.usersCampusBogota, { params, headers }),
       axios.get(endpoints.usersCampusBucaramanga, { params, headers })
     ]);
+    console.log(userCampusBogota.data, userCampusBucaramanga.data);
+    
     return {
       usersBogota: userCampusBogota.data,
       usersBucaramanga: userCampusBucaramanga.data    
@@ -88,9 +95,9 @@ const normalizeDataIza = (usersData, messagesData) => {
     // Solo procesar usuarios con ciudad válida
     if (normalizedCity) {
       const userId = user.id;
-      const phoneNumber = normalizePhoneNumber(user.telefono);
+      const phoneNumber = normalizePhoneNumber(user.phone);
       const validMessages = (messagesByUserId[userId] || []).filter(
-        message => message.MessageId !== phoneNumber && message.Message !== user.username
+        message => message.messageId !== phoneNumber && message.content !== user.username
       );
 
       normalizedData[userId] = {
