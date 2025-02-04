@@ -6,7 +6,7 @@ const getHeaders = () => {
   return {
     "Content-Type": "application/json",
     "Accept": "application/json",
-    "Authorization": `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiI2ODkzMTdhNS02ZGY2LTQyZWMtYjMzMS00N2IxMTYxZDg2MTIiLCJzdWIiOiJOaWNvbGFzIFBlZHJhemEiLCJpYXQiOjE3Mzg1OTUxNzIsImV4cCI6MTczODY4MTU3Mn0.rw1Hpwa-dK542Nkhvag2H6W1qCe_1D4WOzul7pBxG7U`
+    "Authorization": `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiI5MTk1ZDE3NC1mNGZjLTQyMWItOWY3MC05YTYyYjJiODFmNmYiLCJzdWIiOiIrOWZQMmpGd1J6RzZoRTVUTWhBM2txcjNwL3Fwd1J0WjFWcUhEeTFvT2tNPSIsImlhdCI6MTczODY5MjAxNSwiZXhwIjoxNzM4Nzc4NDE1fQ.Nmzrhm4qy7RiNegOdWmvtJjtZqYCMe7TfmrRop_aIMM`
   };
 };
 
