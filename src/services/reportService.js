@@ -21,10 +21,10 @@ export const fetchReportDataIza = async (startDate, endDate) => {
       axios.get(endpoints.messagesToday, { params, headers })
     ]);
     console.log('data encontrada sin normalizar ', usersResponse.data, messagesResponse.data);
-    
+
     const dataNormalized = normalizeDataIza(usersResponse.data, messagesResponse.data)
-    console.log('data normalizada ',dataNormalized);
-    
+    console.log('data normalizada ', dataNormalized);
+
     return dataNormalized
 
   } catch (error) {
@@ -35,7 +35,7 @@ export const fetchReportDataIza = async (startDate, endDate) => {
 export const fetchReportDataCampus = async (startDate, endDate) => {
   try {
     console.log('bu');
-    
+
     if (!startDate) startDate = new Date().toISOString().split('T')[0]
     if (!endDate) endDate = new Date().toISOString().split('T')[0]
 
@@ -49,10 +49,10 @@ export const fetchReportDataCampus = async (startDate, endDate) => {
       axios.get(endpoints.usersCampusBucaramanga, { params, headers })
     ]);
     console.log(userCampusBogota.data, userCampusBucaramanga.data);
-    
+
     return {
       usersBogota: userCampusBogota.data,
-      usersBucaramanga: userCampusBucaramanga.data    
+      usersBucaramanga: userCampusBucaramanga.data
     };
 
   } catch (error) {
@@ -95,7 +95,7 @@ const normalizeDataIza = (usersData, messagesData) => {
     // Solo procesar usuarios con ciudad válida
     if (normalizedCity) {
       const userId = user.id;
-      const phoneNumber = normalizePhoneNumber(user.phone);
+      const phoneNumber = normalizePhoneNumber(user.telefono);
       const validMessages = (messagesByUserId[userId] || []).filter(
         message => message.messageId !== phoneNumber && message.content !== user.username
       );
