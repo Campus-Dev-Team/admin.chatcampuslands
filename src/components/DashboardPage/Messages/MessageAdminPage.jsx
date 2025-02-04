@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import ChatList from "./components/ChatList/ChatList";
 import ChatArea from "./components/ChatArea/ChatArea";
 import EmptyChatState from "./components/ChatArea/EmptyChatState";
-import { getAllChats } from "@/services/chatService";
+import { getAllChats } from "@/services/chatsService";
 import { getMessagesByChatId } from "@/services/messagesService";
+import { updateChatMode } from "@/services/chatsService";
 
 export const MessageAdminPage = () => {
   const [selectedChat, setSelectedChat] = useState(null);
@@ -29,14 +30,13 @@ export const MessageAdminPage = () => {
     loadChats();
   }, []);
 
-  // Obtener mensajes cuando se selecciona un chat
   useEffect(() => {
     const loadMessages = async () => {
       if (!selectedChat) return;
 
       try {
         const messages = await getMessagesByChatId(selectedChat.id);
-        setMessages(messages.data)
+        setMessages(messages.data);
       } catch (error) {
         console.error("Error loading messages:", error);
       }
@@ -45,9 +45,32 @@ export const MessageAdminPage = () => {
     loadMessages();
   }, [selectedChat]);
 
-  const toggleAI = () => {
-    setIsAIEnabled(!isAIEnabled);
-    console.log("IA", isAIEnabled ? "Desactivada" : "Activada");
+  const toggleAI = async () => {
+    setIsAIEnabled((prevState) => {
+      const newState = !prevState;
+      console.log("IA", newState ? "Activada" : "Desactivada");
+      return newState;
+    });
+
+    if (!selectedChat) return;
+
+    try {
+      const newMode = isAIEnabled ? "MODO_ADMINISTRADOR" : "MODO_IA";
+      const dataToSend = {
+        chatMode: newMode,
+        chatId: selectedChat.id,
+      };
+
+      console.log("Enviando cambio de modo:", dataToSend);
+      const response = await updateChatMode(dataToSend);
+      console.log("Respuesta del servidor:", response);
+
+      if (!response.ok) {
+        throw new Error(`Error al cambiar el modo: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error cambiando el modo de IA:", error);
+    }
   };
 
   if (loading) {
@@ -70,8 +93,8 @@ export const MessageAdminPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <ChatList
             chats={chats}
-            selectedChat={selectedChat} 
-            setSelectedChat={setSelectedChat} 
+            selectedChat={selectedChat}
+            setSelectedChat={setSelectedChat}
           />
           <div className="lg:col-span-2">
             {selectedChat ? (

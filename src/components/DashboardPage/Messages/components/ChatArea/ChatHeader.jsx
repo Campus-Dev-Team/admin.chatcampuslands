@@ -1,5 +1,5 @@
 import React from "react";
-import { User } from 'lucide-react';
+import { User } from "lucide-react";
 import AIToggle from "../AIToggle/AIToggle";
 
 const ChatHeader = ({ selectedChat, isAIEnabled, toggleAI }) => {
@@ -11,8 +11,8 @@ const ChatHeader = ({ selectedChat, isAIEnabled, toggleAI }) => {
           <User className="w-5 h-5 text-cyan-400" />
         </div>
         <div>
-          <p className="text-white font-medium">{selectedChat.Username}</p>
-          <p className="text-sm text-slate-400">{selectedChat.PhoneNumber}</p>
+          <p className="text-white font-medium">{selectedChat.username}</p>
+          <p className="text-sm text-slate-400">{selectedChat.phone}</p>
         </div>
       </div>
     </div>

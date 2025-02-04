@@ -5,7 +5,7 @@ import LoginPage from '../pages/LoginPage';
 import { ProtectedRoute } from '../router/ProtectedRoute';
 import { GeneralConsult } from '../pages/Dashboard/DashboardGeneralConsult';
 import { DashboardIndex } from '../pages/Dashboard/DashboardIndex';
-import { MessageAdminPage } from '../components/DashboardPage/MessageAdminPage';
+import { MessageAdminPage } from '../components/DashboardPage/Messages/MessageAdminPage';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
