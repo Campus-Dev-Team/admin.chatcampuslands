@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ExcelDownloadButton } from './components/ExcelDownloadButton';
 import { FiltrosReportes } from './components/FiltrosReportes';
 import { StatsOverview } from './components/StatsOverview';
@@ -36,112 +36,124 @@ export const DashboardReports = () => {
     { key: 'messageCount', label: 'Mensajes' }
   ];
 
- 
-  useEffect(() => {
-    if (dates.start && dates.end) {
-      fetchCampusData();
-    }
-  }, [dates]);
+  // Datos filtrados por ciudad
+  const cityFilteredData = useMemo(() => {
+    if (!Array.isArray(filteredDataIza)) return [];
+    return filteredDataIza.filter(user => !ciudad || user.city === ciudad);
+  }, [filteredDataIza, ciudad]);
 
-  useEffect(() => {
-    if (dates.start && dates.end) {
-      calculateStats();
-    }
-  }, [campusData, ciudad, filteredDataIza, spentAmount, dates]);
-
-  const fetchCampusData = async () => {
-    try {
-      const dataCampus = await fetchReportDataCampus(dates.start, dates.end);
-      setCampusData(dataCampus);
-    } catch (error) {
-      console.error("Error fetching campus data:", error);
-    }
-  };
-
-  const calculateStats = () => {
-    if (!Array.isArray(filteredDataIza)) return;
-  
-    // Datos y usuarios registrados filtrados por ciudad
-    const cityFilteredData = filteredDataIza.filter(user => !ciudad || user.city === ciudad);
-    const registeredUsers = ciudad === "Bucaramanga"
+  // Usuarios registrados según la ciudad seleccionada
+  const registeredUsers = useMemo(() => {
+    return ciudad === "Bucaramanga"
       ? campusData.usersBucaramanga
       : campusData.usersBogota;
-  
-    // Totales por ciudad
-    const totalUsers = cityFilteredData.length;
-    console.log(totalUsers);
-    
-    const registeredCount = cityFilteredData.filter(user =>
-      registeredUsers.some(regUser => String(regUser.phone) === String(user.PhoneNumber))
-    );
-  
-    // Cálculo global para costo por usuario
-    const allRegisteredUsers = filteredDataIza.filter(user =>
+  }, [campusData, ciudad]);
+
+  // Todos los usuarios registrados (ambas ciudades)
+  const allRegisteredUsers = useMemo(() => {
+    if (!Array.isArray(filteredDataIza)) return [];
+    return filteredDataIza.filter(user =>
       [...campusData.usersBucaramanga, ...campusData.usersBogota]
         .some(regUser => String(regUser.phone) === String(user.PhoneNumber))
     );
-  
-    const conversionRate = totalUsers > 0 ? ((registeredCount.length / totalUsers) * 100).toFixed(2) : 0;
-    const costPerUser = allRegisteredUsers.length > 0 ? (spentAmount / allRegisteredUsers.length).toFixed(2) : 0;
-  
+  }, [filteredDataIza, campusData]);
+
+  // Conteo de usuarios registrados de la ciudad actual
+  const registeredCount = useMemo(() => {
+    return cityFilteredData.filter(user =>
+      registeredUsers.some(regUser => String(regUser.phone) === String(user.PhoneNumber))
+    );
+  }, [cityFilteredData, registeredUsers]);
+
+  // Efecto para cargar datos del campus
+  useEffect(() => {
+    const fetchCampusData = async () => {
+      try {
+        const dataCampus = await fetchReportDataCampus(dates.start, dates.end);
+        setCampusData(dataCampus);
+      } catch (error) {
+        console.error("Error fetching campus data:", error);
+      }
+    };
+
+    if (dates.start && dates.end) {
+      fetchCampusData();
+    }
+  }, [dates.start, dates.end]);
+
+  // Efecto para actualizar estadísticas
+  useEffect(() => {
+    if (!dates.start || !dates.end) return;
+
+    const totalUsers = cityFilteredData.length;
+    const conversionRate = totalUsers > 0
+      ? ((registeredCount.length / totalUsers) * 100).toFixed(2)
+      : 0;
+    const costPerUser = allRegisteredUsers.length > 0
+      ? (spentAmount / allRegisteredUsers.length).toFixed(2)
+      : 0;
+    console.log('me ejecute');
+    
     setStats({
       totalUsers,
       registeredUsers: registeredCount.length,
       conversionRate: Number(conversionRate),
       costPerUser: Number(costPerUser)
     });
-  };
+  }, [cityFilteredData, registeredCount, allRegisteredUsers, spentAmount]);
 
+  
+  
   const handleDataFetched = (dataIza, newDates) => {
     setFilteredDataIza(dataIza);
     setDates(newDates);
   };
 
-  const getUsersList = (data) => {
-    try {
-      if (!Array.isArray(data)) return { registered: [], unregistered: [] };
+  // Función para obtener listas de usuarios
+  const getUsersList = useMemo(() => {
+    return (data) => {
+      try {
+        if (!Array.isArray(data)) return { registered: [], unregistered: [] };
 
-      const cityFilteredData = data.filter(user => !ciudad || user.city === ciudad);
-      const currentCityUsers = ciudad === "Bucaramanga"
-        ? campusData.usersBucaramanga
-        : campusData.usersBogota;
+        const cityFilteredData = data.filter(user => !ciudad || user.city === ciudad);
+        const currentCityUsers = ciudad === "Bucaramanga"
+          ? campusData.usersBucaramanga
+          : campusData.usersBogota;
 
-      const registered = cityFilteredData.filter(user =>
-        currentCityUsers.some(regUser => String(regUser.phone) === String(user.PhoneNumber))
-      );
+        const registered = cityFilteredData.filter(user =>
+          currentCityUsers.some(regUser => String(regUser.phone) === String(user.PhoneNumber))
+        );
 
-      const unregistered = cityFilteredData.filter(user =>
-        !currentCityUsers.some(regUser => String(regUser.phone) === String(user.PhoneNumber))
-      );
+        const unregistered = cityFilteredData.filter(user =>
+          !currentCityUsers.some(regUser => String(regUser.phone) === String(user.PhoneNumber))
+        );
 
-      return { registered, unregistered };
-    } catch (error) {
-      console.error('Error getting users list:', error);
-      return { registered: [], unregistered: [] };
-    }
-  };
+        return { registered, unregistered };
+      } catch (error) {
+        console.error('Error getting users list:', error);
+        return { registered: [], unregistered: [] };
+      }
+    };
+  }, [ciudad, campusData]);
 
-  const prepareTableData = () => {
-    try {
-      const { registered, unregistered } = getUsersList(filteredDataIza);
-      const registeredData = registered.map(user => ({
-        ...user,
-        status: true,
-        messageCount: user.Messages?.length || 0
-      }));
+  // Datos preparados para la tabla
+  const tableData = useMemo(() => {
+    const { registered, unregistered } = getUsersList(filteredDataIza);
 
-      const unregisteredData = unregistered.map(user => ({
-        ...user,
-        status: false,
-        messageCount: user.Messages?.length || 0
-      }));
+    const registeredData = registered.map(user => ({
+      ...user,
+      status: true,
+      messageCount: user.Messages?.length || 0
+    }));
 
-      return [...registeredData, ...unregisteredData];
-    } catch (error) {
-      console.error('Error preparing table data:', error);
-      return [];
-    }
-  };
+    const unregisteredData = unregistered.map(user => ({
+      ...user,
+      status: false,
+      messageCount: user.Messages?.length || 0
+    }));
+
+    return [...registeredData, ...unregisteredData];
+  }, [filteredDataIza, getUsersList]);
 
   return (
     <div className="p-6 space-y-6 bg-slate-900 overflow-y-scroll scrollbar-custom">
@@ -165,14 +177,13 @@ export const DashboardReports = () => {
               getUsersList={getUsersList}
               filteredData={filteredDataIza}
             />
-            
           </div>
           <SpentAmountInput value={spentAmount} onChange={setSpentAmount} />
         </div>
 
         <StatsOverview stats={stats} />
         <StatsCharts
-          filteredData={filteredDataIza.filter(user => !ciudad || user.city === ciudad)}
+          filteredData={cityFilteredData}
           campusData={campusData}
           ciudad={ciudad}
         />
@@ -183,7 +194,7 @@ export const DashboardReports = () => {
               <h3 className="text-xl font-semibold text-cyan-400">Detalle de Usuarios</h3>
             </div>
             <DashboardTable
-              data={prepareTableData()}
+              data={tableData}
               columns={tableColumns}
               onRowAction={(user) => {
                 setSelectedUser(user);
