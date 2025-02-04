@@ -10,23 +10,26 @@ export const FiltrosReportes = ({ onDataFetched }) => {
     });
     const [isLoading, setIsLoading] = useState(false);
 
+    // Efecto para el loading visual
     useEffect(() => {
         const timer = setTimeout(() => setIsLoaded(true), 500);
         return () => clearTimeout(timer);
     }, []);
 
+    // Efecto para la petición inicial
+    useEffect(() => {
+        fetchData();
+    }, []); // Se ejecuta solo al montar el componente
+
+    // Efecto para cambios en las fechas
     useEffect(() => {
         if (dates.start && dates.end) fetchData();
     }, [dates]);
 
-
     const fetchData = async () => {
-
         try {
             setIsLoading(true);
-
             const dataIza = await fetchReportDataIza(dates.start, dates.end)
-
             onDataFetched(dataIza, dates);
         } catch (error) {
             console.error("Error fetching report data:", error);
@@ -34,8 +37,6 @@ export const FiltrosReportes = ({ onDataFetched }) => {
             setIsLoading(false);
         }
     };
-
-
 
     return (
         <div className="bg-transparent m-2 p-4 md:p-0 text-white rounded-md ">
@@ -64,20 +65,15 @@ export const FiltrosReportes = ({ onDataFetched }) => {
                                 onChange={(e) => setDates(prev => ({ ...prev, end: e.target.value }))}
                             />
                         </div>
-
                     </div>
-
-
 
                     <span
                         className="py-2 px-1 text-white rounded-lg text-[0.875rem] flex flex-row justify-center items-center gap-1"
                         disabled={isLoading}
                     >
                         {isLoading ? 'Cargando...' : <>Filtro Aplicado <Check size={15} /></>}
-
                     </span>
                 </div>
-
             </div>
         </div>
     );
