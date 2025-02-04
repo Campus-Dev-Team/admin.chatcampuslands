@@ -25,7 +25,7 @@ const LoginPage = () => {
 
     try {
       // Intentar iniciar sesión
-      await login({ "id": 0, "username":password, "telefono": 11192006, "role": "ADMIN"});
+      await login({"username":password, "phone": 11192006, "role": "ADMIN"});
 
       // Guardar sesión y redirigir
       loginStorage("ADMIN", "Campuslands");
