@@ -15,13 +15,10 @@ export const UploadFilesModal = ({
         usuariosBogota: null,
         usuariosBucaramanga: null
     });
+    const [displayAmount, setDisplayAmount] = useState('');
+
 
     if (!showModal) return null;
-
-    const handleSpentAmountChange = (e) => {
-        const value = e.target.value;
-        setSpentAmount(value === '' ? '' : Number(value));
-    };
 
     // Función para procesar archivos Excel y agregar campo ciudad
     const processExcelFile = async (file, ciudad) => {
@@ -66,30 +63,50 @@ export const UploadFilesModal = ({
         }));
     };
 
+    const handleSpentAmountChange = (e) => {
+        const rawValue = e.target.value.replace(/[^0-9]/g, '');
+        setSpentAmount(Number(rawValue));
+        localStorage.setItem('spentAmount', rawValue);
+
+        const formatter = new Intl.NumberFormat('es-CO');
+        setDisplayAmount(rawValue ? formatter.format(rawValue) : '');
+    };
+
     const handleUpload = async () => {
         try {
-            let mergedUsers = [];
+            let mergedUsers = {
+                usersBogota: [],
+                usersBucaramanga: []
+            };
 
-            // Procesar archivos Excel si están presentes
             if (files.usuariosBogota) {
                 const bogotaData = await processExcelFile(files.usuariosBogota, 'Bogotá');
-                mergedUsers = [...mergedUsers, ...bogotaData];
+                mergedUsers.usersBogota = bogotaData.map(user => ({
+                    name: user.Username || user.Nombre,
+                    phone: user.PhoneNumber?.toString() || user.Celular?.toString(),
+                    email: user.Email || '',
+                    createdAt: new Date().toISOString(),
+                    state: user.state || user.Estado
+                }));
             }
 
             if (files.usuariosBucaramanga) {
                 const bucaramangaData = await processExcelFile(files.usuariosBucaramanga, 'Bucaramanga');
-                mergedUsers = [...mergedUsers, ...bucaramangaData];
+                mergedUsers.usersBucaramanga = bucaramangaData.map(user => ({
+                    name: user.Username || user.Nombre,
+                    phone: user.PhoneNumber?.toString() || user.Celular?.toString(),
+                    email: user.Email || '',
+                    createdAt: new Date().toISOString(),
+                    state:  user.state || user.Estado
+                }));
             }
 
-            // Si hay archivos cargados, guardar en localStorage
-            if (mergedUsers.length > 0) {
-                localStorage.setItem('mergedUsers', JSON.stringify(mergedUsers));
-            }
+            localStorage.setItem('mergedUsers', JSON.stringify(mergedUsers));
+            localStorage.setItem('spentAmount', spentAmount.toString());
 
-            // Recalcular estadísticas y notificar al padre
             calculateStats(filteredData);
             onClose();
-            onUploadSuccess?.(); // Notificar al padre que la carga fue exitosa
+            onUploadSuccess?.();
 
         } catch (err) {
             console.error("Error en la carga de archivos:", err);
@@ -115,8 +132,8 @@ export const UploadFilesModal = ({
                         Gasto Total ($)
                     </label>
                     <input
-                        type="number"
-                        value={spentAmount === 0 ? '' : spentAmount}
+                        type="text"
+                        value={displayAmount}
                         onChange={handleSpentAmountChange}
                         className="w-full bg-slate-700 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                         placeholder="Ingrese el monto gastado"

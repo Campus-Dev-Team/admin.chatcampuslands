@@ -1,8 +1,22 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, MessageSquare, TrendingUp } from "lucide-react";
+import CountUp from 'react-countup';
 
 export const StatsOverview = ({ stats }) => {
+  const StatValue = ({ value, prefix = '', suffix = '' }) => (
+    <CountUp
+      end={Number(value) || 0}
+      prefix={prefix}
+      suffix={suffix}
+      decimals={suffix === '%' ? 2 : 0}
+      duration={1}
+      separator=","
+      className="text-2xl font-bold text-cyan-400 mt-2"
+    />
+  );
+
+
   // Definición de las tarjetas de estadísticas
   const statsCards = [
     {
@@ -22,14 +36,16 @@ export const StatsOverview = ({ stats }) => {
     {
       title: "Tasa de Conversión",
       icon: TrendingUp,
-      value: `${stats.conversionRate}%`,
+      value: stats.conversionRate,
+      format: (value) => `${value}%`,
       color: "cyan",
       description: "Porcentaje de usuarios registrados"
     },
     {
       title: "Costo Global por Usuario",
       icon: MessageSquare,
-      value: `$${stats.costPerUser}`,
+      value: stats.costPerUser,
+      format: (value) => `$${new Intl.NumberFormat('es-CO').format(value)}`,
       color: "cyan",
       description: "Costo promedio por usuario"
     }
@@ -46,14 +62,17 @@ export const StatsOverview = ({ stats }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-400">{stat.title}</p>
-                <p className={`text-2xl font-bold text-${stat.color}-400 mt-2`}>
-                  {stat.value}
-                </p>
-                <p className="text-xs text-slate-500 mt-1">
-                  {stat.description}
-                </p>
+                <span className="text-2xl font-bold text-cyan-400 mt-2 block">
+                  <CountUp
+                    end={Number(stat.value)}
+                    preserveValue={true}
+                    formattingFn={stat.format}
+                    duration={1}
+                  />
+                </span>
+                <p className="text-xs text-slate-500 mt-1">{stat.description}</p>
               </div>
-              <stat.icon className={`w-8 h-8 text-${stat.color}-400 opacity-80`} />
+              <stat.icon className="w-8 h-8 text-cyan-400 opacity-80" />
             </div>
           </CardContent>
         </Card>
