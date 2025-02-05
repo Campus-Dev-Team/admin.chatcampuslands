@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";import { useEffect, useState } from "react";
 import { TitleHeader } from '../components/TitleHeader';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,8 +28,6 @@ export const DashboardUsers = () => {
     }
   ]);
 
-  const [selectedStates, setSelectedStates] = useState([]);
-
   const [selectedIds] = useState([
     "319700312",
     "319700312",
@@ -42,21 +40,6 @@ export const DashboardUsers = () => {
     "319700312",
     "319700312",
   ]);
-
-  const states = [
-    { id: 1, label: "Registrado", value: "registered" },
-    { id: 2, label: "No Registrado", value: "unregistered" },
-    { id: 3, label: "Sin Estado", value: "no-state" }
-  ];
-
-  const handleStateChange = (value) => {
-    setSelectedStates(prevStates => {
-      if (prevStates.includes(value)) {
-        return prevStates.filter(state => state !== value);
-      }
-      return [...prevStates, value];
-    });
-  };
 
   const toggleTemplate = (id) => {
     setExpandedId(expandedId === id ? null : id);
@@ -71,7 +54,7 @@ export const DashboardUsers = () => {
             <div className="w-[180px]">
               <select 
                 defaultValue="Bucaramanga"
-                className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
+                className="w-full h-9 px-3 rounded-md border border-slate-700 bg-slate-800/50 text-slate-200 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-500"
               >
                 <option value="Bucaramanga">Bucaramanga</option>
                 <option value="Bogota">Bogotá</option>
@@ -88,7 +71,7 @@ export const DashboardUsers = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="col-span-1 bg-slate-800/50 border-slate-700">
             <div className="p-4">
               <div className="flex justify-between items-center mb-6">
@@ -156,34 +139,23 @@ export const DashboardUsers = () => {
             </div>
           </Card>
 
-          <div className="flex flex-col w-full">
-          <div className="mb-6">
-              <h3 className="text-lg font-medium text-white mb-4">Seleccione el estado</h3>
-                              <RadioGroup 
-                  value={selectedStates} 
-                  onValueChange={setSelectedStates}
-                  className="flex gap-4"
-                >
-                  {states.map(state => (
-                    <div className="flex items-center space-x-2" key={state.id}>
-                      <RadioGroupItem 
-                        value={state.value} 
-                        id={state.value}
-                        className="border-slate-500"
-                      />
-                      <Label 
-                        htmlFor={state.value}
-                        className="text-slate-200"
-                      >
-                        {state.label}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-            </div>
           <Card className="col-span-2 bg-slate-800/50 border-slate-700">
             <div className="p-4">
-              
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-medium text-white mb-2">Estado Usuario</h3>
+                  <div className="flex gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <Label className="text-sm text-slate-300">Registrado</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-slate-500"></div>
+                      <Label className="text-sm text-slate-300">No Registrado</Label>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <div className="mt-6">
                 <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -211,7 +183,6 @@ export const DashboardUsers = () => {
               </div>
             </div>
           </Card>
-          </div>
         </div>
       </div>
     </div>
