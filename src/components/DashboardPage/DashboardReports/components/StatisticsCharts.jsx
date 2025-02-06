@@ -32,26 +32,42 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
             const user = filteredData.find(u =>
               (u.Messages || []).some(m => m.MessageId === msg.MessageId)
             );
+            console.log('User found:', user?.PhoneNumber);
             return user ? user.PhoneNumber : null;
           }).filter(Boolean)
         );
 
+        console.log('Daily messages:', dailyMessages);
+        console.log('Filtered Data:', filteredData);
+
+        console.log('Processing date:', date);
+        console.log('Daily unique users:', Array.from(dailyUniqueUsers));
+        console.log('Registered users:', registeredUsers);
+
         const totalUsers = dailyUniqueUsers.size;
         
         // Filtramos los usuarios registrados y obtenemos su fecha de registro
+        console.log('Example registered user:', registeredUsers[0]);
         const registeredUsersWithDates = registeredUsers
-          .filter(regUser => 
-            Array.from(dailyUniqueUsers).some(
-              phoneNumber => String(regUser.phone) === String(phoneNumber)
-            )
-          )
+          .filter(regUser => {
+            const phoneAsInt = parseInt(String(regUser.phone).replace(/\D/g, ''));
+            const isUserActive = Array.from(dailyUniqueUsers).some(
+              phoneNumber => phoneNumber === phoneAsInt
+            );
+            console.log('Phone comparison:', {
+              regUserPhone: phoneAsInt,
+              activeUsers: Array.from(dailyUniqueUsers),
+              isActive: isUserActive
+            });
+            return isUserActive;
+          })
           .filter(regUser => {
             try {
               // Verificamos si tenemos una fecha válida
-              if (!regUser.registrationDate) return false;
+              if (!regUser.createdAt) return false;
               
               // Intentamos parsear la fecha
-              const regDate = new Date(regUser.registrationDate);
+              const regDate = new Date(regUser.createdAt);
               
               // Verificamos si la fecha es válida
               if (isNaN(regDate.getTime())) return false;

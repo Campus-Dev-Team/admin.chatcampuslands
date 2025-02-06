@@ -26,7 +26,7 @@ export const DashboardReports = () => {
     registeredUsers: 0,
     conversionRate: 0,
     costPerUser: 0,
-    registeredUsers: []
+    dataRegisteredUsers: []
   });
 
   const tableColumns = [
@@ -93,18 +93,17 @@ export const DashboardReports = () => {
     const costPerUser = allRegisteredUsers.length > 0
       ? (spentAmount / allRegisteredUsers.length).toFixed(2)
       : 0;
-    console.log(registeredUsers);
     
     setStats({
       totalUsers,
       registeredUsers: registeredCount.length,
       conversionRate: Number(conversionRate),
       costPerUser: Number(costPerUser),
-      registeredUsers: registeredUsers
+      dataRegisteredUsers: registeredUsers
     });
 
   }, [cityFilteredData, registeredCount, allRegisteredUsers, spentAmount]);
-
+  
   
   
   const handleDataFetched = (dataIza, newDates) => {
