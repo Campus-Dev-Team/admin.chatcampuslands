@@ -37,6 +37,7 @@ export const DashboardReports = () => {
     { key: 'messageCount', label: 'Mensajes' }
   ];
 
+
   // Datos filtrados por ciudad
   const cityFilteredData = useMemo(() => {
     if (!Array.isArray(filteredDataIza)) return [];
@@ -67,6 +68,7 @@ export const DashboardReports = () => {
   }, [cityFilteredData, registeredUsers]);
 
   // Efecto para cargar datos del campus
+
   useEffect(() => {
     const fetchCampusData = async () => {
       try {
@@ -86,6 +88,7 @@ export const DashboardReports = () => {
   useEffect(() => {
     if (!dates.start || !dates.end) return;
 
+
     const totalUsers = cityFilteredData.length;
     const conversionRate = totalUsers > 0
       ? ((registeredCount.length / totalUsers) * 100).toFixed(2)
@@ -103,7 +106,6 @@ export const DashboardReports = () => {
     });
 
   }, [cityFilteredData, registeredCount, allRegisteredUsers, spentAmount]);
-  
   
   
   const handleDataFetched = (dataIza, newDates) => {
@@ -179,6 +181,7 @@ export const DashboardReports = () => {
               getUsersList={getUsersList}
               filteredData={filteredDataIza}
             />
+
           </div>
           <SpentAmountInput value={spentAmount} onChange={setSpentAmount} />
         </div>

@@ -4,7 +4,7 @@ import { DashboardPage } from '../pages/DashboardPage';
 import LoginPage from '../pages/LoginPage';
 import { ProtectedRoute } from '../router/ProtectedRoute';
 import { DashboardReports } from '../components/DashboardPage/DashboardReports/DashboardReports';
-import { MessageAdminPage } from '../components/DashboardPage/MessageAdminPage/MessageAdminPage';
+import { MessageAdminPage } from '../components/DashboardPage/Messages/MessageAdminPage';
 import { DashboardUsers } from '../components/DashboardPage/DashboardUsers/DashboardUsers';
 
 
@@ -14,16 +14,21 @@ const AppRouter = () => {
   return (
     <Routes>
       {/* Ruta por defecto */}
-      <Route path="/" element={
-        isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/auth/login" />
-      } />
+      <Route
+        path="/"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/dashboard" />
+          ) : (
+            <Navigate to="/auth/login" />
+          )
+        }
+      />
 
       {/* Ruta de login */}
       <Route
         path="/auth/login"
-        element={
-          isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />
-        }
+        element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
       />
 
       {/* Rutas protegidas del dashboard */}
