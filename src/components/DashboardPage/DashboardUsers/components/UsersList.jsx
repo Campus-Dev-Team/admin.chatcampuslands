@@ -32,5 +32,3 @@ export const UserList = ({ selectedUsers }) => {
     </div>
   );
 };
-
-export default UserList;
