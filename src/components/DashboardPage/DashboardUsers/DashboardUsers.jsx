@@ -19,6 +19,21 @@ export const DashboardUsers = () => {
   const [excelData, setExcelData] = useState(null);
   const [selectedStates, setSelectedStates] = useState([]);
   const [selectedIds] = useState([]);
+  const [loading, setLoading] = useState([])
+
+
+  const izaData = [
+    { nombre: "Ana Martínez", telefono: "+573001234567" },
+    { nombre: "Carlos Ruiz", telefono: "+573009876543" },
+    { nombre: "Diana López", telefono: "+573002345678" },
+    { nombre: "Eduardo Torres", telefono: "+573008765432" },
+    { nombre: "Fernanda García", telefono: "+573003456789" },
+    { nombre: "Gabriel Pérez", telefono: "+573007654321" },
+    { nombre: "Helena Ramírez", telefono: "+573004567890" },
+    { nombre: "Ignacio Silva", telefono: "+573006543210" },
+    { nombre: "Julia Morales", telefono: "+573005678901" },
+    { nombre: "Kevin Castro", telefono: "+573004321098" }
+  ];
 
   useEffect(() => {
     const loadTemplates = async () => {
@@ -85,6 +100,8 @@ export const DashboardUsers = () => {
 
   const handleExcelData = (data) => {
     setExcelData(data);
+    console.log(excelData);
+
   };
 
   return (
@@ -110,7 +127,15 @@ export const DashboardUsers = () => {
               <Switch
                 id="data-source"
                 checked={!isExcelMode}
-                onCheckedChange={(checked) => setIsExcelMode(!checked)}
+                onCheckedChange={(checked) => {
+                  setIsExcelMode(!checked);
+                  if (!checked) {
+                    // Si está cambiando a modo Excel, no hacemos nada
+                  } else {
+                    // Si está cambiando a modo IZA, limpiamos el excelData
+                    setExcelData(null);
+                  }
+                }}
                 className="data-[state=checked]:bg-cyan-500"
               />
               <Label htmlFor="data-source" className="text-slate-200">
@@ -136,7 +161,6 @@ export const DashboardUsers = () => {
                     selectedStates={selectedStates}
                     setSelectedStates={setSelectedStates}
                   />
-
                   <UserMessagePanel
                     selectedIds={selectedIds}
                     selectedTemplate={selectedTemplate}
@@ -157,6 +181,7 @@ export const DashboardUsers = () => {
                   selectedIds={selectedIds}
                   selectedTemplate={selectedTemplate}
                   onSendMessages={handleSendMessages}
+                  data={izaData}
                 />
               </>
             )}
