@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { TitleHeader } from "../components/TitleHeader";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, MessageCircle, ChevronDown } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { TemplatesList } from "@/components/DashboardPage/DashboardUsers/components/TemplatesList";
-import { getAllTemplates } from "@/services/templateService";
+import { getAllTemplates, sendTemplates } from "@/services/templateService";
+import { UserMessagePanel } from "./components/UserMessagePanel";
+import { getUsersByStateBogota, getUsersByStateBucaramanga } from "@/services/userService";
+import { StateSelection } from "./components/StateSelection";
 
 export const DashboardUsers = () => {
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [templates, setTemplates] = useState([]);
-
+  const [selectedCity, setSelectedCity] = useState("");
 
   useEffect(() => {
     const loadTemplates = async () => {
@@ -32,24 +32,46 @@ export const DashboardUsers = () => {
 
   const [selectedStates, setSelectedStates] = useState([]);
 
-  const [selectedIds] = useState([
-    "319700312",
-    "319700312",
-    "319700312",
-    "319700312",
-    "319700312",
-    "319700312",
-    "319700312",
-    "319700312",
-    "319700312",
-    "319700312",
-  ]);
+  const [selectedIds] = useState([]);
 
-  const states = [
-    { id: 1, label: "Registrado", value: "registered" },
-    { id: 2, label: "No Registrado", value: "unregistered" },
-    { id: 3, label: "Sin Estado", value: "no-state" },
-  ];
+  const handleGetUsersByState = async () => {
+    let dataUsers = {
+      status: selectedStates,
+      list: [],
+    };
+    if(selectedCity == null){
+      console.warn("Porfavor selecciona una ciudad")
+    } else if(selectedCity == "Bucaramanga") {
+      try {
+        const response = await getUsersByStateBucaramanga(dataUsers); 
+        console.log("respuesta al enviar mensajes masivos", response);
+      } catch (error) {
+        console.error("error al enviar mensajes masivos", error)
+      }
+    } else if(selectedCity == "Bogota"){
+      try {
+        const response = await getUsersByStateBogota(dataUsers); 
+        console.log("respuesta al enviar mensajes masivos", response);
+      } catch (error) {
+        console.error("error al enviar mensajes masivos", error)
+      }
+    } else {
+      console.error("ciudad no encontrada")
+    }
+  };
+
+  const handleSendMessages = async () => {
+    let dataMasiveMessage = {
+      toList: [],
+      template: templates,
+    };
+    try {
+      const response = await sendTemplates(dataMasiveMessage); 
+      console.log("respuesta al enviar mensajes masivos", response);
+    } catch (error) {
+      console.error("error al enviar mensajes masivos", error)
+    }
+  };
 
   const handleStateChange = (value) => {
     setSelectedStates((prevStates) => {
@@ -58,10 +80,6 @@ export const DashboardUsers = () => {
       }
       return [...prevStates, value];
     });
-  };
-
-  const toggleTemplate = (id) => {
-    setExpandedId(expandedId === id ? null : id);
   };
 
   return (
@@ -74,6 +92,7 @@ export const DashboardUsers = () => {
               <select
                 defaultValue="Bucaramanga"
                 className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
+                onSelect={setSelectedCity}
               >
                 <option value="Bucaramanga">Bucaramanga</option>
                 <option value="Bogota">Bogotá</option>
@@ -95,62 +114,23 @@ export const DashboardUsers = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <TemplatesList templates={templates} />
+          <div>
+            <TemplatesList
+              templates={templates}
+              sendTemplate={setSelectedTemplate}
+            />
+          </div>
 
           <div className="flex flex-col w-full">
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-white mb-4">
-                Seleccione el estado
-              </h3>
-              <RadioGroup
-                value={selectedStates}
-                onValueChange={setSelectedStates}
-                className="flex gap-4"
-              >
-                {states.map((state) => (
-                  <div className="flex items-center space-x-2" key={state.id}>
-                    <RadioGroupItem
-                      value={state.value}
-                      id={state.value}
-                      className="border-slate-500"
-                    />
-                    <Label htmlFor={state.value} className="text-slate-200">
-                      {state.label}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-            <Card className="col-span-2 bg-slate-800/50 border-slate-700">
-              <div className="p-4">
-                <div className="mt-6">
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {selectedIds.map((id, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-4 p-3 bg-slate-700/30 rounded-lg"
-                      >
-                        <span className="text-slate-300 min-w-8">
-                          {index + 1}
-                        </span>
-                        <span className="text-slate-300 flex-1">NOMBRE</span>
-                        <span className="text-slate-400 font-mono">{id}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-6">
-                  <Button
-                    className="w-full bg-cyan-500 hover:bg-cyan-600 text-white"
-                    disabled={!selectedTemplate}
-                  >
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    Enviar Mensajes
-                  </Button>
-                </div>
-              </div>
-            </Card>
+            <StateSelection
+              selectedStates={selectedStates}
+              setSelectedStates={setSelectedStates}
+            />
+            <UserMessagePanel
+              selectedIds={selectedIds}
+              selectedTemplate={selectedTemplate}
+              onSendMessages={handleSendMessages}
+            />
           </div>
         </div>
       </div>

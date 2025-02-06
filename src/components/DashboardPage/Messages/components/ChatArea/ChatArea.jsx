@@ -23,11 +23,11 @@ const ChatArea = ({ selectedChat, messages, isAIEnabled, toggleAI }) => {
           toggleAI={toggleAI}
         />
         <MessageList messages={messages} />
-        <MessageInput
+        {/* <MessageInput
           message={message}
           setMessage={setMessage}
           handleSendMessage={handleSendMessage}
-        />
+        /> */}
       </CardContent>
     </Card>
   );

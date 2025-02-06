@@ -7,9 +7,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
-export const TemplatesList = ({ templates }) => {
+export const TemplatesList = ({ templates, sendTemplate }) => {
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [expandedId, setExpandedId] = useState(null);
+
+  const handleTemplateSelection = (templateId) => {
+    setSelectedTemplate(templateId);
+    sendTemplate(templateId);
+  };
 
   const toggleTemplate = (id) => {
     setExpandedId(expandedId === id ? null : id);
@@ -18,26 +23,26 @@ export const TemplatesList = ({ templates }) => {
   return (
     <div className="p-6 space-y-6 bg-slate-900 overflow-y-scroll scrollbar-custom">
       <div className="mx-auto space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="h-full">
           <Card className="col-span-1 bg-slate-800/50 border-slate-700">
             <div className="p-4">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-medium text-white">
                   Lista de Plantillas
                 </h3>
-                <Button
+                {/* <Button
                   variant="outline"
                   size="sm"
                   className="bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-500 border-cyan-500/20"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Agregar Plantilla
-                </Button>
+                </Button> */}
               </div>
 
               <RadioGroup
                 value={selectedTemplate}
-                onValueChange={setSelectedTemplate}
+                onValueChange={handleTemplateSelection}
                 className="space-y-4"
               >
                 {templates.map((template) => (
@@ -63,7 +68,7 @@ export const TemplatesList = ({ templates }) => {
                             className={`text-sm text-slate-400 mb-2 transition-all duration-500 ease-in-out overflow-hidden ${
                               expandedId === template.id
                                 ? "max-h-[500px]"
-                                : "max-h-[48px]"
+                                : "max-h-[43px]"
                             }`}
                           >
                             {template.descripcion}
