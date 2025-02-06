@@ -20,10 +20,8 @@ export const fetchReportDataIza = async (startDate, endDate) => {
       axios.get(endpoints.usersToday, { params, headers }),
       axios.get(endpoints.messagesToday, { params, headers })
     ]);
-    console.log('data encontrada sin normalizar ', usersResponse.data, messagesResponse.data);
 
     const dataNormalized = normalizeDataIza(usersResponse.data, messagesResponse.data)
-    console.log('data normalizada ', dataNormalized);
 
     return dataNormalized
 
@@ -34,8 +32,6 @@ export const fetchReportDataIza = async (startDate, endDate) => {
 
 export const fetchReportDataCampus = async (startDate, endDate) => {
   try {
-    console.log('bu');
-
     if (!startDate) startDate = new Date().toISOString().split('T')[0]
     if (!endDate) endDate = new Date().toISOString().split('T')[0]
 
@@ -48,7 +44,6 @@ export const fetchReportDataCampus = async (startDate, endDate) => {
       axios.get(endpoints.usersCampusBogota, { params, headers }),
       axios.get(endpoints.usersCampusBucaramanga, { params, headers })
     ]);
-    console.log(userCampusBogota.data, userCampusBucaramanga.data);
 
     return {
       usersBogota: userCampusBogota.data,
