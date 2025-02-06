@@ -30,6 +30,7 @@ export const endpoints = {
 
   usersBogotaByState: `${API_BASE_URL}api/bogota/users-status`,
   usersBucaramangaByState: `${API_BASE_URL}api/campuslands/users-status`,
+  allUsers: `${API_BASE_URL}user/getAll`,
 };
 
 export default API_WEBSOCKET_URL;

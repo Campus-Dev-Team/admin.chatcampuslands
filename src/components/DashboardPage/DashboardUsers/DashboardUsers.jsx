@@ -6,14 +6,38 @@ import { Switch } from "@/components/ui/switch";
 import { TemplatesList } from "@/components/DashboardPage/DashboardUsers/components/TemplatesList";
 import { getAllTemplates, sendTemplates } from "@/services/templateService";
 import { UserMessagePanel } from "./components/UserMessagePanel";
-import { getUsersByStateBogota, getUsersByStateBucaramanga } from "@/services/userService";
+import {
+  getAllusers,
+  getUsersByStateBogota,
+  getUsersByStateBucaramanga,
+} from "@/services/userService";
 import { StateSelection } from "./components/StateSelection";
 
 export const DashboardUsers = () => {
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [templates, setTemplates] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
+  const [currentState, setCurrentState] = useState("Registrados");
+  const [usersIza, setUsersIza] = useState([]);
+  const [selectedCity, setSelectedCity] = useState("Bucaramanga");
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [filteredNumbers, setFilteredNumbers] = useState([]);
+
+  useEffect(() => {
+    const loadUsersIza = async () => {
+      try {
+        const usersData = await getAllusers();
+        setUsersIza(usersData.data);
+      } catch (error) {
+        console.error("Error loading templates:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsersIza();
+  }, []);
 
   useEffect(() => {
     const loadTemplates = async () => {
@@ -26,60 +50,93 @@ export const DashboardUsers = () => {
         setLoading(false);
       }
     };
-
     loadTemplates();
   }, []);
 
+  useEffect(() => {
+    console.log("Usuarios de Iza actualizados:", usersIza);
+  }, [usersIza]);
+
+  const cleanPhoneNumber = (phone) => {
+    if (!phone) return null;
+    let phoneStr = phone.toString();
+    if (phoneStr.startsWith("57")) {
+      phoneStr = phoneStr.slice(2);
+    }
+    return phoneStr.length === 10 ? phoneStr : "0";
+  };
+  const add57ToPhone = (phone) => {
+    // Convert to string in case number is passed
+    let phoneStr = phone.toString();
+
+    // If already has 57, return as is
+    if (phoneStr.startsWith("57")) {
+      return phoneStr;
+    }
+
+    // Add 57 to the front
+    return `57${phoneStr}`;
+  };
+
   const [selectedStates, setSelectedStates] = useState([]);
 
-  const [selectedIds] = useState([]);
+  const handleGetUsersByState = async (currentState) => {
+    if (!selectedCity) {
+      console.warn("Por favor selecciona una ciudad");
+      return;
+    }
 
-  const handleGetUsersByState = async () => {
-    let dataUsers = {
-      status: selectedStates,
-      list: [],
+    const cleanedNumbers = usersIza
+      .map((user) => cleanPhoneNumber(user.phone))
+      .filter((number) => number !== null);
+
+    setFilteredNumbers(cleanedNumbers);
+    console.log("Numeros filtrados", filteredNumbers);
+
+    const dataUsers = {
+      status: currentState,
+      list: cleanedNumbers,
     };
-    if(selectedCity == null){
-      console.warn("Porfavor selecciona una ciudad")
-    } else if(selectedCity == "Bucaramanga") {
-      try {
-        const response = await getUsersByStateBucaramanga(dataUsers); 
-        console.log("respuesta al enviar mensajes masivos", response);
-      } catch (error) {
-        console.error("error al enviar mensajes masivos", error)
-      }
-    } else if(selectedCity == "Bogota"){
-      try {
-        const response = await getUsersByStateBogota(dataUsers); 
-        console.log("respuesta al enviar mensajes masivos", response);
-      } catch (error) {
-        console.error("error al enviar mensajes masivos", error)
-      }
-    } else {
-      console.error("ciudad no encontrada")
+
+    console.log("📤 Data a enviar:", JSON.stringify(dataUsers, null, 2));
+
+    try {
+      const response =
+        selectedCity === "Bucaramanga"
+          ? await getUsersByStateBucaramanga(dataUsers)
+          : await getUsersByStateBogota(dataUsers);
+      setFilteredUsers(response.data);
+      const formattedUsers = response.data.users.map((user, index) => ({
+        id: index + 1,
+        username: user.name || user.email.split("@")[0],
+        phone: cleanPhoneNumber(user.phone),
+      }));
+
+      setUsersIza(formattedUsers);
+      console.log("Formatted users:", usersIza);
+    } catch (error) {
+      console.error("Error al obtener usuarios:", error);
+      setFilteredUsers([]);
     }
   };
 
   const handleSendMessages = async () => {
+    const cleanedNumbers = usersIza
+      .map((user) => add57ToPhone(user.phone))
+      .filter((number) => number !== null);
+
+    setFilteredNumbers(cleanedNumbers);
     let dataMasiveMessage = {
-      toList: [],
-      template: templates,
+      toList: cleanedNumbers,
+      template: selectedTemplate,
     };
     try {
-      const response = await sendTemplates(dataMasiveMessage); 
+      console.log(dataMasiveMessage)
+      const response = await sendTemplates(dataMasiveMessage);
       console.log("respuesta al enviar mensajes masivos", response);
     } catch (error) {
-      console.error("error al enviar mensajes masivos", error)
+      console.error("error al enviar mensajes masivos", error);
     }
-  };
-
-  const handleStateChange = (value) => {
-    setSelectedStates((prevStates) => {
-      if (prevStates.includes(value)) {
-        return prevStates.filter((state) => state !== value);
-      }
-      return [...prevStates, value];
-    });
   };
 
   return (
@@ -90,9 +147,9 @@ export const DashboardUsers = () => {
           <div className="flex items-center gap-6">
             <div className="w-[180px]">
               <select
-                defaultValue="Bucaramanga"
+                defaultValue={selectedCity}
                 className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
-                onSelect={setSelectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
               >
                 <option value="Bucaramanga">Bucaramanga</option>
                 <option value="Bogota">Bogotá</option>
@@ -123,11 +180,13 @@ export const DashboardUsers = () => {
 
           <div className="flex flex-col w-full">
             <StateSelection
-              selectedStates={selectedStates}
-              setSelectedStates={setSelectedStates}
+              currentState={currentState}
+              setCurrentState={setCurrentState}
+              onStateSelect={handleGetUsersByState}
+              selectedCity={selectedCity}
             />
             <UserMessagePanel
-              selectedIds={selectedIds}
+              selectedUsers={usersIza}
               selectedTemplate={selectedTemplate}
               onSendMessages={handleSendMessages}
             />

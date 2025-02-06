@@ -1,9 +1,15 @@
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-export const StateSelection = ({ selectedStates, setSelectedStates }) => {
+export const StateSelection = ({
+  currentState,
+  setCurrentState,
+  onStateSelect,
+  selectedCity,
+}) => {
+  // Define available states
   const states = [
-    { id: 1, label: "Registrado", value: "registered" },
+    { id: 1, label: "Registrado", value: "Registrado" },
     { id: 2, label: "No Registrado", value: "NO REGISTRADO" },
     { id: 3, label: "Preseleccionado", value: "Preseleccionado" },
     { id: 4, label: "Agendado", value: "Agendado" },
@@ -16,14 +22,19 @@ export const StateSelection = ({ selectedStates, setSelectedStates }) => {
     { id: 11, label: "Retirado", value: "Retirado" },
   ];
 
+  const handleStateChange = (value) => {
+    setCurrentState(value);
+    onStateSelect(value);
+  };
+
   return (
     <div className="mb-6">
       <h3 className="text-lg font-medium text-white mb-4">
         Seleccione el estado
       </h3>
       <RadioGroup
-        value={selectedStates}
-        onValueChange={setSelectedStates}
+        value={currentState}
+        onValueChange={handleStateChange}
         className="flex gap-4 flex-wrap"
       >
         {states.map((state) => (
@@ -42,5 +53,3 @@ export const StateSelection = ({ selectedStates, setSelectedStates }) => {
     </div>
   );
 };
-
-export default StateSelection;
