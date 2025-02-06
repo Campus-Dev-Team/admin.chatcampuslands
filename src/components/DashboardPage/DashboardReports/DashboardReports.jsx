@@ -48,7 +48,7 @@ export const DashboardReports = () => {
 
   const cityFilteredData = useMemo(() => {
     if (!Array.isArray(filteredDataIza)) return [];
-    return filteredDataIza.filter(user => 
+    return filteredDataIza.filter(user =>
       user && !ciudad || (user.city === ciudad && user.PhoneNumber)
     );
   }, [filteredDataIza, ciudad]);
@@ -106,11 +106,11 @@ export const DashboardReports = () => {
     try {
       const totalUsers = cityFilteredData.length;
       const registeredUsersCount = registeredCount.length;
-      
+
       const conversionRate = totalUsers > 0
         ? ((registeredUsersCount / totalUsers) * 100)
         : 0;
-        
+
       const registeredUsersTotal = allRegisteredUsers.length;
       const costPerUser = registeredUsersTotal > 0
         ? (spentAmount / registeredUsersTotal)
@@ -142,22 +142,22 @@ export const DashboardReports = () => {
       try {
         if (!Array.isArray(data)) return { registered: [], unregistered: [] };
 
-        const cityUsers = data.filter(user => 
+        const cityUsers = data.filter(user =>
           user && (!ciudad || user.city === ciudad) && user.PhoneNumber
         );
-        
+
         const currentCityUsers = registeredUsers;
 
         const registered = cityUsers.filter(user => {
           const userPhone = formatPhone(user.PhoneNumber);
-          return currentCityUsers.some(regUser => 
+          return currentCityUsers.some(regUser =>
             formatPhone(regUser.phone) === userPhone
           );
         });
 
         const unregistered = cityUsers.filter(user => {
           const userPhone = formatPhone(user.PhoneNumber);
-          return !currentCityUsers.some(regUser => 
+          return !currentCityUsers.some(regUser =>
             formatPhone(regUser.phone) === userPhone
           );
         });
@@ -199,28 +199,30 @@ export const DashboardReports = () => {
   return (
     <div className="p-6 space-y-6 bg-slate-900 overflow-y-scroll scrollbar-custom">
       <div className="mx-auto space-y-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between">
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-4">
           <TitleHeader title="Informe de Conversión Iza ChatBot" />
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <select
-              value={ciudad}
-              onChange={(e) => setCiudad(e.target.value)}
-              className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
-            >
-              <option value="Bogota">Bogotá</option>
-              <option value="Bucaramanga">Bucaramanga</option>
-            </select>
-            <FiltrosReportes onDataFetched={handleDataFetched} />
-            <ExcelDownloadButton
-              stats={stats}
-              spentAmount={spentAmount}
-              ciudad={ciudad}
-              getUsersList={getUsersList}
-              filteredData={filteredDataIza}
-            />
 
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="flex items-center gap-4">
+              <select
+                value={ciudad}
+                onChange={(e) => setCiudad(e.target.value)}
+                className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
+              >
+                <option value="Bogota">Bogotá</option>
+                <option value="Bucaramanga">Bucaramanga</option>
+              </select>
+              <FiltrosReportes onDataFetched={handleDataFetched} />
+              <ExcelDownloadButton
+                stats={stats}
+                spentAmount={spentAmount}
+                ciudad={ciudad}
+                getUsersList={getUsersList}
+                filteredData={filteredDataIza}
+              />
+            </div>
+            <SpentAmountInput value={spentAmount} onChange={setSpentAmount} />
           </div>
-          <SpentAmountInput value={spentAmount} onChange={setSpentAmount} />
         </div>
 
         <StatsOverview stats={stats} />
