@@ -14,10 +14,13 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
       return prevData;
     }
 
-    const registeredUsers = ciudad === "Bucaramanga"
+    const registeredUsers = ciudad === "Bucaramanga" 
       ? campusData?.usersBucaramanga || []
       : campusData?.usersBogota || [];
 
+    // Track first registration date for each user
+    const firstRegistrationDates = new Map();
+    
     const messagesByDate = _.groupBy(
       filteredData.flatMap(user => user.Messages || []),
       message => message.Time.split('T')[0]
@@ -29,7 +32,7 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
         const dailyMessages = messagesByDate[date];
         const dailyUniqueUsers = new Set(
           dailyMessages.map(msg => {
-            const user = filteredData.find(u =>
+            const user = filteredData.find(u => 
               (u.Messages || []).some(m => m.MessageId === msg.MessageId)
             );
             return user ? user.PhoneNumber : null;
@@ -37,41 +40,23 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
         );
 
         const totalUsers = dailyUniqueUsers.size;
-        
-        // Filtramos los usuarios registrados y obtenemos su fecha de registro
-        const registeredUsersWithDates = registeredUsers
-          .filter(regUser => 
-            Array.from(dailyUniqueUsers).some(
-              phoneNumber => String(regUser.phone) === String(phoneNumber)
-            )
-          )
-          .filter(regUser => {
-            try {
-              // Verificamos si tenemos una fecha válida
-              if (!regUser.registrationDate) return false;
-              
-              // Intentamos parsear la fecha
-              const regDate = new Date(regUser.registrationDate);
-              
-              // Verificamos si la fecha es válida
-              if (isNaN(regDate.getTime())) return false;
-              
-              // Convertimos a YYYY-MM-DD
-              const formattedDate = regDate.toISOString().split('T')[0];
-              
-              // Solo contamos si la fecha de registro es igual a la fecha actual del bucle
-              return formattedDate === date;
-            } catch (error) {
-              console.error('Error processing date:', error);
-              return false;
-            }
-          });
-        
-        const registeredCount = registeredUsersWithDates.length;
+        let registeredCount = 0;
+
+        // Check each user for registration
+        dailyUniqueUsers.forEach(phoneNumber => {
+          const isRegistered = registeredUsers.some(regUser => 
+            String(regUser.phone) === String(phoneNumber)
+          );
+
+          if (isRegistered && !firstRegistrationDates.has(phoneNumber)) {
+            firstRegistrationDates.set(phoneNumber, date);
+            registeredCount++;
+          }
+        });
 
         return {
           date,
-          conversionRate: totalUsers > 0
+          conversionRate: totalUsers > 0 
             ? parseFloat(((registeredCount / totalUsers) * 100).toFixed(2))
             : 0,
           totalUsers,
@@ -90,8 +75,9 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
   }, [filteredData, campusData, ciudad]);
 
   return (
-    <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8 transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'
-      }`}>
+    <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8 transition-opacity duration-300 ${
+      isLoading ? 'opacity-50' : 'opacity-100'
+    }`}>
       <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4">
         <h3 className="text-lg font-semibold text-cyan-400 mb-4">
           Tasa de Conversión Diaria
@@ -102,7 +88,7 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis dataKey="date" stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} />
               <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} unit="%" />
-              <Tooltip contentStyle={{
+              <Tooltip contentStyle={{ 
                 backgroundColor: '#1F2937',
                 border: '1px solid #374151',
                 borderRadius: '0.375rem',
@@ -125,6 +111,7 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
           </ResponsiveContainer>
         </div>
       </div>
+
       <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4">
         <h3 className="text-lg font-semibold text-cyan-400 mb-4">
           Usuarios por Día
@@ -135,7 +122,7 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis dataKey="date" stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} />
               <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} />
-              <Tooltip contentStyle={{
+              <Tooltip contentStyle={{ 
                 backgroundColor: '#1F2937',
                 border: '1px solid #374151',
                 borderRadius: '0.375rem',
