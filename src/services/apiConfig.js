@@ -24,6 +24,9 @@ export const endpoints = {
   chats: `${API_BASE_URL}api/chat/list`,
   chatMode: `${API_BASE_URL}api/chat/chatMode`,
   getMessages: `${API_BASE_URL}messages/chat`,
+
+  getTemplates: `${API_BASE_URL}templates/getAll`,
+  sendTemplates: `${API_BASE_URL}whatsapp/handleAdminMessages`,
 };
 
 export default API_WEBSOCKET_URL;
