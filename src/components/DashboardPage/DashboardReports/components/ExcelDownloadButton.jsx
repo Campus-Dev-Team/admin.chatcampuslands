@@ -11,8 +11,6 @@ export const ExcelDownloadButton = ({
 }) => {
   const exportToExcel = () => {
     try {
-
-
       // Preparar datos de estadísticas generales
       const generalStats = [
         {
@@ -72,6 +70,7 @@ export const ExcelDownloadButton = ({
         }))
       );
 
+      // Estilos para encabezados
       const headerStyle = {
         font: { bold: true, color: { rgb: "FFFFFF" } },
         fill: { fgColor: { rgb: "2A303C" } },
@@ -102,7 +101,6 @@ export const ExcelDownloadButton = ({
       // Crear y agregar hoja de estadísticas
       const wsStats = XLSX.utils.json_to_sheet(generalStats);
       XLSX.utils.book_append_sheet(workbook, wsStats, 'Estadísticas Generales');
-
       setCellStyles(wsStats, headerStyle, cellStyle);
 
       // Crear y agregar hoja de usuarios
@@ -154,11 +152,13 @@ export const ExcelDownloadButton = ({
   return (
     <button
       onClick={exportToExcel}
-      className="flex flex-row items-center gap-2 px-4 py-1 sm:px-6 sm:py-2 lg:px-8 lg:py-2 bg-[#2A303C] text-white rounded-lg font-semibold
-      hover:bg-[#1B2430]/90 border-b border-cyan-40
-      transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base lg:text-md"
+      className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 
+                 rounded-lg p-2 hover:bg-slate-700 focus:ring-2 focus:ring-cyan-400 
+                 focus:border-transparent transition-all duration-200 flex items-center gap-2"
+      title="Descargar reporte Excel"
     >
-      <FileDown size={25} />
+      <FileDown className="h-5 w-5 text-cyan-400" />
+      <span className="hidden sm:inline">Exportar</span>
     </button>
   );
 };

@@ -15,7 +15,7 @@ import { LazyImage } from "../../common/LazyImage";
 export const DashboardNavbar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation(); // Hook para obtener la ruta actual
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -29,27 +29,30 @@ export const DashboardNavbar = () => {
       icon: <BarChart2 className="h-5 w-5" />,
       label: "Reportes",
       path: "/dashboard",
+      inDevelopment: false
     },
     {
       icon: <MessageCircle className="h-5 w-5" />,
       label: "Mensajes",
       path: "/dashboard/messages",
+      inDevelopment: true
     },
     {
       icon: <Users className="h-5 w-5" />,
       label: "Usuarios",
       path: "/dashboard/users",
+      inDevelopment: true
     },
     {
       icon: <Settings className="h-5 w-5" />,
       label: "Configuración",
       path: "/dashboard/settings",
+      inDevelopment: true
     }
   ];
 
   return (
     <>
-      {/* Botón hamburguesa (móvil) */}
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         className="lg:hidden fixed top-1/2 -translate-y-1/2 left-0 z-50 
@@ -59,7 +62,6 @@ export const DashboardNavbar = () => {
         {isMenuOpen ? <ChevronLeft /> : <ChevronRight />}
       </button>
 
-      {/* Botón colapso (desktop) */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
         className="hidden lg:flex justify-center items-center fixed top-1/2 -translate-y-1/2 z-50 w-8 h-8 
@@ -73,7 +75,6 @@ export const DashboardNavbar = () => {
         {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
       </button>
 
-      {/* Navbar */}
       <div
         className={`fixed lg:relative lg:translate-x-0 inset-y-0 left-0 z-40
                   bg-slate-800/50 backdrop-blur-xl border-cyan-400/10
@@ -81,7 +82,6 @@ export const DashboardNavbar = () => {
                   ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}
                   ${isCollapsed ? "lg:w-[64px]" : "lg:w-80"}`}
       >
-        {/* Contenido del navbar */}
         <div className={`p-8 flex flex-col items-center space-y-6 ${isCollapsed ? "lg:p-4" : ""}`}>
           <div className="relative">
             <div
@@ -103,7 +103,6 @@ export const DashboardNavbar = () => {
           </div>
         </div>
 
-        {/* Menú de opciones */}
         <div className="flex-1 flex flex-col space-y-2 p-4">
           {menuItems.map((item, index) => (
             <button
@@ -115,13 +114,24 @@ export const DashboardNavbar = () => {
                   : "text-white/70 hover:text-cyan-400 hover:bg-cyan-400/5"
                 } ${isCollapsed ? "justify-center" : ""}`}
             >
-              {item.icon}
-              {!isCollapsed && <span className="ml-3">{item.label}</span>}
+              <div className="flex items-center flex-1">
+                {item.icon}
+                {!isCollapsed && <span className="ml-3">{item.label}</span>}
+              </div>
+              {item.inDevelopment && !isCollapsed && (
+                <span className="text-xs px-2 py-0.5 bg-cyan-400/20 text-cyan-400 rounded-full">
+                  En desarrollo
+                </span>
+              )}
+              {item.inDevelopment && isCollapsed && (
+                <div className="absolute left-16 bg-slate-800 text-cyan-400 px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                  En desarrollo
+                </div>
+              )}
             </button>
           ))}
         </div>
 
-        {/* Cerrar sesión */}
         <div className="p-6 border-t border-cyan-400/10 flex flex-col">
           <button
             onClick={handleLogout}
@@ -135,7 +145,6 @@ export const DashboardNavbar = () => {
         </div>
       </div>
 
-      {/* Overlay (cierre menú móvil) */}
       {isMenuOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
@@ -145,3 +154,5 @@ export const DashboardNavbar = () => {
     </>
   );
 };
+
+export default DashboardNavbar;
