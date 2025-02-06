@@ -20,7 +20,7 @@ export const chatService = {
 
     getChatMessages: async (chatId) => {
         try {
-          const response = await axios.get(endpoints.chatMessages(chatId), getAuthHeader());
+          const response = await axios.get(endpoints.getMessages(chatId), getAuthHeader());
           return response.data;
         } catch (error) {
           console.error('Error fetching messages', error);
