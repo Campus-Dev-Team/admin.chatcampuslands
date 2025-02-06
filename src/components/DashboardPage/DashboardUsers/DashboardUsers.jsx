@@ -6,35 +6,67 @@ import { Switch } from "@/components/ui/switch";
 import { TemplatesList } from "@/components/DashboardPage/DashboardUsers/components/TemplatesList";
 import { getAllTemplates, sendTemplates } from "@/services/templateService";
 import { UserMessagePanel } from "./components/UserMessagePanel";
-import { getUsersByStateBogota, getUsersByStateBucaramanga } from "@/services/userService";
+import {
+  getAllusers,
+  getUsersByStateBogota,
+  getUsersByStateBucaramanga,
+} from "@/services/userService";
 import { StateSelection } from "./components/StateSelection";
 import ExcelUpload from "./components/ExcelUpload";
 
 export const DashboardUsers = () => {
+  // Estados básicos
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [selectedCity, setSelectedCity] = useState("Bucaramanga");
+  const [loading, setLoading] = useState(false);
+  
+  // Estados para el manejo de usuarios
+  const [currentState, setCurrentState] = useState("Registrados");
+  const [usersIza, setUsersIza] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [filteredNumbers, setFilteredNumbers] = useState([]);
+  
+  // Estados para el manejo de Excel
   const [isExcelMode, setIsExcelMode] = useState(false);
   const [excelData, setExcelData] = useState(null);
   const [selectedStates, setSelectedStates] = useState([]);
-  const [selectedIds] = useState([]);
-  const [loading, setLoading] = useState([])
 
+  // Utilidades para el manejo de números telefónicos
+  const cleanPhoneNumber = (phone) => {
+    if (!phone) return null;
+    let phoneStr = phone.toString();
+    if (phoneStr.startsWith("57")) {
+      phoneStr = phoneStr.slice(2);
+    }
+    return phoneStr.length === 10 ? phoneStr : "0";
+  };
 
-  const izaData = [
-    { nombre: "Ana Martínez", telefono: "+573001234567" },
-    { nombre: "Carlos Ruiz", telefono: "+573009876543" },
-    { nombre: "Diana López", telefono: "+573002345678" },
-    { nombre: "Eduardo Torres", telefono: "+573008765432" },
-    { nombre: "Fernanda García", telefono: "+573003456789" },
-    { nombre: "Gabriel Pérez", telefono: "+573007654321" },
-    { nombre: "Helena Ramírez", telefono: "+573004567890" },
-    { nombre: "Ignacio Silva", telefono: "+573006543210" },
-    { nombre: "Julia Morales", telefono: "+573005678901" },
-    { nombre: "Kevin Castro", telefono: "+573004321098" }
-  ];
+  const add57ToPhone = (phone) => {
+    let phoneStr = phone.toString();
+    return phoneStr.startsWith("57") ? phoneStr : `57${phoneStr}`;
+  };
 
+  // Cargar usuarios de IZA
+  useEffect(() => {
+    const loadUsersIza = async () => {
+      try {
+        const usersData = await getAllusers();
+        setUsersIza(usersData.data);
+      } catch (error) {
+        console.error("Error loading users:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!isExcelMode) {
+      loadUsersIza();
+    }
+  }, [isExcelMode]);
+
+  // Cargar plantillas
   useEffect(() => {
     const loadTemplates = async () => {
       try {
@@ -50,71 +82,77 @@ export const DashboardUsers = () => {
     loadTemplates();
   }, []);
 
-  const handleGetUsersByState = async () => {
-    let dataUsers = {
-      status: selectedStates,
-      list: [],
+  const handleGetUsersByState = async (currentState) => {
+    if (!selectedCity) {
+      console.warn("Por favor selecciona una ciudad");
+      return;
+    }
+
+    const cleanedNumbers = usersIza
+      .map((user) => cleanPhoneNumber(user.phone))
+      .filter((number) => number !== null);
+
+    setFilteredNumbers(cleanedNumbers);
+
+    const dataUsers = {
+      status: currentState,
+      list: cleanedNumbers,
     };
-    if (selectedCity == null) {
-      console.warn("Porfavor selecciona una ciudad")
-    } else if (selectedCity == "Bucaramanga") {
-      try {
-        const response = await getUsersByStateBucaramanga(dataUsers);
-        console.log("respuesta al enviar mensajes masivos", response);
-      } catch (error) {
-        console.error("error al enviar mensajes masivos", error)
-      }
-    } else if (selectedCity == "Bogota") {
-      try {
-        const response = await getUsersByStateBogota(dataUsers);
-        console.log("respuesta al enviar mensajes masivos", response);
-      } catch (error) {
-        console.error("error al enviar mensajes masivos", error)
-      }
-    } else {
-      console.error("ciudad no encontrada")
+
+    try {
+      const response =
+        selectedCity === "Bucaramanga"
+          ? await getUsersByStateBucaramanga(dataUsers)
+          : await getUsersByStateBogota(dataUsers);
+      
+      const formattedUsers = response.data.users.map((user, index) => ({
+        id: index + 1,
+        username: user.name || user.email.split("@")[0],
+        phone: cleanPhoneNumber(user.phone),
+      }));
+
+      setUsersIza(formattedUsers);
+      setFilteredUsers(response.data);
+    } catch (error) {
+      console.error("Error al obtener usuarios:", error);
+      setFilteredUsers([]);
     }
   };
 
   const handleSendMessages = async () => {
+    const dataToSend = isExcelMode ? excelData : usersIza;
+    const phoneNumbers = dataToSend
+      .map((user) => add57ToPhone(user.phone || user.telefono))
+      .filter((number) => number !== null);
+
     let dataMasiveMessage = {
-      toList: [],
-      template: templates,
+      toList: phoneNumbers,
+      template: selectedTemplate,
     };
+
     try {
       const response = await sendTemplates(dataMasiveMessage);
       console.log("respuesta al enviar mensajes masivos", response);
     } catch (error) {
-      console.error("error al enviar mensajes masivos", error)
+      console.error("error al enviar mensajes masivos", error);
     }
-  };
-
-  const handleStateChange = (value) => {
-    setSelectedStates((prevStates) => {
-      if (prevStates.includes(value)) {
-        return prevStates.filter((state) => state !== value);
-      }
-      return [...prevStates, value];
-    });
   };
 
   const handleExcelData = (data) => {
     setExcelData(data);
-    console.log(excelData);
-
   };
 
   return (
     <div className="p-6 space-y-6 bg-slate-900 h-screen overflow-y-auto scrollbar-custom">
-      <div className="mx-auto space-y-8 ">
+      <div className="mx-auto space-y-8">
         <div className="flex flex-col lg:flex-row items-center justify-between">
           <TitleHeader title="Mensajes masivos" />
           <div className="flex items-center gap-6">
             <div className="w-[180px]">
               <select
-                defaultValue="Bucaramanga"
+                value={selectedCity}
                 className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
-                onSelect={setSelectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
               >
                 <option value="Bucaramanga">Bucaramanga</option>
                 <option value="Bogota">Bogotá</option>
@@ -129,10 +167,7 @@ export const DashboardUsers = () => {
                 checked={!isExcelMode}
                 onCheckedChange={(checked) => {
                   setIsExcelMode(!checked);
-                  if (!checked) {
-                    // Si está cambiando a modo Excel, no hacemos nada
-                  } else {
-                    // Si está cambiando a modo IZA, limpiamos el excelData
+                  if (checked) {
                     setExcelData(null);
                   }
                 }}
@@ -145,27 +180,28 @@ export const DashboardUsers = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 ">
-          <div >
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
             <TemplatesList
               templates={templates}
               sendTemplate={setSelectedTemplate}
             />
           </div>
 
-          <div className="flex flex-col  w-full my-6 h-auto lg:h-[30em]">
+          <div className="flex flex-col w-full my-6 h-auto lg:h-[30em]">
             {isExcelMode ? (
               excelData ? (
                 <>
                   <StateSelection
-                    selectedStates={selectedStates}
-                    setSelectedStates={setSelectedStates}
+                    currentState={currentState}
+                    setCurrentState={setCurrentState}
+                    onStateSelect={handleGetUsersByState}
+                    selectedCity={selectedCity}
                   />
                   <UserMessagePanel
-                    selectedIds={selectedIds}
+                    selectedUsers={excelData}
                     selectedTemplate={selectedTemplate}
                     onSendMessages={handleSendMessages}
-                    data={excelData}
                   />
                 </>
               ) : (
@@ -174,14 +210,15 @@ export const DashboardUsers = () => {
             ) : (
               <>
                 <StateSelection
-                  selectedStates={selectedStates}
-                  setSelectedStates={setSelectedStates}
+                  currentState={currentState}
+                  setCurrentState={setCurrentState}
+                  onStateSelect={handleGetUsersByState}
+                  selectedCity={selectedCity}
                 />
                 <UserMessagePanel
-                  selectedIds={selectedIds}
+                  selectedUsers={usersIza}
                   selectedTemplate={selectedTemplate}
                   onSendMessages={handleSendMessages}
-                  data={izaData}
                 />
               </>
             )}

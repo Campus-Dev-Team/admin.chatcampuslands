@@ -11,9 +11,9 @@ export const TemplatesList = ({ templates, sendTemplate }) => {
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [expandedId, setExpandedId] = useState(null);
 
-  const handleTemplateSelection = (templateId) => {
-    setSelectedTemplate(templateId);
-    sendTemplate(templateId);
+  const handleTemplateSelection = (templateName) => {
+    setSelectedTemplate(templateName);
+    sendTemplate(templateName);
   };
 
   const toggleTemplate = (id) => {
@@ -47,12 +47,12 @@ export const TemplatesList = ({ templates, sendTemplate }) => {
               >
                 {templates.map((template) => (
                   <div
-                    key={template.id}
+                    key={template.name}
                     className="relative flex flex-col p-4 rounded-lg bg-slate-700/50 border border-slate-600 hover:border-cyan-500/50 transition-colors duration-200"
                   >
                     <div className="flex items-start space-x-4">
                       <RadioGroupItem
-                        value={template.id}
+                        value={template.name}
                         id={template.id}
                         className="mt-1 border-slate-500"
                       />
