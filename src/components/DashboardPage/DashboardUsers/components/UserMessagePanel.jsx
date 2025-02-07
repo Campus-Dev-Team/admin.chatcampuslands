@@ -6,11 +6,13 @@ import { Card } from "@/components/ui/card";
 export const UserMessagePanel = ({
   selectedUsers,
   selectedTemplate,
+  citySelected, 
+  stateSelected,
   onSendMessages,
 }) => {
 
   useEffect(() => {
-    console.log("Usuarios de Iza actualizados:", selectedUsers);
+    console.log("lista de usuarios:", selectedUsers);
   }, [selectedUsers]); 
 
   return (
@@ -22,6 +24,8 @@ export const UserMessagePanel = ({
         <div className="mt-6">
           <SendMessageButton
             selectedTemplate={selectedTemplate}
+            citySelected={citySelected}
+            stateSelected={stateSelected}
             onSendMessages={onSendMessages}
           />
         </div>

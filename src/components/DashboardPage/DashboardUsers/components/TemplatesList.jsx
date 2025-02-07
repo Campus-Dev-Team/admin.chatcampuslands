@@ -21,7 +21,7 @@ export const TemplatesList = ({ templates, sendTemplate }) => {
   };
 
   return (
-    <div className="p-6 space-y-6 bg-slate-900 overflow-y-scroll scrollbar-custom">
+    <div className="space-y-6 bg-slate-900 overflow-y-scroll scrollbar-custom">
       <div className="mx-auto space-y-8">
         <div className="h-full">
           <Card className="col-span-1 bg-slate-800/50 border-slate-700">

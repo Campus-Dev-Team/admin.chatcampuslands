@@ -11,43 +11,32 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { loginStorage } = useAuth();
+  const { setIsAuthenticated } = useAuth();
 
   const handleInputChange = (e) => {
     setPassword(e.target.value);
     if (error) setError("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+// In LoginPage.jsx
 
-    try {
-      // Intentar iniciar sesión
-      await login({"username":password, "phone": 11192006, "role": "ADMIN"});
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setIsLoading(true);
 
-      // Guardar sesión y redirigir
-      loginStorage("ADMIN", "Campuslands");
-      navigate("/dashboard");
-    } catch (error) {
-      if (error.response) {
-        switch (error.response.status) {
-          case 401:
-            setError("Contraseña incorrecta");
-            break;
-          default:
-            setError("Error al iniciar sesión. Intente nuevamente");
-        }
-      } else if (error.request) {
-        setError("Error de conexión. Verifique su internet");
-      } else {
-        setError("Error al procesar la solicitud");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  try {
+    await login({"username": password, "phone": 11192006, "role": "ADMIN"});
+    localStorage.setItem('userName', 'Campuslands');
+    setIsAuthenticated(true);
+    navigate("/dashboard");
+  } catch (error) {
+    console.error('Login error:', error);
+    setError(error.message || "Error al procesar la solicitud");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen w-full bg-slate-900 flex flex-col items-center justify-center p-4">
