@@ -34,6 +34,28 @@ export const StateSelection = ({
 
   return (
     <div className="flex gap-4 items-center mb-6">
+        <div className="flex-1">
+          <h3 className="text-lg font-medium text-white mb-2">Sede</h3>
+          <Select value={selectedCity} onValueChange={setSelectedCity}>
+            <SelectTrigger className="w-full bg-slate-800 border-slate-600 text-slate-200">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-slate-800 border-slate-600">
+              <SelectItem 
+                value="Bucaramanga"
+                className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700"
+              >
+                Bucaramanga
+              </SelectItem>
+              <SelectItem 
+                value="Bogota"
+                className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700"
+              >
+                Bogotá
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       <div className="flex-1">
         <h3 className="text-lg font-medium text-white mb-2">Estado</h3>
         <Select value={currentState} onValueChange={handleStateChange}>
@@ -44,7 +66,7 @@ export const StateSelection = ({
             {states.map((state) => (
               <SelectItem 
                 key={state.id} 
-                value={state.value}
+                value={state.value }
                 className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700"
               >
                 {state.label}
@@ -54,28 +76,6 @@ export const StateSelection = ({
         </Select>
       </div>
       
-      <div className="flex-1">
-        <h3 className="text-lg font-medium text-white mb-2">Ciudad</h3>
-        <Select value={selectedCity} onValueChange={setSelectedCity}>
-          <SelectTrigger className="w-full bg-slate-800 border-slate-600 text-slate-200">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-slate-800 border-slate-600">
-            <SelectItem 
-              value="Bucaramanga"
-              className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700"
-            >
-              Bucaramanga
-            </SelectItem>
-            <SelectItem 
-              value="Bogota"
-              className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700"
-            >
-              Bogotá
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
     </div>
   );
 };
