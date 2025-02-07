@@ -56,7 +56,7 @@ const ExcelUpload = ({ onDataProcessed }) => {
   };
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 flex justify-center items-center h-full mt-5">
+    <Card className="bg-slate-800/50 border-slate-700 flex justify-center items-center h-[450px]  mt-5">
       <div
         onDragEnter={handleDragIn}
         onDragLeave={handleDragOut}
