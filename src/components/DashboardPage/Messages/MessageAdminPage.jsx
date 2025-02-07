@@ -39,6 +39,7 @@ export const MessageAdminPage = () => {
         setMessages(messages.data);
       } catch (error) {
         console.error("Error loading messages:", error);
+        setMessages([]);
       }
     };
 

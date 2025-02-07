@@ -15,7 +15,7 @@ export const StateSelection = ({
 }) => {
   const states = [
     { id: 1, label: "Registrado", value: "Registrado" },
-    { id: 2, label: "No Registrado", value: "NO REGISTRADO" },
+    { id: 2, label: "No Registrado", value: "NO_REGISTRADO" },
     { id: 3, label: "Preseleccionado", value: "Preseleccionado" },
     { id: 4, label: "Agendado", value: "Agendado" },
     { id: 5, label: "Rechazado", value: "Rechazado" },
