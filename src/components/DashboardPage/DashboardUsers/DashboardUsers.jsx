@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { TitleHeader } from "../components/TitleHeader";
-import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { TemplatesList } from "@/components/DashboardPage/DashboardUsers/components/TemplatesList";
@@ -15,24 +14,22 @@ import { StateSelection } from "./components/StateSelection";
 import ExcelUpload from "./components/ExcelUpload";
 
 export const DashboardUsers = () => {
-  // Estados básicos
+  // Basic states
   const [selectedTemplate, setSelectedTemplate] = useState("");
-  const [expandedId, setExpandedId] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [selectedCity, setSelectedCity] = useState("Bucaramanga");
   
-  // Estados para el manejo de usuarios
+  // User handling states
   const [currentState, setCurrentState] = useState("Registrados");
+  const [originalUsers, setOriginalUsers] = useState([]); // Store original user list
   const [addressee, setAddressee] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [filteredNumbers, setFilteredNumbers] = useState([]);
   
-  // Estados para el manejo de Excel
+  // Excel handling states
   const [isExcelMode, setIsExcelMode] = useState(false);
   const [excelData, setExcelData] = useState(null);
-  const [selectedStates, setSelectedStates] = useState([]);
 
-  // Utilidades para el manejo de números telefónicos
+  // Phone number utilities
   const cleanPhoneNumber = (phone) => {
     if (!phone) return null;
     let phoneStr = phone.toString();
@@ -47,15 +44,15 @@ export const DashboardUsers = () => {
     return phoneStr.startsWith("57") ? phoneStr : `57${phoneStr}`;
   };
 
-  // Cargar usuarios de IZA
+  // Load IZA users
   useEffect(() => {
     const loadUsersIza = async () => {
       try {
         const usersData = await getAllusers();
+        setOriginalUsers(usersData.data); // Store original data
         setAddressee(usersData.data);
       } catch (error) {
         console.error("Error loading users:", error);
-      } finally {
       }
     };
 
@@ -64,9 +61,8 @@ export const DashboardUsers = () => {
     }
   }, [isExcelMode]);
 
-  // Cargar plantillas
+  // Load templates
   useEffect(() => {
-
     loadTemplates();
   }, []);
   
@@ -76,7 +72,6 @@ export const DashboardUsers = () => {
       setTemplates(templatesData.data);
     } catch (error) {
       console.error("Error loading templates:", error);
-    } finally {
     }
   };
 
@@ -86,11 +81,10 @@ export const DashboardUsers = () => {
       return;
     }
 
-    const cleanedNumbers = addressee
+    const usersToFilter = isExcelMode ? addressee : originalUsers;
+    const cleanedNumbers = usersToFilter
       .map((user) => cleanPhoneNumber(user.phone))
       .filter((number) => number !== null);
-
-    setFilteredNumbers(cleanedNumbers);
 
     const dataUsers = {
       status: currentState,
@@ -105,7 +99,7 @@ export const DashboardUsers = () => {
       
       const formattedUsers = response.data.users.map((user, index) => ({
         id: index + 1,
-        username: user.name || user.email.split("@")[0],
+        username: user.name || user.email?.split("@")[0] || 'N/A',
         phone: cleanPhoneNumber(user.phone),
       }));
 
@@ -114,31 +108,33 @@ export const DashboardUsers = () => {
     } catch (error) {
       console.error("Error al obtener usuarios:", error);
       setFilteredUsers([]);
+      // Reset to original list on error
+      setAddressee(isExcelMode ? addressee : originalUsers);
     }
   };
 
   const handleSendMessages = async () => {
-    const dataToSend =  addressee;
-    const phoneNumbers = dataToSend
+    const phoneNumbers = addressee
       .map((user) => add57ToPhone(user.phone || user.telefono))
       .filter((number) => number !== null);
 
-    let dataMasiveMessage = {
+    const dataMasiveMessage = {
       toList: phoneNumbers,
       template: selectedTemplate,
     };
 
     try {
       const response = await sendTemplates(dataMasiveMessage);
-      console.log("respuesta al enviar mensajes masivos", response);
+      console.log("Mensajes masivos enviados exitosamente", response);
     } catch (error) {
-      console.error("error al enviar mensajes masivos", error);
+      console.error("Error al enviar mensajes masivos", error);
     }
   };
 
   const handleExcelData = (data) => {
+    setOriginalUsers(data); // Store original Excel data
     setAddressee(data);
-    setExcelData(true)
+    setExcelData(true);
   };
 
   return (
@@ -146,37 +142,26 @@ export const DashboardUsers = () => {
       <div className="mx-auto space-y-8">
         <div className="flex flex-col lg:flex-row items-center justify-between">
           <TitleHeader title="Mensajes masivos" />
-          <div className="flex items-center gap-6">
-            <div className="w-[180px]">
-              <select
-                value={selectedCity}
-                className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
-                onChange={(e) => setSelectedCity(e.target.value)}
-              >
-                <option value="Bucaramanga">Bucaramanga</option>
-                <option value="Bogota">Bogotá</option>
-              </select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="data-source" className="text-slate-200">
-                Datos Excel
-              </Label>
-              <Switch
-                id="data-source"
-                checked={!isExcelMode}
-                onCheckedChange={(checked) => {
-                  setIsExcelMode(!checked);
-                  if (checked) {
-                    setExcelData(null);
-                    setAddressee(loadUsersIza())
-                  }
-                }}
-                className="data-[state=checked]:bg-cyan-500"
-              />
-              <Label htmlFor="data-source" className="text-slate-200">
-                Datos IZA
-              </Label>
-            </div>
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="data-source" className="text-slate-200">
+              Datos Excel
+            </Label>
+            <Switch
+              id="data-source"
+              checked={!isExcelMode}
+              onCheckedChange={(checked) => {
+                setIsExcelMode(!checked);
+                if (checked) {
+                  setExcelData(null);
+                  setAddressee([]);
+                  setOriginalUsers([]);
+                }
+              }}
+              className="data-[state=checked]:bg-cyan-500"
+            />
+            <Label htmlFor="data-source" className="text-slate-200">
+              Datos IZA
+            </Label>
           </div>
         </div>
 
@@ -197,6 +182,7 @@ export const DashboardUsers = () => {
                     setCurrentState={setCurrentState}
                     onStateSelect={handleGetUsersByState}
                     selectedCity={selectedCity}
+                    setSelectedCity={setSelectedCity}
                   />
                   <UserMessagePanel
                     selectedUsers={addressee}
@@ -214,6 +200,7 @@ export const DashboardUsers = () => {
                   setCurrentState={setCurrentState}
                   onStateSelect={handleGetUsersByState}
                   selectedCity={selectedCity}
+                  setSelectedCity={setSelectedCity}
                 />
                 <UserMessagePanel
                   selectedUsers={addressee}

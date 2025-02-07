@@ -1,13 +1,18 @@
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const StateSelection = ({
   currentState,
   setCurrentState,
   onStateSelect,
   selectedCity,
+  setSelectedCity,
 }) => {
-  // Define available states
   const states = [
     { id: 1, label: "Registrado", value: "Registrado" },
     { id: 2, label: "No Registrado", value: "NO REGISTRADO" },
@@ -28,28 +33,49 @@ export const StateSelection = ({
   };
 
   return (
-    <div className="mb-6">
-      <h3 className="text-lg font-medium text-white mb-4">
-        Seleccione el estado
-      </h3>
-      <RadioGroup
-        value={currentState}
-        onValueChange={handleStateChange}
-        className="flex gap-4 flex-wrap"
-      >
-        {states.map((state) => (
-          <div className="flex items-center space-x-2" key={state.id}>
-            <RadioGroupItem
-              value={state.value}
-              id={state.value}
-              className="border-slate-500"
-            />
-            <Label htmlFor={state.value} className="text-slate-200">
-              {state.label}
-            </Label>
-          </div>
-        ))}
-      </RadioGroup>
+    <div className="flex gap-4 items-center mb-6">
+      <div className="flex-1">
+        <h3 className="text-lg font-medium text-white mb-2">Estado</h3>
+        <Select value={currentState} onValueChange={handleStateChange}>
+          <SelectTrigger className="w-full bg-slate-800 border-slate-600 text-slate-200">
+            <SelectValue placeholder="Seleccione un estado" />
+          </SelectTrigger>
+          <SelectContent className="bg-slate-800 border-slate-600">
+            {states.map((state) => (
+              <SelectItem 
+                key={state.id} 
+                value={state.value}
+                className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700"
+              >
+                {state.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="flex-1">
+        <h3 className="text-lg font-medium text-white mb-2">Ciudad</h3>
+        <Select value={selectedCity} onValueChange={setSelectedCity}>
+          <SelectTrigger className="w-full bg-slate-800 border-slate-600 text-slate-200">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-slate-800 border-slate-600">
+            <SelectItem 
+              value="Bucaramanga"
+              className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700"
+            >
+              Bucaramanga
+            </SelectItem>
+            <SelectItem 
+              value="Bogota"
+              className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700"
+            >
+              Bogotá
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 };
