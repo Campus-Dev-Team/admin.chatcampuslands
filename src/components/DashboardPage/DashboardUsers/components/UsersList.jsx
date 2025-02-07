@@ -9,6 +9,8 @@ export const UserList = ({ selectedUsers }) => {
   };
 
   // Filter out invalid numbers
+  console.log(selectedUsers);
+  
   const filteredUsers = selectedUsers.filter(
     (user) => cleanPhoneNumber(user.phone) !== null
   );
@@ -22,7 +24,7 @@ export const UserList = ({ selectedUsers }) => {
         >
           <span className="text-slate-300 min-w-8">{user.id}</span>
           <span className="text-slate-300 flex-1">
-            {user.username || "NOMBRE"}
+            {user?.username || user?.name}
           </span>
           <span className="text-slate-400 font-mono">
             {cleanPhoneNumber(user.phone)}

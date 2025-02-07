@@ -20,11 +20,10 @@ export const DashboardUsers = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [selectedCity, setSelectedCity] = useState("Bucaramanga");
-  const [loading, setLoading] = useState(false);
   
   // Estados para el manejo de usuarios
   const [currentState, setCurrentState] = useState("Registrados");
-  const [usersIza, setUsersIza] = useState([]);
+  const [addressee, setAddressee] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [filteredNumbers, setFilteredNumbers] = useState([]);
   
@@ -53,11 +52,10 @@ export const DashboardUsers = () => {
     const loadUsersIza = async () => {
       try {
         const usersData = await getAllusers();
-        setUsersIza(usersData.data);
+        setAddressee(usersData.data);
       } catch (error) {
         console.error("Error loading users:", error);
       } finally {
-        setLoading(false);
       }
     };
 
@@ -68,19 +66,19 @@ export const DashboardUsers = () => {
 
   // Cargar plantillas
   useEffect(() => {
-    const loadTemplates = async () => {
-      try {
-        const templatesData = await getAllTemplates();
-        setTemplates(templatesData.data);
-      } catch (error) {
-        console.error("Error loading templates:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     loadTemplates();
   }, []);
+  
+  const loadTemplates = async () => {
+    try {
+      const templatesData = await getAllTemplates();
+      setTemplates(templatesData.data);
+    } catch (error) {
+      console.error("Error loading templates:", error);
+    } finally {
+    }
+  };
 
   const handleGetUsersByState = async (currentState) => {
     if (!selectedCity) {
@@ -88,7 +86,7 @@ export const DashboardUsers = () => {
       return;
     }
 
-    const cleanedNumbers = usersIza
+    const cleanedNumbers = addressee
       .map((user) => cleanPhoneNumber(user.phone))
       .filter((number) => number !== null);
 
@@ -111,7 +109,7 @@ export const DashboardUsers = () => {
         phone: cleanPhoneNumber(user.phone),
       }));
 
-      setUsersIza(formattedUsers);
+      setAddressee(formattedUsers);
       setFilteredUsers(response.data);
     } catch (error) {
       console.error("Error al obtener usuarios:", error);
@@ -120,7 +118,7 @@ export const DashboardUsers = () => {
   };
 
   const handleSendMessages = async () => {
-    const dataToSend = isExcelMode ? excelData : usersIza;
+    const dataToSend =  addressee;
     const phoneNumbers = dataToSend
       .map((user) => add57ToPhone(user.phone || user.telefono))
       .filter((number) => number !== null);
@@ -139,7 +137,8 @@ export const DashboardUsers = () => {
   };
 
   const handleExcelData = (data) => {
-    setExcelData(data);
+    setAddressee(data);
+    setExcelData(true)
   };
 
   return (
@@ -169,6 +168,7 @@ export const DashboardUsers = () => {
                   setIsExcelMode(!checked);
                   if (checked) {
                     setExcelData(null);
+                    setAddressee(loadUsersIza())
                   }
                 }}
                 className="data-[state=checked]:bg-cyan-500"
@@ -199,7 +199,7 @@ export const DashboardUsers = () => {
                     selectedCity={selectedCity}
                   />
                   <UserMessagePanel
-                    selectedUsers={excelData}
+                    selectedUsers={addressee}
                     selectedTemplate={selectedTemplate}
                     onSendMessages={handleSendMessages}
                   />
@@ -216,7 +216,7 @@ export const DashboardUsers = () => {
                   selectedCity={selectedCity}
                 />
                 <UserMessagePanel
-                  selectedUsers={usersIza}
+                  selectedUsers={addressee}
                   selectedTemplate={selectedTemplate}
                   onSendMessages={handleSendMessages}
                 />
