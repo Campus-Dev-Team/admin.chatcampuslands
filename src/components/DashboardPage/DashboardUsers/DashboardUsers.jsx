@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { TitleHeader } from "../components/TitleHeader";
-import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { TemplatesList } from "@/components/DashboardPage/DashboardUsers/components/TemplatesList";
@@ -13,27 +12,25 @@ import {
 } from "@/services/userService";
 import { StateSelection } from "./components/StateSelection";
 import ExcelUpload from "./components/ExcelUpload";
+import { StepIndicator } from "./components/StepIndicator";
 
 export const DashboardUsers = () => {
-  // Estados básicos
+  // Basic states
   const [selectedTemplate, setSelectedTemplate] = useState("");
-  const [expandedId, setExpandedId] = useState(null);
   const [templates, setTemplates] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("Bucaramanga");
-  const [loading, setLoading] = useState(false);
+  const [selectedCity, setSelectedCity] = useState(null);
 
-  // Estados para el manejo de usuarios
-  const [currentState, setCurrentState] = useState("Registrados");
-  const [usersIza, setUsersIza] = useState([]);
+  // User handling states
+  const [currentState, setCurrentState] = useState(null);
+  const [originalUsers, setOriginalUsers] = useState([]); // Store original user list
+  const [addressee, setAddressee] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [filteredNumbers, setFilteredNumbers] = useState([]);
 
-  // Estados para el manejo de Excel
+  // Excel handling states
   const [isExcelMode, setIsExcelMode] = useState(false);
   const [excelData, setExcelData] = useState(null);
-  const [selectedStates, setSelectedStates] = useState([]);
 
-  // Utilidades para el manejo de números telefónicos
+  // Phone number utilities
   const cleanPhoneNumber = (phone) => {
     if (!phone) return null;
     let phoneStr = phone.toString();
@@ -48,187 +45,218 @@ export const DashboardUsers = () => {
     return phoneStr.startsWith("57") ? phoneStr : `57${phoneStr}`;
   };
 
-  const loadUsersIza = async () => {
-    try {
-      const usersData = await getAllusers();
-      setUsersIza(usersData.data);
-    } catch (error) {
-      console.error("Error loading users:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Load IZA users
   useEffect(() => {
+    const loadUsersIza = async () => {
+      try {
+        const usersData = await getAllusers();
+        setOriginalUsers(usersData.data); // Store original data
+        setAddressee(usersData.data);
+      } catch (error) {
+        console.error("Error loading users:", error);
+      }
+    };
+
     if (!isExcelMode) {
       loadUsersIza();
     }
   }, [isExcelMode]);
 
+  // Load templates
   useEffect(() => {
-    const loadTemplates = async () => {
-      try {
-        const templatesData = await getAllTemplates();
-        setTemplates(templatesData.data);
-      } catch (error) {
-        console.error("Error loading templates:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadTemplates();
   }, []);
 
+  const loadTemplates = async () => {
+    try {
+      const templatesData = await getAllTemplates();
+      setTemplates(templatesData.data);
+    } catch (error) {
+      console.error("Error loading templates:", error);
+    }
+  };
+
+  // Keep using the existing city-specific endpoints
   const handleGetUsersByState = async (currentState) => {
-    if (!selectedCity) {
-      console.warn("Por favor selecciona una ciudad");
-      return;
-    }
+    if (!selectedCity) return;
 
-    if (!isExcelMode) {
-      await loadUsersIza();
-    }
-
-    const cleanedNumbers = usersIza
-      .map((user) => cleanPhoneNumber(user.phone))
-      .filter((number) => number !== null);
-
-    setFilteredNumbers(cleanedNumbers);
-
+    const usersToFilter = isExcelMode ? addressee : originalUsers;
     const dataUsers = {
       status: currentState,
-      list: cleanedNumbers,
+      list: usersToFilter
+        .map((user) => cleanPhoneNumber(user.phone))
+        .filter(Boolean),
     };
 
     try {
       const response =
-        selectedCity === "Bucaramanga"
-          ? await getUsersByStateBucaramanga(dataUsers)
-          : await getUsersByStateBogota(dataUsers);
+        selectedCity === "Bogota"
+          ? await getUsersByStateBogota(dataUsers)
+          : await getUsersByStateBucaramanga(dataUsers);
 
-      const formattedUsers = response.data.users.map((user, index) => ({
-        id: index + 1,
-        username: user.name,
-        phone: cleanPhoneNumber(user.phone),
-      }));
-
-      setUsersIza(formattedUsers);
+      if (currentState === "NO_REGISTRADO") {
+        const matchingUsers = usersToFilter.filter(user => 
+          response.data.users.includes(cleanPhoneNumber(user.phone))
+        );
+        
+        setAddressee(
+          matchingUsers.map((user, index) => ({
+            id: index + 1,
+            username: user.name || user.username,
+            phone: cleanPhoneNumber(user.phone)
+          }))
+        );
+      } else {
+        setAddressee(
+          response.data.users.map((user, index) => ({
+            id: index + 1,
+            username: user.name,
+            phone: cleanPhoneNumber(user.phone),
+          }))
+        );
+      }
       setFilteredUsers(response.data);
     } catch (error) {
       console.error("Error al obtener usuarios:", error);
       setFilteredUsers([]);
+      setAddressee(originalUsers);
+    }
+  };
+
+  // Update city handler
+  const handleCityChange = (newCity) => {
+    setSelectedCity(newCity);
+    if (currentState) {
+      handleGetUsersByState(currentState);
+      console.log(newCity, currentState, selectedCity);
+    } else {
+      // If no state is selected, keep original users
+      setAddressee(originalUsers);
     }
   };
 
   const handleSendMessages = async () => {
-    const dataToSend = isExcelMode ? excelData : usersIza;
-    const phoneNumbers = dataToSend
+    const phoneNumbers = addressee
       .map((user) => add57ToPhone(user.phone || user.telefono))
       .filter((number) => number !== null);
 
-    let dataMasiveMessage = {
+    const dataMasiveMessage = {
       toList: phoneNumbers,
       template: selectedTemplate,
     };
 
     try {
       const response = await sendTemplates(dataMasiveMessage);
-      console.log("respuesta al enviar mensajes masivos", response);
+      console.log("Mensajes masivos enviados exitosamente", response);
     } catch (error) {
-      console.error("error al enviar mensajes masivos", error);
+      console.error("Error al enviar mensajes masivos", error);
     }
   };
 
   const handleExcelData = (data) => {
-    setExcelData(data);
+    setOriginalUsers(data); // Store original Excel data
+    setAddressee(data);
+    setExcelData(true);
   };
 
   return (
-    <div className="p-6 space-y-6 bg-slate-900 h-screen overflow-y-auto scrollbar-custom">
-      <div className="mx-auto space-y-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between">
+    <div className="min-h-screen bg-slate-900">
+      <div className="container mx-auto p-6">
+        {/* Header Section */}
+        <div className="flex flex-wrap md:flex-nowrap justify-between items-center mb-8">
           <TitleHeader title="Mensajes masivos" />
-          <div className="flex items-center gap-6">
-            <div className="w-[180px]">
-              <select
-                value={selectedCity}
-                className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
-                onChange={(e) => setSelectedCity(e.target.value)}
-              >
-                <option value="Bucaramanga">Bucaramanga</option>
-                <option value="Bogota">Bogotá</option>
-              </select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="data-source" className="text-slate-200">
-                Datos Excel
-              </Label>
-              <Switch
-                id="data-source"
-                checked={!isExcelMode}
-                onCheckedChange={(checked) => {
-                  setIsExcelMode(!checked);
-                  if (checked) {
-                    setExcelData(null);
-                  }
-                }}
-                className="data-[state=checked]:bg-cyan-500"
-              />
-              <Label htmlFor="data-source" className="text-slate-200">
-                Datos IZA
-              </Label>
-            </div>
+          <div className="flex items-center mb-4 gap-3">
+            <StepIndicator
+              number={1}
+              active={!selectedTemplate}
+              text="Selecciona una plantilla"
+            />
+            <StepIndicator
+              number={2}
+              active={selectedTemplate && !selectedCity}
+              text="Selecciona una sede"
+              disabled={!selectedTemplate}
+            />
+            <StepIndicator
+              number={3}
+              active={selectedCity && !currentState}
+              text="Selecciona el estado"
+              disabled={!selectedCity}
+            />
           </div>
+          <DataSourceSwitch
+            isExcelMode={isExcelMode}
+            setIsExcelMode={setIsExcelMode}
+          />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div>
+        {/* Main Content */}
+        <div className="grid grid-cols-12 gap-6">
+          {/* Left Panel - Templates */}
+          <div className="col-span-12 lg:col-span-4">
             <TemplatesList
               templates={templates}
               sendTemplate={setSelectedTemplate}
             />
           </div>
 
-          <div className="flex flex-col w-full my-6 h-auto lg:h-[30em]">
-            {isExcelMode ? (
-              excelData ? (
-                <>
-                  <StateSelection
-                    currentState={currentState}
-                    setCurrentState={setCurrentState}
-                    onStateSelect={handleGetUsersByState}
-                    selectedCity={selectedCity}
-                  />
+          {/* Right Panel - User Selection & Messages */}
+          <div className="col-span-12 lg:col-span-8">
+            {/* Filters Bar */}
+            {/* In DashboardUsers.jsx */}
+            <div className="bg-slate-800/50 rounded-lg p-4 mb-6">
+              <StateSelection
+                currentState={currentState}
+                setCurrentState={setCurrentState}
+                onStateSelect={handleGetUsersByState}
+                selectedCity={selectedCity}
+                setSelectedCity={handleCityChange}
+                disabled={!selectedTemplate}
+              />
+            </div>
+
+            {/* User List or Excel Upload */}
+            <div className="bg-slate-800/50 rounded-lg">
+              {isExcelMode ? (
+                excelData ? (
                   <UserMessagePanel
-                    selectedUsers={excelData}
+                    selectedUsers={addressee}
                     selectedTemplate={selectedTemplate}
                     onSendMessages={handleSendMessages}
                   />
-                </>
+                ) : (
+                  <ExcelUpload onDataProcessed={handleExcelData} />
+                )
               ) : (
-                <ExcelUpload onDataProcessed={handleExcelData} />
-              )
-            ) : (
-              <>
-                <StateSelection
-                  currentState={currentState}
-                  setCurrentState={setCurrentState}
-                  onStateSelect={handleGetUsersByState}
-                  selectedCity={selectedCity}
-                />
                 <UserMessagePanel
-                  selectedUsers={usersIza}
+                  selectedUsers={addressee}
                   selectedTemplate={selectedTemplate}
                   onSendMessages={handleSendMessages}
                 />
-              </>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+const DataSourceSwitch = ({ isExcelMode, setIsExcelMode }) => (
+  <div className="flex items-center gap-3 bg-slate-800/50 p-3 rounded-lg">
+    <Label htmlFor="data-source" className="text-slate-200">
+      Excel
+    </Label>
+    <Switch
+      id="data-source"
+      checked={!isExcelMode}
+      onCheckedChange={(checked) => setIsExcelMode(!checked)}
+      className="data-[state=checked]:bg-cyan-500"
+    />
+    <Label htmlFor="data-source" className="text-slate-200">
+      IZA
+    </Label>
+  </div>
+);
 
 export default DashboardUsers;
