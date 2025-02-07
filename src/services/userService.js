@@ -24,7 +24,7 @@ export const getUsersByStateBucaramanga = async (data) => {
 
     return response;
   } catch (error) {
-    console.error("Error saving a message", error);
+    console.error("Error fetching users by state bucaramanga", error);
     throw error;
   }
 };
@@ -52,7 +52,7 @@ export const getUsersByStateBogota = async (data) => {
 
     return response;
   } catch (error) {
-    console.error("Error saving a message", error);
+    console.error("Error fetching users by state Bogota", error);
     throw error;
   }
 };

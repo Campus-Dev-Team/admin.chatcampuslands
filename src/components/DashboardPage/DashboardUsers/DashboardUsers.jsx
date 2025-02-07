@@ -21,13 +21,13 @@ export const DashboardUsers = () => {
   const [templates, setTemplates] = useState([]);
   const [selectedCity, setSelectedCity] = useState("Bucaramanga");
   const [loading, setLoading] = useState(false);
-  
+
   // Estados para el manejo de usuarios
   const [currentState, setCurrentState] = useState("Registrados");
   const [usersIza, setUsersIza] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [filteredNumbers, setFilteredNumbers] = useState([]);
-  
+
   // Estados para el manejo de Excel
   const [isExcelMode, setIsExcelMode] = useState(false);
   const [excelData, setExcelData] = useState(null);
@@ -48,25 +48,23 @@ export const DashboardUsers = () => {
     return phoneStr.startsWith("57") ? phoneStr : `57${phoneStr}`;
   };
 
-  // Cargar usuarios de IZA
-  useEffect(() => {
-    const loadUsersIza = async () => {
-      try {
-        const usersData = await getAllusers();
-        setUsersIza(usersData.data);
-      } catch (error) {
-        console.error("Error loading users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadUsersIza = async () => {
+    try {
+      const usersData = await getAllusers();
+      setUsersIza(usersData.data);
+    } catch (error) {
+      console.error("Error loading users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (!isExcelMode) {
       loadUsersIza();
     }
   }, [isExcelMode]);
 
-  // Cargar plantillas
   useEffect(() => {
     const loadTemplates = async () => {
       try {
@@ -88,6 +86,10 @@ export const DashboardUsers = () => {
       return;
     }
 
+    if (!isExcelMode) {
+      await loadUsersIza();
+    }
+
     const cleanedNumbers = usersIza
       .map((user) => cleanPhoneNumber(user.phone))
       .filter((number) => number !== null);
@@ -104,10 +106,10 @@ export const DashboardUsers = () => {
         selectedCity === "Bucaramanga"
           ? await getUsersByStateBucaramanga(dataUsers)
           : await getUsersByStateBogota(dataUsers);
-      
+
       const formattedUsers = response.data.users.map((user, index) => ({
         id: index + 1,
-        username: user.name || user.email.split("@")[0],
+        username: user.name,
         phone: cleanPhoneNumber(user.phone),
       }));
 
@@ -180,7 +182,7 @@ export const DashboardUsers = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div>
             <TemplatesList
               templates={templates}
