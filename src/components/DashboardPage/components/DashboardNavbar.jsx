@@ -6,7 +6,7 @@ import {
   LogOut,
   MessageCircle,
   Settings,
-  Users,
+  MessagesSquare,
   BarChart2,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -38,8 +38,8 @@ export const DashboardNavbar = () => {
       inDevelopment: true
     },
     {
-      icon: <Users className="h-5 w-5" />,
-      label: "Usuarios",
+      icon: <MessagesSquare className="h-5 w-5" />, // Cambiado a Send
+      label: "Mensajes Masivos",
       path: "/dashboard/users",
       inDevelopment: true
     },
@@ -50,6 +50,7 @@ export const DashboardNavbar = () => {
       inDevelopment: true
     }
   ];
+  
 
   return (
     <>
