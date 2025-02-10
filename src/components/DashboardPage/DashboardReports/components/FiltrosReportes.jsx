@@ -41,10 +41,12 @@ export const FiltrosReportes = ({ onDataFetched }) => {
     return (
         <div className="bg-transparent m-2 p-4 md:p-0 text-white rounded-md ">
             <div
-                className={`flex flex-wrap md:flex-nowrap justify-center items-center gap-5 transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                className={`flex flex-wrap md:flex-nowrap 
+                sm:flex-nowrap justify-center items-center gap-5 transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
             >
                 <div className="flex flex-col justify-center items-end shadow-md rounded-lg px-1 pt-4">
-                    <div className='flex flex-wrap md:flex-nowrap items-center gap-4 w-full md:w-fit justify-center'>
+                    <div className='flex flex-wrap md:flex-nowrap
+                    sm:flex-nowrap items-center gap-4 w-full md:w-fit justify-center'>
                         <div className="flex flex-col">
                             <label className="text-white/70 text-sm mb-1">Fecha Inicio</label>
                             <input

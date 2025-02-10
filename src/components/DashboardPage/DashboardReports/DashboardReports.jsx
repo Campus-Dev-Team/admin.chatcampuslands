@@ -202,12 +202,12 @@ export const DashboardReports = () => {
         <div className="flex flex-col lg:flex-row items-start justify-between gap-4">
           <TitleHeader title="Informe de Conversión Iza ChatBot" />
 
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:justify-start xs:flex-row items-center gap-4 px-4 md:px-6 lg:px-8 xl:px-10 ">
+            <div className="flex flex-col xs:flex-row items-center w-full sm:w-auto" >
               <select
                 value={ciudad}
                 onChange={(e) => setCiudad(e.target.value)}
-                className="h-fit w-fit bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
+                className="h-fit w-full sm:w-auto bg-slate-800 text-white text-[0.9rem] border border-slate-600 rounded-lg p-2 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
               >
                 <option value="Bogota">Bogotá</option>
                 <option value="Bucaramanga">Bucaramanga</option>
@@ -223,6 +223,8 @@ export const DashboardReports = () => {
             </div>
             <SpentAmountInput value={spentAmount} onChange={setSpentAmount} />
           </div>
+
+
         </div>
 
         <StatsOverview stats={stats} />
@@ -237,22 +239,25 @@ export const DashboardReports = () => {
             <div className="p-4 border-b border-slate-700">
               <h3 className="text-xl font-semibold text-cyan-400">Detalle de Usuarios</h3>
             </div>
-            <DashboardTable
-              data={tableData}
-              columns={tableColumns}
-              onRowAction={(user) => {
-                setSelectedUser(user);
-                setShowMessagesModal(true);
-              }}
-              actionLabel="Ver Mensajes"
-              rowClassName={(row) => row.status ? 'bg-green-900/10' : 'bg-red-900/10'}
-              statusColumn="status"
-              emptyMessage="No hay usuarios disponibles para mostrar."
-              statusFilter={statusFilter}
-              onStatusFilterChange={setStatusFilter}
-            />
+            <div className="overflow-y-auto sm:overflow-y-scroll h-[400px] md:h-auto">
+              <DashboardTable
+                data={tableData}
+                columns={tableColumns}
+                onRowAction={(user) => {
+                  setSelectedUser(user);
+                  setShowMessagesModal(true);
+                }}
+                actionLabel="Ver Mensajes"
+                rowClassName={(row) => row.status ? 'bg-green-900/10' : 'bg-red-900/10'}
+                statusColumn="status"
+                emptyMessage="No hay usuarios disponibles para mostrar."
+                statusFilter={statusFilter}
+                onStatusFilterChange={setStatusFilter}
+              />
+            </div>
           </div>
         </div>
+
 
         <UserMessagesModal
           isOpen={showMessagesModal}
