@@ -3,12 +3,12 @@ import { StepIndicator } from "./StepIndicator";
 import { DataSourceSwitch } from "./DataSourceSwitch";
 
 export const DashboardHeader = ({ selectedTemplate, selectedCity, selectState, isExcelMode, setIsExcelMode }) => (
-  <div className="flex items-center justify-between w-full mb-6 ">
-    <div className="flex-shrink-0">
+  <div className="flex flex-col lg:flex-row items-center justify-between w-full mb-6 gap-4">
+    <div className="flex-shrink-0 w-full lg:w-auto">
       <TitleHeader title="Mensajes masivos" />
     </div>
-    
-    <div className="flex items-center gap-3 flex-grow justify-center">
+
+    <div className="flex items-center gap-2 md:gap-3 flex-grow justify-center overflow-x-auto w-full lg:w-auto py-2">
       <StepIndicator
         number={1}
         active={!selectedTemplate}
@@ -27,8 +27,8 @@ export const DashboardHeader = ({ selectedTemplate, selectedCity, selectState, i
         disabled={!selectedCity}
       />
     </div>
-    
-    <div className="flex-shrink-0">
+
+    <div className="flex-shrink-0 w-full lg:w-auto">
       <DataSourceSwitch
         isExcelMode={isExcelMode}
         setIsExcelMode={setIsExcelMode}

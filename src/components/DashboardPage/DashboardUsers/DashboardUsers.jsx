@@ -174,7 +174,7 @@ export const DashboardUsers = () => {
       setFilteredUsers([]);
       setAddressee([]);
     }
-};
+  };
 
   // Maneja el cambio de ciudad seleccionada
   const handleCityChange = (city) => {
@@ -288,7 +288,7 @@ export const DashboardUsers = () => {
   // Renderización del componente
   return (
     <div className="min-h-screen bg-slate-900">
-      <div className="container mx-auto p-6 flex flex-col justify-center">
+      <div className="container mx-auto px-4 py-4 md:p-6 flex flex-col justify-center">
         {/* Contenedor de notificaciones */}
         <ToastContainer />
 
@@ -311,9 +311,9 @@ export const DashboardUsers = () => {
         />
 
         {/* Contenido del dashboard */}
-        <div className="grid grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
           {/* Lista de plantillas */}
-          <div className="col-span-12 lg:col-span-4">
+          <div className="lg:col-span-4">
             <TemplatesList
               templates={templates}
               sendTemplate={setSelectedTemplate}
@@ -321,7 +321,7 @@ export const DashboardUsers = () => {
           </div>
 
           {/* Panel principal */}
-          <div className="col-span-12 lg:col-span-8">
+          <div className="lg:col-span-8">
             {/* Selección de estado */}
             <div className="bg-slate-800/50 rounded-lg p-4 mb-6">
               <StateSelection
