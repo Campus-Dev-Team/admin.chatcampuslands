@@ -40,6 +40,7 @@ export const UserMessagePanel = ({
             citySelected={citySelected}
             stateSelected={stateSelected}
             usersExist={selectedUsers.length}
+            isLoading={isLoading}
             onSendMessages={onSendMessages}
           />
         </div>
