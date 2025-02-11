@@ -1,14 +1,33 @@
 import { Button } from "@/components/ui/button";
-import { Plus, MessageCircle, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
-export const SendMessageButton = ({ selectedTemplate, citySelected, stateSelected, onSendMessages }) => {
+export const SendMessageButton = ({ selectedTemplate, citySelected, stateSelected, usersExist, onSendMessages }) => {
+  const [isSending, setIsSending] = useState(false);
+
+  const handleClick = async () => {
+    setIsSending(true);
+    try {
+      await onSendMessages();
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <Button
-      className="w-full bg-cyan-500 hover:bg-cyan-600 text-white"
-      disabled={!selectedTemplate || !citySelected || !stateSelected}
-      onClick={onSendMessages}
+      className="w-full bg-cyan-500 hover:bg-cyan-600 text-white disabled:bg-slate-600"
+      disabled={!selectedTemplate || !citySelected || !stateSelected || usersExist == 0 || isSending}
+      onClick={handleClick}
     >
-      Enviar Mensajes
+      {isSending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Enviando Mensajes...
+        </>
+      ) : (
+        'Enviar Mensajes'
+      )}
     </Button>
   );
 };

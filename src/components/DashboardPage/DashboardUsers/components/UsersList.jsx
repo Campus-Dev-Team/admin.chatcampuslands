@@ -1,4 +1,6 @@
-export const UserList = ({ selectedUsers }) => {
+import { MessageCircle } from "lucide-react";
+
+export const UserList = ({ selectedUsers, stateSelected }) => {
   const cleanPhoneNumber = (phone) => {
     if (!phone) return null;
     let phoneStr = phone.toString();
@@ -7,7 +9,7 @@ export const UserList = ({ selectedUsers }) => {
     }
     return phoneStr.length === 10 ? phoneStr : "Numero no valido";
   };
-  
+
   // Filter out users with invalid phone numbers and create unique keys
   const filteredUsers = selectedUsers
     .filter((user) => cleanPhoneNumber(user.phone || user.telefono) !== null)
@@ -25,17 +27,39 @@ export const UserList = ({ selectedUsers }) => {
 
   return (
     <div className="h-[450px] overflow-hidden">
-      <div className="h-full overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
-        {filteredUsers.map((user) => (
-          <div
-            key={user.uniqueKey}
-            className="flex items-center gap-4 p-3 bg-slate-700/30 rounded-lg"
-          >
-            <span className="text-slate-300 min-w-8">{user.displayIndex}</span>
-            <span className="text-slate-300 flex-1">{user.displayName}</span>
-            <span className="text-slate-400 font-mono">{user.phoneNumber}</span>
+      <div className="transition-all duration-300 ease-in-out">
+        {selectedUsers.length > 0 ? (
+          <div className="animate-fadeIn">
+            <div className="mb-4 p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg transition-all duration-300">
+              <p className="text-blue-200 text-sm">
+                Se enviará la plantilla a {selectedUsers.length} usuario{selectedUsers.length !== 1 ? 's' : ''} seleccionado{selectedUsers.length !== 1 ? 's' : ''}.
+              </p>
+            </div>
+            <div className="h-full overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
+              {filteredUsers.map((user, index) => (
+                <div
+                  key={user.uniqueKey}
+                  className="flex items-center gap-4 p-3 bg-slate-700/30 rounded-lg transition-all duration-300 animate-fadeSlideIn"
+                  style={{
+                    animationDelay: `${index * 50}ms`
+                  }}
+                >
+                  <span className="text-slate-300 min-w-8">{user.displayIndex}</span>
+                  <span className="text-slate-300 flex-1">{user.displayName}</span>
+                  <span className="text-slate-400 font-mono">{user.phoneNumber}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
+        ) : (
+          <div className="flex items-center justify-center h-full animate-fadeIn">
+            <div className="text-center space-y-2 pt-8">
+              <MessageCircle className="w-12 h-12 text-slate-500 mx-auto animate-bounce" />
+              <p className="text-slate-400">No hay usuarios para mostrar</p>
+              <p className="text-sm text-slate-500">Prueba cambiando la sede o el estado</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

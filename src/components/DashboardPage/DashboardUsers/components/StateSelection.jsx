@@ -12,6 +12,7 @@ export const StateSelection = ({
   onStateSelect,
   selectedCity,
   setSelectedCity,
+  isLoading,
 }) => {
   const states = [
     { id: 1, label: "Registrado", value: "Registrado" },
