@@ -16,8 +16,6 @@ export const endpoints = {
   messagesToday: `${API_BASE_URL2}admin/messages/today`,
 
   // enpoints para consultar el historial de usuarios registrados en CAMPUS
-  // usersCampusBogota: `${API_BASE_URL}admin/users/today`,
-  // usersCampusBucaramanga: `${API_BASE_URL}admin/messages/today`
   usersCampusBogota: `${API_BASE_URL}api/bogota/users-register`,
   usersCampusBucaramanga: `${API_BASE_URL}api/campuslands/users-register`,
 

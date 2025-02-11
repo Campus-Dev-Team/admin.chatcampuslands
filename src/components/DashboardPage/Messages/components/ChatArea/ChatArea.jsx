@@ -10,7 +10,7 @@ const ChatArea = ({ selectedChat, messages, isAIEnabled, toggleAI }) => {
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
-    console.log("Mensaje enviado:", message);
+    //console.log("Mensaje enviado:", message);
     setMessage("");
   };
 
