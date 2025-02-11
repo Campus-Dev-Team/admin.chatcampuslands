@@ -106,12 +106,13 @@ export const DashboardReports = () => {
     try {
       const totalUsers = cityFilteredData.length;
       const registeredUsersCount = registeredCount.length;
-
+      
       const conversionRate = totalUsers > 0
-        ? ((registeredUsersCount / totalUsers) * 100)
-        : 0;
-
+      ? ((registeredUsersCount / totalUsers) * 100)
+      : 0;
+      
       const registeredUsersTotal = allRegisteredUsers.length;
+      console.log(allRegisteredUsers);
       const costPerUser = registeredUsersTotal > 0
         ? (spentAmount / registeredUsersTotal)
         : 0;
