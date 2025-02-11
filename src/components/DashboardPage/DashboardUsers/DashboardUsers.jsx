@@ -26,6 +26,7 @@ export const DashboardUsers = () => {
   const [originalUsers, setOriginalUsers] = useState([]); // Lista de usuarios sin filtrar
   const [addressee, setAddressee] = useState([]); // Lista de destinatarios final
   const [filteredUsers, setFilteredUsers] = useState([]); // Lista de usuarios filtrados
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false); // Estado de carga para el filtrado
 
   // Estados para manejar el modo de carga de Excel
   const [isExcelMode, setIsExcelMode] = useState(false); // Indicador si está en modo Excel
@@ -106,12 +107,17 @@ export const DashboardUsers = () => {
 
   // Maneja el filtrado de usuarios por estado y ciudad seleccionada
   const handleGetUsersByState = async (state) => {
-    if (!selectedCity) return;
+    setIsLoadingUsers(true);
+
+    if (!selectedCity) {
+      setIsLoadingUsers(false);
+      return;
+    }
 
     const usersToFilter = isExcelMode ? excelData : originalUsers;
 
     if (!usersToFilter?.length) {
-      toast.warn("No hay usuarios disponibles", toastStyles);
+      setIsLoadingUsers(false);
       return;
     }
 
@@ -124,7 +130,7 @@ export const DashboardUsers = () => {
     };
 
     if (!dataUsers.list.length) {
-      toast.warn("No se encontraron números válidos", toastStyles);
+      setIsLoadingUsers(false);
       return;
     }
 
@@ -160,15 +166,15 @@ export const DashboardUsers = () => {
           }))
         );
       }
-
       setFilteredUsers(response.data);
+      setIsLoadingUsers(false);
     } catch (error) {
-      // Manejo de errores
+      setIsLoadingUsers(false);
       toast.error("Error al filtrar usuarios", toastStyles);
       setFilteredUsers([]);
       setAddressee([]);
     }
-  };
+};
 
   // Maneja el cambio de ciudad seleccionada
   const handleCityChange = (city) => {
@@ -339,6 +345,7 @@ export const DashboardUsers = () => {
                   citySelected={selectedCity}
                   stateSelected={currentState}
                   onSendMessages={handleSendMessages}
+                  isLoading={isLoadingUsers}  // Añadimos esta prop
                 />
               )}
             </div>

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
-export const SendMessageButton = ({ selectedTemplate, citySelected, stateSelected, onSendMessages }) => {
+export const SendMessageButton = ({ selectedTemplate, citySelected, stateSelected, usersExist, onSendMessages }) => {
   const [isSending, setIsSending] = useState(false);
 
   const handleClick = async () => {
@@ -17,7 +17,7 @@ export const SendMessageButton = ({ selectedTemplate, citySelected, stateSelecte
   return (
     <Button
       className="w-full bg-cyan-500 hover:bg-cyan-600 text-white disabled:bg-slate-600"
-      disabled={!selectedTemplate || !citySelected || !stateSelected || isSending}
+      disabled={!selectedTemplate || !citySelected || !stateSelected || usersExist == 0 || isSending}
       onClick={handleClick}
     >
       {isSending ? (
