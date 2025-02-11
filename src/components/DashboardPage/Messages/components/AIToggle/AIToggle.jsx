@@ -1,7 +1,7 @@
 import React from "react";
 
 const AIToggle = ({ isAIEnabled, toggleAI }) => {
-  console.log(isAIEnabled);
+  //console.log(isAIEnabled);
   
   return (
     <div className="flex items-center gap-4 order-2">

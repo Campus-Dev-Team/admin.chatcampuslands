@@ -12,7 +12,7 @@ export const UserMessagePanel = ({
 }) => {
 
   useEffect(() => {
-    console.log("lista de usuarios:", selectedUsers);
+    //console.log("lista de usuarios:", selectedUsers);
   }, [selectedUsers]); 
 
   return (
