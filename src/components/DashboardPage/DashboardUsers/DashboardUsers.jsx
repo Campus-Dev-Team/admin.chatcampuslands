@@ -177,6 +177,10 @@ export const DashboardUsers = () => {
       template: selectedTemplate,
     };
   
+    //in reseterar los selects
+    setSelectedCity(null)
+    setCurrentState(null)
+
     // Mostrar toast de "Enviando mensaje..."
     const sendingToastId = toast.info("📨 Enviando mensaje...", {
       position: "top-right",
