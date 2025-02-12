@@ -1,5 +1,5 @@
 // Utilidad mejorada para normalizar números de teléfono
-const normalizePhoneNumber = (phone) => {
+export const normalizePhoneNumber = (phone) => {
   if (!phone) return null;
   
   try {
@@ -39,8 +39,58 @@ const normalizePhoneNumber = (phone) => {
   }
 };
 
+// Utilidad para normalizar nombres de campos
+export const normalizeUserFields = (user) => {
+  if (!user) return null;
+
+  try {
+    // Buscar el nombre en diferentes variaciones de la propiedad
+    const name = user.name || user.Name || user.username || user.USERNAME || 'Sin nombre';
+    
+    // Buscar el teléfono en diferentes variaciones de la propiedad y normalizarlo
+    const rawPhone = user.phone || user.Phone || user.telefono || user.PHONE;
+    const phone = normalizePhoneNumber(rawPhone);
+    
+    // Si no hay teléfono válido, retornar null
+    if (!phone) return null;
+
+    return {
+      username: name.trim(),
+      phone: phone,
+      // Mantener otros campos relevantes si existen
+      ...Object.keys(user).reduce((acc, key) => {
+        if (!['name', 'Name', 'phone', 'Phone', 'telefono', 'PHONE', 'username', 'USERNAME'].includes(key)) {
+          acc[key] = user[key];
+        }
+        return acc;
+      }, {})
+    };
+  } catch (error) {
+    console.error('Error al normalizar campos de usuario:', error);
+    return null;
+  }
+};
+
+// Utilidad para procesar lista de usuarios
+export const processUsersList = (users) => {
+  if (!Array.isArray(users)) return [];
+  
+  try {
+    return users
+      .map(normalizeUserFields)
+      .filter(Boolean) // Filtrar usuarios nulos o inválidos
+      .map((user, index) => ({
+        id: index + 1,
+        ...user
+      }));
+  } catch (error) {
+    console.error('Error al procesar lista de usuarios:', error);
+    return [];
+  }
+};
+
 // Utilidad para añadir prefijo 57 cuando sea necesario
-const add57Prefix = (phone) => {
+export const add57Prefix = (phone) => {
   if (!phone) return null;
 
   try {
