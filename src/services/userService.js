@@ -74,7 +74,13 @@ export const getAllusers = async () => {
 
     const response = await axios.get(endpoints.allUsers, config);
 
-    return response;
+    // Filter out user with ID 16 from the response data
+    const filteredData = {
+      ...response,
+      data: response.data.filter(user => user.id !== 16)
+    };
+
+    return filteredData;
   } catch (error) {
     console.error("Error fetching users", error);
     throw error;

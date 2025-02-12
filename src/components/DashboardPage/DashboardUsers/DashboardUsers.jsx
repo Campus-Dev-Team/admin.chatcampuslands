@@ -9,6 +9,11 @@ import {
   getUsersByStateBogota,
   getUsersByStateBucaramanga,
 } from "@/services/userService";
+import {
+  normalizePhoneNumber,
+  processUsersList,
+  add57Prefix
+} from "../../../services/userDataUtils";
 import { StateSelection } from "./components/StateSelection";
 import ExcelUpload from "./components/ExcelUpload";
 import { DashboardHeader } from "./components/DashboardHeader";
@@ -64,16 +69,14 @@ export const DashboardUsers = () => {
     return phoneStr.length === 10 ? phoneStr : "0"; // Devuelve "0" si no cumple la longitud
   };
 
-  // Utilidad para añadir el prefijo 57 al número de teléfono si no lo tiene
-  const add57ToPhone = (phone) => (phone.startsWith("57") ? phone : `57${phone}`);
-
   // Carga inicial de los usuarios cuando no está en modo Excel
   useEffect(() => {
     const loadUsersIza = async () => {
       try {
-        const usersData = await getAllusers(); // Llama al servicio para obtener usuarios
-        setOriginalUsers(usersData.data);
-        setAddressee(usersData.data);
+        const usersData = await getAllusers();
+        const processedUsers = processUsersList(usersData.data);
+        setOriginalUsers(processedUsers);
+        setAddressee(processedUsers);
       } catch (error) {
         toast.error("Error al cargar usuarios", toastStyles);
       }
@@ -125,7 +128,7 @@ export const DashboardUsers = () => {
     const dataUsers = {
       status: state,
       list: usersToFilter
-        .map((user) => cleanPhoneNumber(user.phone))
+        .map(user => normalizePhoneNumber(user.phone))
         .filter(Boolean),
     };
 
@@ -135,7 +138,6 @@ export const DashboardUsers = () => {
     }
 
     try {
-      // Llama al servicio según la ciudad seleccionada
       const response =
         selectedCity === "Bogota"
           ? await getUsersByStateBogota(dataUsers)
@@ -144,28 +146,22 @@ export const DashboardUsers = () => {
       const filteredResponseUsers = response?.data?.users || [];
 
       if (state === "NO_REGISTRADO") {
-        // Para usuarios no registrados, filtra la lista original
+        // Para usuarios no registrados, filtra y procesa la lista original
         const matchingUsers = usersToFilter.filter((user) =>
-          filteredResponseUsers.includes(cleanPhoneNumber(user.phone))
+          filteredResponseUsers.includes(normalizePhoneNumber(user.phone))
         );
 
-        setAddressee(
-          matchingUsers.map((user, index) => ({
-            id: index + 1,
-            username: user.name || user.username,
-            phone: cleanPhoneNumber(user.phone),
-          }))
-        );
+        setAddressee(processUsersList(matchingUsers));
       } else {
-        // Para otros estados, se utilizan los datos filtrados directamente
+        // Para otros estados, procesa los datos filtrados
         setAddressee(
-          filteredResponseUsers.map((user, index) => ({
-            id: index + 1,
-            username: user.name,
-            phone: cleanPhoneNumber(user.phone),
-          }))
+          processUsersList(filteredResponseUsers.map(user => ({
+            name: user.name,
+            phone: user.phone
+          })))
         );
       }
+
       setFilteredUsers(response.data);
       setIsLoadingUsers(false);
     } catch (error) {
@@ -184,17 +180,18 @@ export const DashboardUsers = () => {
 
   // Maneja los datos cargados desde un archivo Excel
   const handleExcelData = (data) => {
-    setOriginalUsers([]); // Resetea usuarios originales
+    setOriginalUsers([]);
     setSelectedCity(null);
     setCurrentState(null);
-    setExcelData(data);
-    setAddressee(data); // Configura los destinatarios con los datos de Excel
+    const processedData = processUsersList(data);
+    setExcelData(processedData);
+    setAddressee(processedData);
   };
 
   // Maneja el envío masivo de mensajes
   const handleSendMessages = async () => {
     const phoneNumbers = addressee
-      .map((user) => add57ToPhone(user.phone || user.telefono))
+      .map(user => add57Prefix(user.phone))
       .filter(Boolean);
 
     const dataMasiveMessage = {
@@ -287,10 +284,6 @@ export const DashboardUsers = () => {
       );
     }
   };
-
-
-
-
 
   // Renderización del componente
   return (
