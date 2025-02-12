@@ -30,9 +30,15 @@ export const SendMessageButton = ({
       }, 3000);
     }
   };
+  
+  const falseClick = () =>{
+    // Iniciar simulación de progreso
+    simulateProgress(usersExist);
+  }
 
   return (
     <div className="space-y-4 flex flex-col justify-center items-center">
+            
       {isSending && progress.total > 0 && (
         <ProgressBar
           progress={progress.current}
