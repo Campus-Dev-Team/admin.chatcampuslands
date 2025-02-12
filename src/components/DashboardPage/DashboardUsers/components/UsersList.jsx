@@ -35,7 +35,7 @@ export const UserList = ({ selectedUsers, stateSelected }) => {
                 Se enviará la plantilla a {selectedUsers.length} usuario{selectedUsers.length !== 1 ? 's' : ''} seleccionado{selectedUsers.length !== 1 ? 's' : ''}.
               </p>
             </div>
-            <div className="flex-1 overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
+            <div className="flex-1 overflow-y-auto pr-2 space-y-2 scrollbar-custom">
               {filteredUsers.map((user, index) => (
                 <div
                   key={user.uniqueKey}
