@@ -196,29 +196,47 @@ export const DashboardUsers = () => {
     const phoneNumbers = addressee
       .map((user) => add57ToPhone(user.phone || user.telefono))
       .filter(Boolean);
-
+  
     const dataMasiveMessage = {
       toList: phoneNumbers,
       template: selectedTemplate,
     };
-
+  
     // Resetea selecciones
     setSelectedCity(null);
     setCurrentState(null);
-
+  
     // Muestra un mensaje de carga mientras se envían los mensajes
     const sendingToastId = toast.loading(
       <div className="flex items-center space-x-2">
-        <span className="text-cyan-400">📨</span>
         <span>Enviando mensajes...</span>
       </div>,
       toastStyles
     );
-
+  
     try {
       const response = await sendTemplates(dataMasiveMessage);
       const { success = [], failed = [] } = response.data;
-
+      
+  
+      console.log(response.data);
+  
+      // ------------------------------
+      // Nueva lógica para eliminar duplicados [esto es provicional mientra el backen entrega el los datos sin duplicados]
+      // ------------------------------
+  
+      // 1. Eliminar duplicados en el array de éxitos
+      const uniqueSuccess = [...new Set(success)];
+  
+      // 2. Eliminar duplicados en fallidos y, además, omitir números que ya están en success
+      const uniqueFailed = [...new Set(failed)].filter(
+        (numero) => !uniqueSuccess.includes(numero)
+      );
+  
+      // ------------------------------
+      // Fin de la nueva lógica para deduplicar
+      // ------------------------------
+  
       // Detalles de usuarios con éxito y fallo
       const getDetailsWithNames = (numbersList) =>
         numbersList.map((number) => {
@@ -227,7 +245,7 @@ export const DashboardUsers = () => {
             const userPhone = cleanPhoneNumber(user.phone || user.telefono);
             return userPhone === cleanNumber;
           });
-
+  
           return {
             number,
             name: userDetails
@@ -235,22 +253,21 @@ export const DashboardUsers = () => {
               : "Desconocido",
           };
         });
-
+  
       setMessageStatus({
-        success,
-        failed,
-        successDetails: getDetailsWithNames(success),
-        failedDetails: getDetailsWithNames(failed),
+        success: uniqueSuccess,
+        failed: uniqueFailed,
+        successDetails: getDetailsWithNames(uniqueSuccess),
+        failedDetails: getDetailsWithNames(uniqueFailed),
       });
-
+  
       toast.dismiss(sendingToastId);
-
+  
       // Mensajes de resultado
-      if (success.length > 0 && failed.length === 0) {
+      if (uniqueSuccess.length > 0 && uniqueFailed.length === 0) {
         toast.success(
           <div className="flex items-center space-x-2 cursor-pointer">
-            <span className="text-emerald-400">✅</span>
-            <span>{success.length} mensajes enviados exitosamente!</span>
+            <span>{uniqueSuccess.length} mensajes enviados exitosamente!</span>
             <span className="text-xs text-cyan-300">(Click para ver detalles)</span>
           </div>,
           {
@@ -258,12 +275,11 @@ export const DashboardUsers = () => {
             onClick: () => setIsModalOpen(true), // Abre el modal al hacer clic
           }
         );
-      } else if (failed.length > 0) {
+      } else if (uniqueFailed.length > 0) {
         toast.warn(
           <div className="flex items-center space-x-2 cursor-pointer">
-            <span className="text-amber-400">⚠️</span>
             <span>
-              {success.length} enviados, {failed.length} fallidos
+              {uniqueSuccess.length} enviados, {uniqueFailed.length} fallidos
             </span>
             <span className="text-xs text-cyan-300">(Click para ver detalles)</span>
           </div>,
@@ -277,13 +293,15 @@ export const DashboardUsers = () => {
       toast.dismiss(sendingToastId);
       toast.error(
         <div className="flex items-center space-x-2">
-          <span className="text-red-400">❌</span>
           <span>Error al enviar los mensajes</span>
         </div>,
         toastStyles
       );
     }
   };
+  
+
+  
 
   // Renderización del componente
   return (
