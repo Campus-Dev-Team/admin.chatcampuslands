@@ -76,7 +76,6 @@ const normalizeDataIza = (usersData, messagesData) => {
     return cityMap[cityId] || null;
   };
 
-  // Primero vamos a verificar los datos
   // console.log('Total usuarios:', usersData.length);
   // console.log('Total mensajes:', messagesData.length);
 

@@ -61,11 +61,22 @@ export const DashboardReports = () => {
 
   const allRegisteredUsers = useMemo(() => {
     if (!Array.isArray(filteredDataIza)) return [];
-    const allUsers = [...(campusData?.usersBucaramanga || []), ...(campusData?.usersBogota || [])];
+
     return filteredDataIza.filter(user => {
       if (!user?.PhoneNumber) return false;
       const userPhone = formatPhone(user.PhoneNumber);
-      return allUsers.some(regUser => formatPhone(regUser.phone) === userPhone);
+
+      // Verificar si el usuario está registrado en su ciudad correspondiente
+      if (user.city === "Bucaramanga") {
+        return campusData?.usersBucaramanga?.some(
+          regUser => formatPhone(regUser.phone) === userPhone
+        );
+      } else if (user.city === "Bogota") {
+        return campusData?.usersBogota?.some(
+          regUser => formatPhone(regUser.phone) === userPhone
+        );
+      }
+      return false;
     });
   }, [filteredDataIza, campusData]);
 
@@ -106,13 +117,13 @@ export const DashboardReports = () => {
     try {
       const totalUsers = cityFilteredData.length;
       const registeredUsersCount = registeredCount.length;
-      
+
       const conversionRate = totalUsers > 0
-      ? ((registeredUsersCount / totalUsers) * 100)
-      : 0;
-      
+        ? ((registeredUsersCount / totalUsers) * 100)
+        : 0;
+
       const registeredUsersTotal = allRegisteredUsers.length;
-      //console.log(allRegisteredUsers);
+      console.log(allRegisteredUsers);
       const costPerUser = registeredUsersTotal > 0
         ? (spentAmount / registeredUsersTotal)
         : 0;
