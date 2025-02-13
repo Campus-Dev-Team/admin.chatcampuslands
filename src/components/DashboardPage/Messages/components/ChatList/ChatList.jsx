@@ -23,13 +23,13 @@ const formatLastConnection = (dateString) => {
 };
 
 const ChatList = ({ chats, selectedChat, setSelectedChat }) => {
-  
+  const activeChats = chats.filter(chat => chat.lastConnection);
   return (
     <Card className="bg-slate-800/50 h-[80.3vh] border-slate-700 backdrop-blur-sm overflow-x-clip overflow-y-scroll scrollbar-custom">
       <CardContent className="p-6 pr-2">
         <h3 className="text-xl font-semibold text-cyan-400 mb-4">Chats</h3>
         <div className="space-y-4">
-          {chats.map((chat) => (
+          {activeChats.map((chat) => (
             <div
               key={chat.userId}
               onClick={() => setSelectedChat(chat)}
@@ -46,11 +46,9 @@ const ChatList = ({ chats, selectedChat, setSelectedChat }) => {
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
                     <p className="text-white font-medium truncate max-w-[70%]">{chat.username}</p>
-                    {chat.lastConnection && (
-                      <span className="text-xs text-gray-400">
-                        {formatLastConnection(chat.lastConnection)}
-                      </span>
-                    )}
+                    <span className="text-xs text-gray-400">
+                      {formatLastConnection(chat.lastConnection)}
+                    </span>
                   </div>
                   <p className="font-thin text-sm text-gray-300">
                     +{chat.phone}
