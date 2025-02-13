@@ -74,10 +74,10 @@ export const getAllusers = async () => {
 
     const response = await axios.get(endpoints.allUsers, config);
 
-    // Filter out user with ID 16 from the response data
+    // Filter out user with ID 60 from the response data
     const filteredData = {
       ...response,
-      data: response.data.filter(user => user.id !== 16)
+      data: response.data.filter(user => user.id !== 60)
     };
 
     return filteredData;
