@@ -41,7 +41,8 @@ export const DashboardNavbar = () => {
       icon: <MessagesSquare className="h-5 w-5" />, // Cambiado a Send
       label: "Mensajes Masivos",
       path: "/dashboard/users",
-      inDevelopment: true
+      inDevelopment: false,
+      inBeta: true
     },
     {
       icon: <Settings className="h-5 w-5" />,
@@ -120,15 +121,26 @@ export const DashboardNavbar = () => {
                 {!isCollapsed && <span className="ml-3">{item.label}</span>}
               </div>
               {item.inDevelopment && !isCollapsed && (
-                <span className="text-xs px-2 py-0.5 bg-cyan-400/20 text-cyan-400 rounded-full">
+                <span className="text-[0.6em] px-2 py-0.5 bg-cyan-400/20 text-cyan-400 rounded-full">
                   En desarrollo
                 </span>
               )}
               {item.inDevelopment && isCollapsed && (
-                <div className="absolute left-16 bg-slate-800 text-cyan-400 px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute left-16 bg-slate-800 text-cyan-400 px-2 py-1 rounded text-[0.6em] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                   En desarrollo
                 </div>
               )}
+              {item.inBeta && !isCollapsed && (
+                <span className="text-[0.6em] px-2 py-0.5 bg-cyan-400/20 text-cyan-400 rounded-full">
+                  Beta
+                </span>
+              )}
+              {item.inBeta && isCollapsed && (
+                <div className="absolute left-16 bg-slate-800 text-cyan-400 px-2 py-1 rounded text-[0.6em] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                  Beta
+                </div>
+              )}
+              
             </button>
           ))}
         </div>
