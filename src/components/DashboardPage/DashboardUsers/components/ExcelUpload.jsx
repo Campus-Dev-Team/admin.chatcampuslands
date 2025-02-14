@@ -48,7 +48,7 @@ const ExcelUpload = ({ onDataProcessed }) => {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet);
-      console.log(data);
+      //console.log(data);
       
       onDataProcessed(data);
     };
@@ -56,7 +56,7 @@ const ExcelUpload = ({ onDataProcessed }) => {
   };
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 flex justify-center items-center h-full mt-5">
+    <Card className="bg-slate-800/50 border-slate-700 flex justify-center items-center h-[80vh] md:h-[40vh] lg:h-[50vh] overflow-hidden  mt-5">
       <div
         onDragEnter={handleDragIn}
         onDragLeave={handleDragOut}

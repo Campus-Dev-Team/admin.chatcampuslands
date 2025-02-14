@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { TitleHeader } from "../components/TitleHeader";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { TemplatesList } from "@/components/DashboardPage/DashboardUsers/components/TemplatesList";
 import { getAllTemplates, sendTemplates } from "@/services/templateService";
 import { UserMessagePanel } from "./components/UserMessagePanel";
@@ -10,83 +9,133 @@ import {
   getUsersByStateBogota,
   getUsersByStateBucaramanga,
 } from "@/services/userService";
+import {
+  normalizePhoneNumber,
+  processUsersList,
+  add57Prefix
+} from "../../../services/userDataUtils";
 import { StateSelection } from "./components/StateSelection";
 import ExcelUpload from "./components/ExcelUpload";
-import { StepIndicator } from "./components/StepIndicator";
+import { DashboardHeader } from "./components/DashboardHeader";
+import MessageStatusModal from "./components/MessageStatusModal";
 
+// Componente principal del dashboard de usuarios
 export const DashboardUsers = () => {
-  // Basic states
+  // Estados para manejar las plantillas y la ciudad seleccionada
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [templates, setTemplates] = useState([]);
   const [selectedCity, setSelectedCity] = useState(null);
 
-  // User handling states
+  // Estados para manejar los usuarios y filtros
   const [currentState, setCurrentState] = useState(null);
-  const [originalUsers, setOriginalUsers] = useState([]); // Store original user list
-  const [addressee, setAddressee] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [originalUsers, setOriginalUsers] = useState([]); // Lista de usuarios sin filtrar
+  const [addressee, setAddressee] = useState([]); // Lista de destinatarios final
+  const [filteredUsers, setFilteredUsers] = useState([]); // Lista de usuarios filtrados
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false); // Estado de carga para el filtrado
 
-  // Excel handling states
-  const [isExcelMode, setIsExcelMode] = useState(false);
-  const [excelData, setExcelData] = useState(null);
+  // Estados para manejar el modo de carga de Excel
+  const [isExcelMode, setIsExcelMode] = useState(false); // Indicador si está en modo Excel
+  const [excelData, setExcelData] = useState(null); // Datos cargados desde el archivo Excel
 
-  // Phone number utilities
+  // Estados para el manejo del modal de estado de mensajes
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [messageStatus, setMessageStatus] = useState({
+    success: [],
+    failed: [],
+    successDetails: [],
+    failedDetails: [],
+  });
+
+  // Configuración de estilos para los mensajes de notificación (toast)
+  const toastStyles = {
+    style: {
+      background: "#1e293b",
+      color: "#f1f5f9",
+      borderRadius: "0.5rem",
+      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+    },
+    position: "top-right",
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+  };
+
+  // Utilidad para limpiar el número de teléfono (remueve prefijo 57 y valida longitud)
   const cleanPhoneNumber = (phone) => {
     if (!phone) return null;
-    let phoneStr = phone.toString();
-    if (phoneStr.startsWith("57")) {
-      phoneStr = phoneStr.slice(2);
-    }
-    return phoneStr.length === 10 ? phoneStr : "0";
+    const phoneStr = phone.toString().replace(/^57/, "");
+    return phoneStr.length === 10 ? phoneStr : "0"; // Devuelve "0" si no cumple la longitud
   };
 
-  const add57ToPhone = (phone) => {
-    let phoneStr = phone.toString();
-    return phoneStr.startsWith("57") ? phoneStr : `57${phoneStr}`;
-  };
-
-  // Load IZA users
+  // Carga inicial de los usuarios cuando no está en modo Excel
   useEffect(() => {
     const loadUsersIza = async () => {
       try {
         const usersData = await getAllusers();
-        setOriginalUsers(usersData.data); // Store original data
-        setAddressee(usersData.data);
+        const processedUsers = processUsersList(usersData.data);
+        setOriginalUsers(processedUsers);
+        setAddressee(processedUsers);
       } catch (error) {
-        console.error("Error loading users:", error);
+        toast.error("Error al cargar usuarios", toastStyles);
       }
     };
 
     if (!isExcelMode) {
       loadUsersIza();
     }
+  }, [isExcelMode]); // Se ejecuta cuando cambia el estado de `isExcelMode`
+
+  // Carga inicial de las plantillas al montar el componente
+  useEffect(() => {
+    const loadTemplates = async () => {
+      try {
+        const templatesData = await getAllTemplates(); // Llama al servicio para obtener plantillas
+        setTemplates(templatesData.data);
+      } catch (error) {
+        toast.error("Error al cargar plantillas", toastStyles);
+      }
+    };
+
+    loadTemplates();
+  }, []); // Solo se ejecuta una vez al montar el componente
+
+  // Limpia los datos de Excel cuando se desactiva el modo Excel
+  useEffect(() => {
+    if (!isExcelMode) {
+      setExcelData(null);
+    }
   }, [isExcelMode]);
 
-  // Load templates
-  useEffect(() => {
-    loadTemplates();
-  }, []);
+  // Maneja el filtrado de usuarios por estado y ciudad seleccionada
+  const handleGetUsersByState = async (state) => {
+    setIsLoadingUsers(true);
 
-  const loadTemplates = async () => {
-    try {
-      const templatesData = await getAllTemplates();
-      setTemplates(templatesData.data);
-    } catch (error) {
-      console.error("Error loading templates:", error);
+    if (!selectedCity) {
+      setIsLoadingUsers(false);
+      return;
     }
-  };
 
-  // Keep using the existing city-specific endpoints
-  const handleGetUsersByState = async (currentState) => {
-    if (!selectedCity) return;
+    const usersToFilter = isExcelMode ? excelData : originalUsers;
 
-    const usersToFilter = isExcelMode ? addressee : originalUsers;
+    if (!usersToFilter?.length) {
+      setIsLoadingUsers(false);
+      return;
+    }
+
+    // Filtra usuarios válidos por número de teléfono
     const dataUsers = {
-      status: currentState,
+      status: state,
       list: usersToFilter
-        .map((user) => cleanPhoneNumber(user.phone))
+        .map(user => normalizePhoneNumber(user.phone))
         .filter(Boolean),
     };
+
+    if (!dataUsers.list.length) {
+      setIsLoadingUsers(false);
+      return;
+    }
 
     try {
       const response =
@@ -94,116 +143,186 @@ export const DashboardUsers = () => {
           ? await getUsersByStateBogota(dataUsers)
           : await getUsersByStateBucaramanga(dataUsers);
 
-      if (currentState === "NO_REGISTRADO") {
-        const matchingUsers = usersToFilter.filter(user => 
-          response.data.users.includes(cleanPhoneNumber(user.phone))
+      const filteredResponseUsers = response?.data?.users || [];
+
+      if (state === "NO_REGISTRADO") {
+        // Para usuarios no registrados, filtra y procesa la lista original
+        const matchingUsers = usersToFilter.filter((user) =>
+          filteredResponseUsers.includes(normalizePhoneNumber(user.phone))
         );
-        
-        setAddressee(
-          matchingUsers.map((user, index) => ({
-            id: index + 1,
-            username: user.name || user.username,
-            phone: cleanPhoneNumber(user.phone)
-          }))
-        );
+
+        setAddressee(processUsersList(matchingUsers));
       } else {
+        // Para otros estados, procesa los datos filtrados
         setAddressee(
-          response.data.users.map((user, index) => ({
-            id: index + 1,
-            username: user.name,
-            phone: cleanPhoneNumber(user.phone),
-          }))
+          processUsersList(filteredResponseUsers.map(user => ({
+            name: user.name,
+            phone: user.phone
+          })))
         );
       }
+
       setFilteredUsers(response.data);
+      setIsLoadingUsers(false);
     } catch (error) {
-      console.error("Error al obtener usuarios:", error);
+      setIsLoadingUsers(false);
+      toast.error("Error al filtrar usuarios", toastStyles);
       setFilteredUsers([]);
-      setAddressee(originalUsers);
+      setAddressee([]);
     }
   };
 
-  // Update city handler
-  const handleCityChange = (newCity) => {
-    setSelectedCity(newCity);
-    if (currentState) {
-      handleGetUsersByState(currentState);
-      console.log(newCity, currentState, selectedCity);
-    } else {
-      // If no state is selected, keep original users
-      setAddressee(originalUsers);
-    }
+  // Maneja el cambio de ciudad seleccionada
+  const handleCityChange = (city) => {
+    setSelectedCity(city);
+    setCurrentState(null); // Resetea el estado actual
   };
 
+  // Maneja los datos cargados desde un archivo Excel
+  const handleExcelData = (data) => {
+    setOriginalUsers([]);
+    setSelectedCity(null);
+    setCurrentState(null);
+    const processedData = processUsersList(data);
+    setExcelData(processedData);
+    setAddressee(processedData);
+  };
+
+  // Maneja el envío masivo de mensajes
   const handleSendMessages = async () => {
     const phoneNumbers = addressee
-      .map((user) => add57ToPhone(user.phone || user.telefono))
-      .filter((number) => number !== null);
+      .map(user => add57Prefix(user.phone))
+      .filter(Boolean);
 
     const dataMasiveMessage = {
       toList: phoneNumbers,
       template: selectedTemplate,
     };
 
+    // Resetea selecciones
+    setSelectedCity(null);
+    setCurrentState(null);
+
+    // Muestra un mensaje de carga mientras se envían los mensajes
+    const sendingToastId = toast.loading(
+      <div className="flex items-center space-x-2">
+        <span>Enviando mensajes...</span>
+      </div>,
+      toastStyles
+    );
+
     try {
       const response = await sendTemplates(dataMasiveMessage);
-      console.log("Mensajes masivos enviados exitosamente", response);
+      const { success = [], failed = [] } = response.data;
+
+      console.log(response.data);
+
+      // Nueva lógica para eliminar duplicados (provisional mientras el backend entrega datos sin duplicados)
+
+      // 1. Eliminar duplicados en el array de éxitos
+      const uniqueSuccess = [...new Set(success)];
+
+      // 2. Eliminar duplicados en fallidos y, además, omitir números que ya están en success
+      const uniqueFailed = [...new Set(failed)].filter(
+        (numero) => !uniqueSuccess.includes(numero)
+      );
+
+      // Detalles de usuarios con éxito y fallo
+      const getDetailsWithNames = (numbersList) =>
+        numbersList.map((number) => {
+          const cleanNumber = number.startsWith("57") ? number.slice(2) : number;
+          const userDetails = addressee.find((user) => {
+            const userPhone = cleanPhoneNumber(user.phone || user.telefono);
+            return userPhone === cleanNumber;
+          });
+
+          return {
+            number,
+            name: userDetails
+              ? userDetails.username || userDetails.name || "Sin nombre"
+              : "Desconocido",
+          };
+        });
+
+      setMessageStatus({
+        success: uniqueSuccess,
+        failed: uniqueFailed,
+        successDetails: getDetailsWithNames(uniqueSuccess),
+        failedDetails: getDetailsWithNames(uniqueFailed),
+      });
+
+      toast.dismiss(sendingToastId);
+
+      // Se muestra el modal de resultados por defecto
+      setIsModalOpen(true);
+
+      // Mensajes de resultado
+      if (uniqueSuccess.length > 0 && uniqueFailed.length === 0) {
+        toast.success(
+          <div className="flex items-center space-x-2">
+            <span>{uniqueSuccess.length} mensajes enviados exitosamente!</span>
+          </div>,
+          toastStyles
+        );
+      } else if (uniqueFailed.length > 0) {
+        toast.warn(
+          <div className="flex items-center space-x-2">
+            <span>
+              {uniqueSuccess.length} enviados, {uniqueFailed.length} fallidos
+            </span>
+          </div>,
+          toastStyles
+        );
+      }
     } catch (error) {
-      console.error("Error al enviar mensajes masivos", error);
+      toast.dismiss(sendingToastId);
+      toast.error(
+        <div className="flex items-center space-x-2">
+          <span>Error al enviar los mensajes</span>
+        </div>,
+        toastStyles
+      );
     }
   };
 
-  const handleExcelData = (data) => {
-    setOriginalUsers(data); // Store original Excel data
-    setAddressee(data);
-    setExcelData(true);
-  };
-
+  // Renderización del componente
   return (
     <div className="min-h-screen bg-slate-900">
-      <div className="container mx-auto p-6">
-        {/* Header Section */}
-        <div className="flex flex-wrap md:flex-nowrap justify-between items-center mb-8">
-          <TitleHeader title="Mensajes masivos" />
-          <div className="flex items-center mb-4 gap-3">
-            <StepIndicator
-              number={1}
-              active={!selectedTemplate}
-              text="Selecciona una plantilla"
-            />
-            <StepIndicator
-              number={2}
-              active={selectedTemplate && !selectedCity}
-              text="Selecciona una sede"
-              disabled={!selectedTemplate}
-            />
-            <StepIndicator
-              number={3}
-              active={selectedCity && !currentState}
-              text="Selecciona el estado"
-              disabled={!selectedCity}
-            />
-          </div>
-          <DataSourceSwitch
-            isExcelMode={isExcelMode}
-            setIsExcelMode={setIsExcelMode}
-          />
-        </div>
+      <div className="container mx-auto px-4 py-4 md:p-6 flex flex-col justify-center">
+        {/* Contenedor de notificaciones */}
+        <ToastContainer />
 
-        {/* Main Content */}
-        <div className="grid grid-cols-12 gap-6">
-          {/* Left Panel - Templates */}
-          <div className="col-span-12 lg:col-span-4">
+        {/* Modal de estado de mensajes */}
+        <MessageStatusModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          successList={messageStatus.success}
+          failedList={messageStatus.failed}
+          messageStatus={messageStatus}
+        />
+
+        {/* Encabezado del dashboard */}
+        <DashboardHeader
+          selectedTemplate={selectedTemplate}
+          selectedCity={selectedCity}
+          selectState={currentState}
+          isExcelMode={isExcelMode}
+          setIsExcelMode={setIsExcelMode}
+        />
+
+        {/* Contenido del dashboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+          {/* Lista de plantillas */}
+          <div className="lg:col-span-4">
             <TemplatesList
               templates={templates}
               sendTemplate={setSelectedTemplate}
             />
           </div>
 
-          {/* Right Panel - User Selection & Messages */}
-          <div className="col-span-12 lg:col-span-8">
-            {/* Filters Bar */}
-            {/* In DashboardUsers.jsx */}
+          {/* Panel principal */}
+          <div className="lg:col-span-8">
+            {/* Selección de estado */}
             <div className="bg-slate-800/50 rounded-lg p-4 mb-6">
               <StateSelection
                 currentState={currentState}
@@ -215,23 +334,18 @@ export const DashboardUsers = () => {
               />
             </div>
 
-            {/* User List or Excel Upload */}
+            {/* Panel de carga de Excel o usuarios */}
             <div className="bg-slate-800/50 rounded-lg">
-              {isExcelMode ? (
-                excelData ? (
-                  <UserMessagePanel
-                    selectedUsers={addressee}
-                    selectedTemplate={selectedTemplate}
-                    onSendMessages={handleSendMessages}
-                  />
-                ) : (
-                  <ExcelUpload onDataProcessed={handleExcelData} />
-                )
+              {isExcelMode && !excelData ? (
+                <ExcelUpload onDataProcessed={handleExcelData} />
               ) : (
                 <UserMessagePanel
                   selectedUsers={addressee}
                   selectedTemplate={selectedTemplate}
+                  citySelected={selectedCity}
+                  stateSelected={currentState}
                   onSendMessages={handleSendMessages}
+                  isLoading={isLoadingUsers}  // Añadimos esta prop
                 />
               )}
             </div>
@@ -241,22 +355,5 @@ export const DashboardUsers = () => {
     </div>
   );
 };
-
-const DataSourceSwitch = ({ isExcelMode, setIsExcelMode }) => (
-  <div className="flex items-center gap-3 bg-slate-800/50 p-3 rounded-lg">
-    <Label htmlFor="data-source" className="text-slate-200">
-      Excel
-    </Label>
-    <Switch
-      id="data-source"
-      checked={!isExcelMode}
-      onCheckedChange={(checked) => setIsExcelMode(!checked)}
-      className="data-[state=checked]:bg-cyan-500"
-    />
-    <Label htmlFor="data-source" className="text-slate-200">
-      IZA
-    </Label>
-  </div>
-);
 
 export default DashboardUsers;

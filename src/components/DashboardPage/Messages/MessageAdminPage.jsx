@@ -49,7 +49,7 @@ export const MessageAdminPage = () => {
   const toggleAI = async () => {
     setIsAIEnabled((prevState) => {
       const newState = !prevState;
-      console.log("IA", newState ? "Activada" : "Desactivada");
+      //console.log("IA", newState ? "Activada" : "Desactivada");
       return newState;
     });
 
@@ -62,9 +62,9 @@ export const MessageAdminPage = () => {
         chatId: selectedChat.id,
       };
 
-      console.log("Enviando cambio de modo:", dataToSend);
+      //console.log("Enviando cambio de modo:", dataToSend);
       const response = await updateChatMode(dataToSend);
-      console.log("Respuesta del servidor:", response);
+      //console.log("Respuesta del servidor:", response);
 
       if (!response.ok) {
         throw new Error(`Error al cambiar el modo: ${response.statusText}`);

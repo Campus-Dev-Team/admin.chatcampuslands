@@ -81,7 +81,16 @@ export default {
 			animation: {
 				'fade-in': 'fadeIn 0.3s ease-out forwards',
 				'slide-in': 'slideIn 0.4s ease-out forwards'
-			}
+			},
+			extend: {
+				screens: {
+					'sm': '640px',
+					'h720': {'raw': '(min-height: 720px)'},  // Cambiamos el nombre para evitar conflictos
+					'lg': '1024px',
+					'xl': '1280px',
+					'2xl': '1536px',
+				  }
+			  }
 		}
 	},
 	plugins: [require("tailwindcss-animate")]

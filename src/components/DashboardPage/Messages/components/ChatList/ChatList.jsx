@@ -1,11 +1,29 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { User } from 'lucide-react';
+import { format, isToday, isYesterday, differenceInDays, parseISO } from 'date-fns';
+import { es } from 'date-fns/locale';
+
+const formatLastConnection = (dateString) => {
+  if (!dateString) return null;
+  
+  const date = parseISO(dateString);
+  
+  if (isToday(date)) {
+    return format(date, 'HH:mm');
+  } else if (isYesterday(date)) {
+    return 'ayer';
+  } else if (differenceInDays(new Date(), date) < 7) {
+    // Capitalizar primera letra del día
+    const dayName = format(date, 'EEEE', { locale: es });
+    return dayName.charAt(0).toUpperCase() + dayName.slice(1);
+  } else {
+    return format(date, 'dd/MM/yyyy');
+  }
+};
 
 const ChatList = ({ chats, selectedChat, setSelectedChat }) => {
-
-  console.log(chats);
-
+  
   return (
     <Card className="bg-slate-800/50 h-[80.3vh] border-slate-700 backdrop-blur-sm overflow-x-clip overflow-y-scroll scrollbar-custom">
       <CardContent className="p-6 pr-2">
@@ -25,15 +43,21 @@ const ChatList = ({ chats, selectedChat, setSelectedChat }) => {
                 <div className="h-10 w-10 rounded-full bg-cyan-400/20 flex items-center justify-center">
                   <User className="w-5 h-5 min-w-[40px] text-cyan-400" />
                 </div>
-                <div>
-                  <p className="text-white font-medium">{chat.username}</p>
-                  <p className="text-white font-thin text-sm">
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <p className="text-white font-medium truncate max-w-[70%]">{chat.username}</p>
+                    {chat.lastConnection && (
+                      <span className="text-xs text-gray-400">
+                        {formatLastConnection(chat.lastConnection)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-thin text-sm text-gray-300">
                     +{chat.phone}
                   </p>
-                  <p className="text-white font-thin text-sm">
-                    #{chat.userId}
+                  <p className="font-thin text-sm text-gray-300">
+                    {chat.chatType}
                   </p>
-                
                 </div>
               </div>
             </div>

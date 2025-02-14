@@ -26,7 +26,7 @@ const handleSubmit = async (e) => {
   setIsLoading(true);
 
   try {
-    await login({"username": password, "phone": 11192006, "role": "ADMIN"});
+    await login({"username": password, "phone": 123456719, "role": "ADMIN"});
     localStorage.setItem('userName', 'Campuslands');
     setIsAuthenticated(true);
     navigate("/dashboard");
