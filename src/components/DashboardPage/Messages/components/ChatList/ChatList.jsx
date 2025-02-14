@@ -55,6 +55,9 @@ const ChatList = ({ chats, selectedChat, setSelectedChat }) => {
                   <p className="font-thin text-sm text-gray-300">
                     +{chat.phone}
                   </p>
+                  <p className="font-thin text-sm text-gray-300">
+                    {chat.chatType}
+                  </p>
                 </div>
               </div>
             </div>
