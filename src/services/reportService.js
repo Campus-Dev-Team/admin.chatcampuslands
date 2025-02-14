@@ -77,8 +77,8 @@ const normalizeDataIza = (usersData, messagesData) => {
   };
 
   // Primero vamos a verificar los datos
-  console.log('Total usuarios:', usersData.length);
-  console.log('Total mensajes:', messagesData.length);
+  // console.log('Total usuarios:', usersData.length);
+  // console.log('Total mensajes:', messagesData.length);
 
   // Agrupar mensajes por userId
   const messagesByUserId = messagesData.reduce((acc, message) => {
@@ -128,7 +128,7 @@ const normalizeDataIza = (usersData, messagesData) => {
   });
 
   // Verificar la normalización
-  console.log('Usuarios normalizados:', Object.keys(normalizedData).length);
+  // console.log('Usuarios normalizados:', Object.keys(normalizedData).length);
 
   return Object.values(normalizedData);
 };
