@@ -21,7 +21,7 @@ export const DashboardReports = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [ciudad, setCiudad] = useState("Bucaramanga");
   const [filteredDataIza, setFilteredDataIza] = useState([]);
-  const [campusData, setCampusData] = useState({ usersBucaramanga: [], usersBogota: [] });
+  const [campusData, setCampusData] = useState({ usersBucaramanga: [], usersBogota: [] , usersCajasan: [], usersTibu: [] });
   const [dates, setDates] = useState({ start: '', end: '' });
   const [spentAmount, setSpentAmount] = useState(() => {
     const savedAmount = localStorage.getItem('spentAmount');
@@ -53,11 +53,7 @@ export const DashboardReports = () => {
     );
   }, [filteredDataIza, ciudad]);
 
-  const registeredUsers = useMemo(() => {
-    return ciudad === "Bucaramanga"
-      ? campusData?.usersBucaramanga || []
-      : campusData?.usersBogota || [];
-  }, [campusData, ciudad]);
+  const registeredUsers = useMemo(() => campusData?.[`users${ciudad}`] || [], [campusData, ciudad]);
 
   const allRegisteredUsers = useMemo(() => {
     if (!Array.isArray(filteredDataIza)) return [];
@@ -75,6 +71,14 @@ export const DashboardReports = () => {
         return campusData?.usersBogota?.some(
           regUser => formatPhone(regUser.phone) === userPhone
         );
+      } else if (user.city === "Cajasan"){
+          return campusData?.usersCajasan?.some(
+            regUser => formatPhone(regUser.phone) === userPhone
+          );
+      } else if (user.city === "Tibu"){
+          return campusData?.usersTibu?.some(
+            regUser => formatPhone(regUser.phone) === userPhone
+          );
       }
       return false;
     });
@@ -95,7 +99,7 @@ export const DashboardReports = () => {
           throw new Error('Fechas inválidas');
         }
         const dataCampus = await fetchReportDataCampus(dates.start, dates.end);
-        if (!dataCampus?.usersBucaramanga || !dataCampus?.usersBogota) {
+        if (!dataCampus?.usersBucaramanga || !dataCampus?.usersBogota || !dataCampus?.usersCajasan || !dataCampus?.usersTibu) {
           throw new Error('Datos incompletos');
         }
         setCampusData(dataCampus);
@@ -123,7 +127,6 @@ export const DashboardReports = () => {
         : 0;
 
       const registeredUsersTotal = allRegisteredUsers.length;
-      console.log(allRegisteredUsers);
       const costPerUser = registeredUsersTotal > 0
         ? (spentAmount / registeredUsersTotal)
         : 0;
@@ -223,6 +226,8 @@ export const DashboardReports = () => {
               >
                 <option value="Bogota">Bogotá</option>
                 <option value="Bucaramanga">Bucaramanga</option>
+                <option value="Cajasan">Cajasan</option>
+                <option value="Tibu">Tibu</option>
               </select>
               <FiltrosReportes onDataFetched={handleDataFetched} />
               <ExcelDownloadButton
@@ -242,6 +247,7 @@ export const DashboardReports = () => {
           filteredData={cityFilteredData}
           campusData={campusData}
           ciudad={ciudad}
+          dates={dates}
         />
 
         <div className="mt-8">

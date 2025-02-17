@@ -5,22 +5,42 @@ import {
 } from 'recharts';
 import _ from 'lodash';
 
-const StatsCharts = ({ filteredData, campusData, ciudad }) => {
-  const [prevData, setPrevData] = useState([]);
+// Función auxiliar para generar un arreglo de fechas (en formato ISO "YYYY-MM-DD")
+const getDateRangeArray = (start, end) => {
+  const datesArr = [];
+  let current = new Date(start);
+  const endDate = new Date(end);
+  while (current <= endDate) {
+    datesArr.push(current.toISOString().split('T')[0]);
+    current.setDate(current.getDate() + 1);
+  }
+  return datesArr;
+};
+
+const StatsCharts = ({ filteredData, campusData, ciudad, dates }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const chartData = useMemo(() => {
+    // Si no hay datos en filteredData, se genera un arreglo de fechas con valores en 0
     if (!Array.isArray(filteredData) || filteredData.length === 0) {
-      return prevData;
+      if (dates && dates.start && dates.end) {
+        const dateRange = getDateRangeArray(dates.start, dates.end);
+        return dateRange.map(date => ({
+          date,
+          conversionRate: 0,
+          totalUsers: 0,
+          registeredUsers: 0
+        }));
+      }
+      // Si no se dispone de rango de fechas, se retorna un arreglo vacío
+      return [];
     }
 
-    const registeredUsers = ciudad === "Bucaramanga" 
-      ? campusData?.usersBucaramanga || []
-      : campusData?.usersBogota || [];
-
-    // Track first registration date for each user
+    const registeredUsers = campusData?.[`users${ciudad}`] || [];
+    // Mapa para rastrear la fecha del primer registro de cada usuario
     const firstRegistrationDates = new Map();
-    
+
+    // Se agrupan todos los mensajes por fecha
     const messagesByDate = _.groupBy(
       filteredData.flatMap(user => user.Messages || []),
       message => message.Time.split('T')[0]
@@ -30,9 +50,11 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
       .sort()
       .map(date => {
         const dailyMessages = messagesByDate[date];
+
+        // Se obtiene el conjunto de usuarios únicos que enviaron mensajes ese día
         const dailyUniqueUsers = new Set(
           dailyMessages.map(msg => {
-            const user = filteredData.find(u => 
+            const user = filteredData.find(u =>
               (u.Messages || []).some(m => m.MessageId === msg.MessageId)
             );
             return user ? user.PhoneNumber : null;
@@ -42,9 +64,9 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
         const totalUsers = dailyUniqueUsers.size;
         let registeredCount = 0;
 
-        // Check each user for registration
+        // Se verifica para cada usuario si está registrado
         dailyUniqueUsers.forEach(phoneNumber => {
-          const isRegistered = registeredUsers.some(regUser => 
+          const isRegistered = registeredUsers.some(regUser =>
             String(regUser.phone) === String(phoneNumber)
           );
 
@@ -56,7 +78,7 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
 
         return {
           date,
-          conversionRate: totalUsers > 0 
+          conversionRate: totalUsers > 0
             ? parseFloat(((registeredCount / totalUsers) * 100).toFixed(2))
             : 0,
           totalUsers,
@@ -64,15 +86,14 @@ const StatsCharts = ({ filteredData, campusData, ciudad }) => {
         };
       });
 
-    setPrevData(newData);
     return newData;
-  }, [filteredData, campusData, ciudad]);
+  }, [filteredData, campusData, ciudad, dates]);
 
   useEffect(() => {
     setIsLoading(true);
     const timer = setTimeout(() => setIsLoading(false), 300);
     return () => clearTimeout(timer);
-  }, [filteredData, campusData, ciudad]);
+  }, [filteredData, campusData, ciudad, dates]);
 
   return (
     <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8 transition-opacity duration-300 ${

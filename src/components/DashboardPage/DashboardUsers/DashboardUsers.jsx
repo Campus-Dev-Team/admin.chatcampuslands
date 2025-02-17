@@ -8,6 +8,8 @@ import {
   getAllusers,
   getUsersByStateBogota,
   getUsersByStateBucaramanga,
+  getUsersByStateCajasan,
+  getUsersByStateTibu
 } from "@/services/userService";
 import {
   normalizePhoneNumber,
@@ -141,7 +143,13 @@ export const DashboardUsers = () => {
       const response =
         selectedCity === "Bogota"
           ? await getUsersByStateBogota(dataUsers)
-          : await getUsersByStateBucaramanga(dataUsers);
+          : selectedCity === "Bucaramanga"
+            ? await getUsersByStateBucaramanga(dataUsers)
+            : selectedCity === "Cajasan"
+              ? await getUsersByStateCajasan(dataUsers)
+              : selectedCity === "Tibu"
+                ? await getUsersByStateTibu(dataUsers)
+                : []; 
 
       const filteredResponseUsers = response?.data?.users || [];
 
