@@ -1,16 +1,13 @@
 import React, { useEffect, useRef } from "react";
 
 const MessageList = ({ messages }) => {
-  // Crea una referencia al contenedor de mensajes
   const messageContainerRef = useRef(null);
 
-  // Desplazar al final cada vez que los mensajes cambien
   useEffect(() => {
-    // Verifica si la referencia está definida y realiza el scroll
     if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+      messageContainerRef.current.scrollTop = 0;
     }
-  }, [messages]); // Se ejecuta cada vez que cambian los mensajes
+  }, [messages]);
 
   return (
     <div
