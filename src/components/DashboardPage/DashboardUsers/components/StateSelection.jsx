@@ -54,6 +54,18 @@ export const StateSelection = ({
             >
               Bogotá
             </SelectItem>
+            <SelectItem
+              value="Cajasan"
+              className="text-slate-200  hover:bg-slate-700 focus:bg-slate-700 focus:text-slate-300"
+            >
+              Cajasan
+            </SelectItem>
+            <SelectItem
+              value="Tibu"
+              className="text-slate-200  hover:bg-slate-700 focus:bg-slate-700 focus:text-slate-300"
+            >
+              Tibu
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
