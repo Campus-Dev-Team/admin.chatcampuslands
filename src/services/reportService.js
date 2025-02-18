@@ -42,14 +42,18 @@ export const fetchReportDataCampus = async (startDate, endDate) => {
 
 
 
-    const [userCampusBogota, userCampusBucaramanga] = await Promise.all([
+    const [userCampusBogota, userCampusBucaramanga, userCampusCajasan, userCampusTibu] = await Promise.all([
       axios.get(endpoints.usersCampusBogota, { params, headers }),
-      axios.get(endpoints.usersCampusBucaramanga, { params, headers })
+      axios.get(endpoints.usersCampusBucaramanga, { params, headers }),
+      axios.get(endpoints.usersCampusCajasan, { params, headers }),
+      axios.get(endpoints.usersCampusTibu, { params, headers})
     ]);
 
     return {
       usersBogota: userCampusBogota.data,
-      usersBucaramanga: userCampusBucaramanga.data
+      usersBucaramanga: userCampusBucaramanga.data,
+      usersCajasan: userCampusCajasan.data,
+      usersTibu: userCampusTibu.data
     };
 
   } catch (error) {
@@ -71,7 +75,9 @@ const normalizeDataIza = (usersData, messagesData) => {
     if (!cityId) return null;
     const cityMap = {
       1: 'Bucaramanga',
-      2: 'Bogota'
+      2: 'Bogota',
+      3: 'Cajasan',
+      4: 'Tibu'
     };
     return cityMap[cityId] || null;
   };

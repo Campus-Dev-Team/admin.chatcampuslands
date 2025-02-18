@@ -64,7 +64,7 @@ export const StatsOverview = ({ stats }) => {
                 <p className="text-sm text-slate-400">{stat.title}</p>
                 <span className="text-2xl font-bold text-cyan-400 mt-2 block">
                   <CountUp
-                    end={Number(stat.value)}
+                    end={Number(stat.value) || 0}
                     preserveValue={true}
                     formattingFn={stat.format}
                     duration={1}

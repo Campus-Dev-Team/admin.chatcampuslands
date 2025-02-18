@@ -1,15 +1,19 @@
 import React, { useEffect, useRef } from "react";
 
 const MessageList = ({ messages }) => {
-  const messagesEndRef = useRef(null);
+  const messageContainerRef = useRef(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    //console.log("messages", messages);
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = 0;
+    }
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-custom py-4 flex flex-col-reverse space-y-4">
+    <div
+      ref={messageContainerRef} // Asigna la referencia al contenedor
+      className="flex-1 overflow-y-auto scrollbar-custom py-4 flex flex-col-reverse space-y-4"
+    >
       {messages.map((msg, index) => (
         <div
           key={index}
@@ -18,7 +22,7 @@ const MessageList = ({ messages }) => {
           }`}
         >
           <div
-            className={`p-3 rounded-lg max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl
+            className={`p-3 rounded-lg max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mb-5
               ${
                 msg.messageType === "IA"
                   ? "bg-slate-700/50"
@@ -31,7 +35,7 @@ const MessageList = ({ messages }) => {
           </div>
         </div>
       ))}
-      <div ref={messagesEndRef} />
+      <div />
     </div>
   );
 };
