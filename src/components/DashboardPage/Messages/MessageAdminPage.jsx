@@ -37,6 +37,8 @@ export const MessageAdminPage = () => {
       try {
         const messages = await getMessagesByChatId(selectedChat.id);
         setMessages(messages.data);
+        console.log(selectedChat.chatMode);
+        setIsAIEnabled(selectedChat.chatMode === "MODO_IA");
       } catch (error) {
         console.error("Error loading messages:", error);
         setMessages([]);
