@@ -24,7 +24,6 @@ export const fetchReportDataIza = async (startDate, endDate) => {
     
 
     const dataNormalized = normalizeDataIza(usersResponse.data, messagesResponse.data)
-
     return dataNormalized
 
   } catch (error) {
@@ -34,13 +33,11 @@ export const fetchReportDataIza = async (startDate, endDate) => {
 
 export const fetchReportDataCampus = async (startDate, endDate) => {
   try {
-    if (!startDate) startDate = new Date().toISOString().split('T')[0]
-    if (!endDate) endDate = new Date().toISOString().split('T')[0]
+    if (!startDate) startDate = new Date().toISOString().split('T')[0];
+    if (!endDate) endDate = new Date().toISOString().split('T')[0];
 
     const params = { startDate: startDate, endDate: endDate };
     const headers = getHeaders();
-
-
 
     const [userCampusBogota, userCampusBucaramanga, userCampusCajasan, userCampusTibu] = await Promise.all([
       axios.get(endpoints.usersCampusBogota, { params, headers }),
@@ -50,15 +47,20 @@ export const fetchReportDataCampus = async (startDate, endDate) => {
     ]);
 
     return {
-      usersBogota: userCampusBogota.data,
-      usersBucaramanga: userCampusBucaramanga.data,
-      usersCajasan: userCampusCajasan.data,
-      usersTibu: userCampusTibu.data
+      usersBogota: Array.isArray(userCampusBogota.data) ? userCampusBogota.data : [],
+      usersBucaramanga: Array.isArray(userCampusBucaramanga.data) ? userCampusBucaramanga.data : [],
+      usersCajasan: Array.isArray(userCampusCajasan.data) ? userCampusCajasan.data : [],
+      usersTibu: Array.isArray(userCampusTibu.data) ? userCampusTibu.data : []
     };
 
   } catch (error) {
-
-    return "hubo un error conteniendo la data de campus ", error;
+    console.error("Error fetching campus data:", error);
+    return {
+      usersBogota: [],
+      usersBucaramanga: [],
+      usersCajasan: [],
+      usersTibu: []
+    };
   }
 };
 
@@ -66,7 +68,7 @@ const normalizeDataIza = (usersData, messagesData) => {
   const normalizedData = {};
   
   const normalizePhoneNumber = (phone) => {
-    if (!phone) return phone;
+    if (!phone) return '';
     const phoneStr = phone.toString();
     return phoneStr.startsWith('57') ? parseInt(phoneStr.slice(2)) : parseInt(phoneStr);
   };
@@ -87,48 +89,55 @@ const normalizeDataIza = (usersData, messagesData) => {
 
   // Agrupar mensajes por userId
   const messagesByUserId = messagesData.reduce((acc, message) => {
-    // Asegurarse de que el userId coincida exactamente
+    if (!message?.userId) return acc;
     const userId = message.userId;
     if (!acc[userId]) {
       acc[userId] = [];
     }
     acc[userId].push({
-      Message: message.content,
-      MessageId: message.messageId,
-      Time: message.messageTime,
+      Message: message.content || '',
+      MessageId: message.messageId || '',
+      Time: message.messageTime || '',
     });
     return acc;
   }, {});
 
   // Procesar usuarios
   usersData.forEach(user => {
-    const normalizedCity = normalizeCity(user.city);
-    if (normalizedCity) {
-      const userId = user.id;
-      const phoneNumber = normalizePhoneNumber(user.phone);
-      
-      // Obtener solo los mensajes que corresponden a este usuario específico
-      const userMessages = messagesByUserId[userId] || [];
-      
-      // Filtrar mensajes de error
-      const validMessages = userMessages.filter(
-        message => message.Message !== 'Ocurrió un error al generar la respuesta.'
-      );
+    try {
+      if (!user || typeof user !== 'object') return;
 
-      // Solo crear entrada si el usuario tiene mensajes válidos
-      if (validMessages.length > 0) {
-        normalizedData[userId] = {
-          UserId: userId,
-          Username: user.username.trim(),
-          PhoneNumber: phoneNumber,
-          Age: user.age,
-          Availability: user?.availability || "No",
-          ContactWay: user.contact_way,
-          Messages: validMessages,
-          city: normalizedCity,
-          messageCount: validMessages.length
-        };
+      const normalizedCity = normalizeCity(user.city);
+      if (normalizedCity) {
+        const userId = user.id;
+        const phoneNumber = normalizePhoneNumber(user.phone);
+        
+        // Obtener solo los mensajes que corresponden a este usuario específico
+        const userMessages = messagesByUserId[userId] || [];
+        
+        // Filtrar mensajes de error y nulos
+        const validMessages = userMessages.filter(
+          message => message?.Message && 
+                    message.Message !== 'Ocurrió un error al generar la respuesta.'
+        );
+
+        // Solo crear entrada si el usuario tiene mensajes válidos
+        if (validMessages.length > 0) {
+          normalizedData[userId] = {
+            UserId: userId,
+            Username: user.username ? user.username.trim() : '',
+            PhoneNumber: phoneNumber,
+            Age: user.age || null,
+            Availability: user?.availability || "No",
+            ContactWay: user.contact_way || '',
+            Messages: validMessages,
+            city: normalizedCity,
+            messageCount: validMessages.length
+          };
+        }
       }
+    } catch (error) {
+      console.error('Error processing user:', user, error);
     }
   });
 
