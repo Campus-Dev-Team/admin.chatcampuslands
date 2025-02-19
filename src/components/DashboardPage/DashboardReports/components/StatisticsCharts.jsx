@@ -107,8 +107,18 @@ const StatsCharts = ({ filteredData, campusData, ciudad, dates }) => {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="date" stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} />
-              <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} unit="%" />
+              <XAxis 
+                dataKey="date" 
+                stroke="#9CA3AF" 
+                tick={{ fill: '#9CA3AF' }}
+                axisLine={{ stroke: '#374151' }}
+              />
+              <YAxis 
+                stroke="#9CA3AF" 
+                tick={{ fill: '#9CA3AF' }} 
+                unit="%" 
+                axisLine={{ stroke: '#374151' }}
+              />
               <Tooltip contentStyle={{ 
                 backgroundColor: '#1F2937',
                 border: '1px solid #374151',
@@ -117,6 +127,7 @@ const StatsCharts = ({ filteredData, campusData, ciudad, dates }) => {
               }} />
               <Legend />
               <Line
+                key="conversion-line"
                 type="monotone"
                 dataKey="conversionRate"
                 name="Tasa de Conversión"
@@ -139,35 +150,85 @@ const StatsCharts = ({ filteredData, campusData, ciudad, dates }) => {
         </h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ left: 10 }}>
+            <BarChart 
+              data={chartData}
+              margin={{ left: 10 }}
+              barGap={0}
+              barCategoryGap="20%"
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="date" stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} />
-              <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} />
-              <Tooltip contentStyle={{ 
-                backgroundColor: '#1F2937',
-                border: '1px solid #374151',
-                borderRadius: '0.375rem',
-                color: '#F3F4F6'
-              }} />
-              <Legend />
+              <XAxis 
+                dataKey="date" 
+                stroke="#9CA3AF" 
+                tick={{ fill: '#9CA3AF' }}
+                axisLine={{ stroke: '#374151' }}
+              />
+              <YAxis 
+                stroke="#9CA3AF" 
+                tick={{ fill: '#9CA3AF' }}
+                axisLine={{ stroke: '#374151' }}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1F2937',
+                  border: '1px solid #374151',
+                  borderRadius: '0.375rem',
+                  color: '#F3F4F6'
+                }}
+                cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
+              />
+              <Legend 
+                verticalAlign="top"
+                height={36}
+              />
               <Bar
+                key="total-users-bar"
                 dataKey="totalUsers"
                 name="Usuarios Totales"
                 fill="#94A3B8"
                 radius={[4, 4, 0, 0]}
-                animationDuration={1000}
-                animationBegin={0}
-                animationEasing="ease-in-out"
-              />
+                isAnimationActive={false}
+                maxBarSize={50}
+              >
+                {
+                  chartData.map((entry, index) => (
+                    <g key={`total-${index}-${entry.date}`}>
+                      <rect 
+                        key={`rect-total-${index}-${entry.date}`}
+                        x={0}
+                        y={0}
+                        width={0}
+                        height={0}
+                        fill="#94A3B8"
+                      />
+                    </g>
+                  ))
+                }
+              </Bar>
               <Bar
+                key="registered-users-bar"
                 dataKey="registeredUsers"
                 name="Usuarios Registrados"
                 fill="#06B6D4"
                 radius={[4, 4, 0, 0]}
-                animationDuration={1000}
-                animationBegin={200}
-                animationEasing="ease-in-out"
-              />
+                isAnimationActive={false}
+                maxBarSize={50}
+              >
+                {
+                  chartData.map((entry, index) => (
+                    <g key={`registered-${index}-${entry.date}`}>
+                      <rect 
+                        key={`rect-registered-${index}-${entry.date}`}
+                        x={0}
+                        y={0}
+                        width={0}
+                        height={0}
+                        fill="#06B6D4"
+                      />
+                    </g>
+                  ))
+                }
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -9,7 +9,10 @@ import { SpentAmountInput } from './components/SpentAmountInput';
 import StatsCharts from './components/StatisticsCharts';
 import { fetchReportDataCampus } from '../../../services/reportService';
 
-const formatPhone = phone => String(phone).replace(/\D/g, '').slice(-10);
+const formatPhone = phone => {
+  if (!phone) return '';
+  return String(phone).replace(/\D/g, '').slice(-10);
+};
 
 const isValidDate = dateStr => {
   const date = new Date(dateStr);
@@ -59,54 +62,130 @@ export const DashboardReports = () => {
     if (!Array.isArray(filteredDataIza)) return [];
 
     return filteredDataIza.filter(user => {
-      if (!user?.PhoneNumber) return false;
-      const userPhone = formatPhone(user.PhoneNumber);
+      try {
+        if (!user?.PhoneNumber) return false;
+        const userPhone = formatPhone(user.PhoneNumber);
+        if (!userPhone) return false;
 
-      // Verificar si el usuario está registrado en su ciudad correspondiente
-      if (user.city === "Bucaramanga") {
-        return campusData?.usersBucaramanga?.some(
-          regUser => formatPhone(regUser.phone) === userPhone
-        );
-      } else if (user.city === "Bogota") {
-        return campusData?.usersBogota?.some(
-          regUser => formatPhone(regUser.phone) === userPhone
-        );
-      } else if (user.city === "Cajasan"){
-          return campusData?.usersCajasan?.some(
-            regUser => formatPhone(regUser.phone) === userPhone
-          );
-      } else if (user.city === "Tibu"){
-          return campusData?.usersTibu?.some(
-            regUser => formatPhone(regUser.phone) === userPhone
-          );
+        const cityData = {
+          "Bucaramanga": campusData?.usersBucaramanga || [],
+          "Bogota": campusData?.usersBogota || [],
+          "Cajasan": campusData?.usersCajasan || [],
+          "Tibu": campusData?.usersTibu || []
+        };
+
+        const cityUsers = cityData[user.city] || [];
+        return cityUsers.some(regUser => {
+          try {
+            return formatPhone(regUser.phone) === userPhone;
+          } catch (error) {
+            console.error(`Error comparing phones for user ${user.Username}:`, error);
+            return false;
+          }
+        });
+      } catch (error) {
+        console.error('Error processing user:', error);
+        return false;
       }
-      return false;
     });
   }, [filteredDataIza, campusData]);
 
   const registeredCount = useMemo(() => {
+    if (!Array.isArray(cityFilteredData) || !Array.isArray(registeredUsers)) {
+      return [];
+    }
+
     return cityFilteredData.filter(user => {
-      if (!user?.PhoneNumber) return false;
-      const userPhone = formatPhone(user.PhoneNumber);
-      return registeredUsers.some(regUser => formatPhone(regUser.phone) === userPhone);
+      try {
+        if (!user?.PhoneNumber) return false;
+        const userPhone = formatPhone(user.PhoneNumber);
+        if (!userPhone) return false;
+
+        return registeredUsers.some(regUser => {
+          try {
+            const regUserPhone = formatPhone(regUser.phone);
+            return regUserPhone === userPhone;
+          } catch (error) {
+            console.error(`Error comparing phones for registered user:`, error);
+            return false;
+          }
+        });
+      } catch (error) {
+        console.error('Error processing user in registeredCount:', error);
+        return false;
+      }
     });
   }, [cityFilteredData, registeredUsers]);
+
+  const handleDataFetched = (dataIza, newDates) => {
+    try {
+      // Validar que dataIza sea un array y newDates tenga valores válidos
+      if (!Array.isArray(dataIza)) {
+        console.warn('Los datos recibidos no son un array válido');
+        setFilteredDataIza([]);
+        return;
+      }
+
+      if (!newDates?.start || !newDates?.end) {
+        console.warn('Fechas inválidas recibidas');
+        return;
+      }
+
+      // Filtrar datos nulos o inválidos
+      const validData = dataIza.filter(item => item && typeof item === 'object');
+      setFilteredDataIza(validData);
+      setDates(newDates);
+    } catch (error) {
+      console.error('Error al procesar los datos:', error);
+      setFilteredDataIza([]);
+    }
+  };
 
   useEffect(() => {
     const fetchCampusData = async () => {
       try {
+        if (!dates?.start || !dates?.end) {
+          console.warn('Fechas no definidas');
+          return;
+        }
+
         if (!isValidDate(dates.start) || !isValidDate(dates.end)) {
           throw new Error('Fechas inválidas');
         }
+
         const dataCampus = await fetchReportDataCampus(dates.start, dates.end);
-        if (!dataCampus?.usersBucaramanga || !dataCampus?.usersBogota || !dataCampus?.usersCajasan || !dataCampus?.usersTibu) {
-          throw new Error('Datos incompletos');
+        
+        if (!dataCampus) {
+          throw new Error('No se recibieron datos del servidor');
         }
-        setCampusData(dataCampus);
+
+        // Validar que todos los arrays de usuarios existan
+        const requiredArrays = ['usersBucaramanga', 'usersBogota', 'usersCajasan', 'usersTibu'];
+        const missingArrays = requiredArrays.filter(key => !Array.isArray(dataCampus[key]));
+        
+        if (missingArrays.length > 0) {
+          throw new Error(`Datos incompletos: faltan ${missingArrays.join(', ')}`);
+        }
+
+        setCampusData({
+          usersBucaramanga: dataCampus.usersBucaramanga || [],
+          usersBogota: dataCampus.usersBogota || [],
+          usersCajasan: dataCampus.usersCajasan || [],
+          usersTibu: dataCampus.usersTibu || []
+        });
+        
         setError(null);
       } catch (error) {
         setError(error.message);
         console.error("Error fetching campus data:", error);
+        
+        // Reiniciar el estado con arrays vacíos en caso de error
+        setCampusData({
+          usersBucaramanga: [],
+          usersBogota: [],
+          usersCajasan: [],
+          usersTibu: []
+        });
       }
     };
 
@@ -142,15 +221,6 @@ export const DashboardReports = () => {
       console.error('Error updating stats:', error);
     }
   }, [cityFilteredData, registeredCount, allRegisteredUsers, spentAmount]);
-
-  const handleDataFetched = (dataIza, newDates) => {
-    if (!Array.isArray(dataIza)) {
-      setFilteredDataIza([]);
-      return;
-    }
-    setFilteredDataIza(dataIza);
-    setDates(newDates);
-  };
 
   const getUsersList = useMemo(() => {
     return (data) => {
